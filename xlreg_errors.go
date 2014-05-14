@@ -1,6 +1,6 @@
 package reg
 
-//xlattice_go/reg/xlreg_errors.go
+//xlReg_go/xlreg_errors.go
 
 import (
 	e "errors"

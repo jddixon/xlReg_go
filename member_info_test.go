@@ -1,10 +1,10 @@
 package reg
 
-// xlattice_go/msg/member_info_test.go
+// xlReg_go/member_info_test.go
 
 import (
 	"fmt"
-	xr "github.com/jddixon/xlattice_go/rnglib"
+	xr "github.com/jddixon/rnglib_go"
 	. "gopkg.in/check.v1"
 )
 

@@ -1,12 +1,12 @@
 package reg
 
-// xlattice_go/reg/solo_client.go
+// xlReg_go/solo_client.go
 
 import (
 	"crypto/rsa"
 	"fmt"
-	xi "github.com/jddixon/xlattice_go/nodeID"
-	xt "github.com/jddixon/xlattice_go/transport"
+	xi "github.com/jddixon/xlNodeID_go"
+	xt "github.com/jddixon/xlTransport_go"
 )
 
 var _ = fmt.Print

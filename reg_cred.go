@@ -1,16 +1,16 @@
 package reg
 
-// xlattice_go/reg/reg_cred.go
+// xlReg_go/reg_cred.go
 
 import (
 	"crypto/rsa"
 	"encoding/hex"
 	"fmt"
-	xc "github.com/jddixon/xlattice_go/crypto"
-	xn "github.com/jddixon/xlattice_go/node"
-	xi "github.com/jddixon/xlattice_go/nodeID"
-	xt "github.com/jddixon/xlattice_go/transport"
-	xu "github.com/jddixon/xlattice_go/util"
+	xc "github.com/jddixon/xlCrypto_go"
+	xn "github.com/jddixon/xlNode_go"
+	xi "github.com/jddixon/xlNodeID_go"
+	xt "github.com/jddixon/xlTransport_go"
+	xu "github.com/jddixon/xlUtil_go"
 	"strings"
 )
 

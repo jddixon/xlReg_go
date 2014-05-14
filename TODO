@@ -1,4 +1,11 @@
-xlattice_go/reg/TODO
+xlReg_go/TODO
+
+2014-05-14
+    * get xlReg server from xlattice_go
+    * review whether reg_node.go actually needs xlattice_go/msg
+    * review whether registry.go needs 'xl' import                      * GONE
+    * review whether in_handler.go needs 'xl' import                    * GONE
+    * website needs new reg_cred before this is deployed
 
 2014-03-16
     * correct other (semi-)infinite loops in other tests

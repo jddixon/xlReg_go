@@ -1,11 +1,10 @@
 package reg
 
-// xlattice_go/msg/reg_cluster_test.go
+// xlReg_go/reg_cluster_test.go
 
 import (
 	"fmt"
-	//xc "github.com/jddixon/xlattice_go/crypto"
-	xr "github.com/jddixon/xlattice_go/rnglib"
+	xr "github.com/jddixon/rnglib_go"
 	. "gopkg.in/check.v1"
 )
 

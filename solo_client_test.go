@@ -1,12 +1,12 @@
 package reg
 
-// xlattice_go/reg/solo_client_test.go
+// xlReg_go/solo_client_test.go
 
 import (
 	"fmt"
-	xr "github.com/jddixon/xlattice_go/rnglib"
-	xt "github.com/jddixon/xlattice_go/transport"
-	xf "github.com/jddixon/xlattice_go/util/lfs"
+	xr "github.com/jddixon/rnglib_go"
+	xt "github.com/jddixon/xlTransport_go"
+	xf "github.com/jddixon/xlUtil_go/lfs"
 	. "gopkg.in/check.v1"
 	"path"
 )

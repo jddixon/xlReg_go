@@ -1,9 +1,9 @@
 package reg
 
-// xlattice_go/reg/reg_options.go
+// xlReg_go/reg_options.go
 
 import (
-	xt "github.com/jddixon/xlattice_go/transport"
+	xt "github.com/jddixon/xlTransport_go"
 	"log"
 )
 

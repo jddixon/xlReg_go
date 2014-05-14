@@ -1,13 +1,12 @@
 package reg
 
-// xlattice_go/reg/user_client.go
+// xlReg_go/user_client.go
 
 import (
 	"crypto/rsa"
-	// "encoding/hex" // DEBUG
 	"fmt"
-	xi "github.com/jddixon/xlattice_go/nodeID"
-	xt "github.com/jddixon/xlattice_go/transport"
+	xi "github.com/jddixon/xlNodeID_go"
+	xt "github.com/jddixon/xlTransport_go"
 )
 
 var _ = fmt.Print

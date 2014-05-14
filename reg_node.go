@@ -1,6 +1,6 @@
 package reg
 
-// xlattice_go/reg/reg_node.go
+// xlReg_go/reg_node.go
 
 // We collect functions and structures relating to the operation
 // of the registry as a communicating server here.
@@ -8,10 +8,10 @@ package reg
 import (
 	"crypto/rsa"
 	"fmt"
-	xc "github.com/jddixon/xlattice_go/crypto"
+	xc "github.com/jddixon/xlCrypto_go"
 	xm "github.com/jddixon/xlattice_go/msg"
-	xn "github.com/jddixon/xlattice_go/node"
-	xt "github.com/jddixon/xlattice_go/transport"
+	xn "github.com/jddixon/xlNode_go"
+	xt "github.com/jddixon/xlTransport_go"
 	"strings"
 )
 

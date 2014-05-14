@@ -1,16 +1,16 @@
 package reg
 
-// xlattice_go/reg/eph_server.go
+// xlReg_go/eph_server.go
 
 import (
 	"crypto/rand"
 	"crypto/rsa"
 	"encoding/hex"
 	"fmt"
-	xn "github.com/jddixon/xlattice_go/node"
-	xi "github.com/jddixon/xlattice_go/nodeID"
-	xr "github.com/jddixon/xlattice_go/rnglib"
-	xt "github.com/jddixon/xlattice_go/transport"
+	xn "github.com/jddixon/xlNode_go"
+	xi "github.com/jddixon/xlNodeID_go"
+	xr "github.com/jddixon/rnglib_go"
+	xt "github.com/jddixon/xlTransport_go"
 )
 
 var _ = fmt.Print

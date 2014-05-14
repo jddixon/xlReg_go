@@ -1,13 +1,12 @@
 package reg
 
-// xlattice_go/reg/in_handler.go
+// xlReg_go/in_handler.go
 
 import (
 	"fmt"
-	xl "github.com/jddixon/xlattice_go"
-	xa "github.com/jddixon/xlattice_go/protocol/aes_cnx"
-	xt "github.com/jddixon/xlattice_go/transport"
-	xu "github.com/jddixon/xlattice_go/util"
+	xa "github.com/jddixon/xlProtocol_go/aes_cnx"
+	xt "github.com/jddixon/xlTransport_go"
+	xu "github.com/jddixon/xlUtil_go"
 )
 
 var _ = fmt.Print
@@ -57,7 +56,7 @@ func init() {
 		{badCombo, badCombo, badCombo, doGetMsg, doByeMsg},
 	}
 	var err error
-	serverVersion, err = xu.ParseDecimalVersion(xl.VERSION)
+	serverVersion, err = xu.ParseDecimalVersion(VERSION)
 	if err != nil {
 		panic(err)
 	}

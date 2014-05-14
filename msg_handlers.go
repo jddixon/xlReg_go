@@ -1,6 +1,6 @@
 package reg
 
-// xlattice_go/reg/msg_handlers.go
+// xlReg_go/msg_handlers.go
 
 import (
 	"crypto"
@@ -10,9 +10,9 @@ import (
 	"encoding/hex" // DEBUG
 	e "errors"
 	"fmt"
-	xc "github.com/jddixon/xlattice_go/crypto"
-	xi "github.com/jddixon/xlattice_go/nodeID"
-	xu "github.com/jddixon/xlattice_go/util"
+	xc "github.com/jddixon/xlCrypto_go"
+	xi "github.com/jddixon/xlNodeID_go"
+	xu "github.com/jddixon/xlUtil_go"
 )
 
 var _ = fmt.Print

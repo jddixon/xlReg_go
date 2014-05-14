@@ -1,6 +1,6 @@
 package reg
 
-// xlattice_go/reg/xlreg_const_test.go
+// xlReg_go/xlreg_const_test.go
 
 import (
 	"fmt"

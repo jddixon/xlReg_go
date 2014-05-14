@@ -1,6 +1,6 @@
 package reg
 
-// xlattice_go/reg/eph_server_test.go
+// xlReg_go/eph_server_test.go
 //   replaces mock_server_test.go AKA old_server_test.go
 
 // BEING MODIFIED to follow the new approach, whereby
@@ -13,8 +13,8 @@ package reg
 
 import (
 	"fmt"
-	xr "github.com/jddixon/xlattice_go/rnglib"
-	xt "github.com/jddixon/xlattice_go/transport"
+	xr "github.com/jddixon/rnglib_go"
+	xt "github.com/jddixon/xlTransport_go"
 	. "gopkg.in/check.v1"
 )
 

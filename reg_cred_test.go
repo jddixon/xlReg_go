@@ -1,15 +1,15 @@
 package reg
 
-// xlattice_go/reg/reg_cred_test.go
+// xlReg_go/reg_cred_test.go
 
 import (
 	// "crypto/rsa"
 	"fmt"
-	xn "github.com/jddixon/xlattice_go/node"
-	xi "github.com/jddixon/xlattice_go/nodeID"
-	xr "github.com/jddixon/xlattice_go/rnglib"
-	xt "github.com/jddixon/xlattice_go/transport"
-	xu "github.com/jddixon/xlattice_go/util"
+	xn "github.com/jddixon/xlNode_go"
+	xi "github.com/jddixon/xlNodeID_go"
+	xr "github.com/jddixon/rnglib_go"
+	xt "github.com/jddixon/xlTransport_go"
+	xu "github.com/jddixon/xlUtil_go"
 	. "gopkg.in/check.v1"
 )
 

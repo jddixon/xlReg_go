@@ -1,6 +1,6 @@
 package reg
 
-// xlattice_go/reg/client_node.go
+// xlReg_go/client_node.go
 
 import (
 	"bytes"
@@ -12,13 +12,13 @@ import (
 	"crypto/sha1"
 	"encoding/binary"
 	"fmt"
-	xc "github.com/jddixon/xlattice_go/crypto"
-	xn "github.com/jddixon/xlattice_go/node"
-	xi "github.com/jddixon/xlattice_go/nodeID"
-	xa "github.com/jddixon/xlattice_go/protocol/aes_cnx"
-	xt "github.com/jddixon/xlattice_go/transport"
-	xu "github.com/jddixon/xlattice_go/util"
-	xf "github.com/jddixon/xlattice_go/util/lfs"
+	xc "github.com/jddixon/xlCrypto_go"
+	xn "github.com/jddixon/xlNode_go"
+	xi "github.com/jddixon/xlNodeID_go"
+	xa "github.com/jddixon/xlProtocol_go/aes_cnx"
+	xt "github.com/jddixon/xlTransport_go"
+	xu "github.com/jddixon/xlUtil_go"
+	xf "github.com/jddixon/xlUtil_go/lfs"
 	"io/ioutil"
 	"os"
 	"path"

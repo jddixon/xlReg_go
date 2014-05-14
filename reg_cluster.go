@@ -1,6 +1,6 @@
 package reg
 
-// xlattice_go/reg/reg_cluster.go
+// xlReg_go/reg_cluster.go
 
 // This file contains functions and structures used to describe
 // and manage the clusters managed by the registry.
@@ -10,9 +10,9 @@ import (
 	"crypto/rsa"
 	"encoding/hex"
 	"fmt"
-	xn "github.com/jddixon/xlattice_go/node"
-	xi "github.com/jddixon/xlattice_go/nodeID"
-	xo "github.com/jddixon/xlattice_go/overlay"
+	xn "github.com/jddixon/xlNode_go"
+	xi "github.com/jddixon/xlNodeID_go"
+	xo "github.com/jddixon/xlOverlay_go"
 	"strconv"
 	"strings"
 	"sync"

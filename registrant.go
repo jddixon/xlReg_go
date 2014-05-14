@@ -1,5 +1,5 @@
 package reg
 
-// xlattice_go/reg/registrant.go
+// xlReg_go/registrant.go
 
 import ()

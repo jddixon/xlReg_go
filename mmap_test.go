@@ -1,11 +1,11 @@
 package reg
 
-// xlattice_go/reg/mmap_test.go
+// xlReg_go/mmap_test.go
 
 import (
 	"bytes"
 	"fmt"
-	xr "github.com/jddixon/xlattice_go/rnglib"
+	xr "github.com/jddixon/rnglib_go"
 	"io/ioutil"
 	. "gopkg.in/check.v1"
 	gm "launchpad.net/gommap"

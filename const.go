@@ -1,6 +1,6 @@
 package reg
 
-// xlattice_go/reg/const.go
+// xlReg_go/const.go
 
 const (
 	BLOCK_SIZE = 4096

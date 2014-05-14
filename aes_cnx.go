@@ -1,6 +1,6 @@
 package reg
 
-// xlattice_go/reg/aes_cnx.go
+// xlReg_go/aes_cnx.go
 
 // Assume that a generator for this code is parameterized by
 //	package name	- defaults to using local directory name
@@ -9,16 +9,15 @@ package reg
 //  file name		- defaults to protocol name + "_aes_cnx.go"
 //  struct name		- defaults to protocol name + "AesCnxHandler"
 //
-// Generator is tested by generating the text for xlattice_go/reg
+// Generator is tested by generating the text for xlReg_go/reg
 // and then comparing it to this file, with this comment block dropped.
 
 import (
 	"code.google.com/p/goprotobuf/proto"
 	"crypto/aes"
 	"crypto/cipher"
-	xc "github.com/jddixon/xlattice_go/crypto"
-	xt "github.com/jddixon/xlattice_go/transport"
-	// "sync"
+	xc "github.com/jddixon/xlCrypto_go"
+	xt "github.com/jddixon/xlTransport_go"
 )
 
 const (

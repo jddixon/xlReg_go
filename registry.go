@@ -1,17 +1,16 @@
 package reg
 
-// xlattice_go/reg/registry.go
+// xlReg_go/registry.go
 
 // This file contains functions and structures used to describe
 // and manage the cluster data managed by the registry.
 
 import (
 	"fmt"
-	xl "github.com/jddixon/xlattice_go"
-	xf "github.com/jddixon/xlattice_go/crypto/filters"
-	xi "github.com/jddixon/xlattice_go/nodeID"
-	xt "github.com/jddixon/xlattice_go/transport"
-	xu "github.com/jddixon/xlattice_go/util"
+	xf "github.com/jddixon/xlCrypto_go/filters"
+	xi "github.com/jddixon/xlNodeID_go"
+	xt "github.com/jddixon/xlTransport_go"
+	xu "github.com/jddixon/xlUtil_go"
 	"io/ioutil"
 	"log"
 	"os"
@@ -52,7 +51,7 @@ func NewRegistry(clusters []*RegCluster,
 		m             *xi.IDMap
 		serverVersion xu.DecimalVersion
 	)
-	serverVersion, err = xu.ParseDecimalVersion(xl.VERSION)
+	serverVersion, err = xu.ParseDecimalVersion(VERSION)
 	if err == nil && rn == nil {
 		err = NilRegNode
 	}
