@@ -18,3 +18,7 @@ the configuration data other members have registered.
 The xlReg server, its clients, and the cluster members, are all
 XLattice [nodes](https://jddixon.github.io/xlattice_go/node.html).
 
+
+## On-line Documentation
+
+More information on the **xlReg_go** project can be found [here](https://jddixon.github.io/xlReg_go)

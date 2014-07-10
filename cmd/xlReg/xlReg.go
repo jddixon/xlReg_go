@@ -222,9 +222,15 @@ func setup(opt *reg.RegOptions) (rs *reg.RegServer, err error) {
 					nil, e, nil)
 			}
 			if err == nil {
+				// DEBUG
+				fmt.Printf("node successfully created\n")
+				// END
 				rn, err = reg.NewRegNode(node, ckPriv, skPriv)
 			}
 			if err == nil {
+				// DEBUG
+				fmt.Printf("regNode successfully created\n")
+				// END
 				err = xf.MkdirsToFile(pathToConfigFile, 0700)
 				if err == nil {
 					err = ioutil.WriteFile(pathToConfigFile,
