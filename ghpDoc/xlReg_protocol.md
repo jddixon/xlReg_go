@@ -29,9 +29,10 @@ An example follows.
 }
 </code></pre>
 
-This particular registry is on stockton.dixons.org, a machine in 
-Amazon's AWS/EC2 cloud.  It listens on `55555`, the port conventionally 
-used by the xlReg server.
+This particular registry was on stockton.dixons.org, a machine in 
+Amazon's AWS/EC2 cloud.  It listened on `55555`, the port conventionally 
+used by the xlReg server.  *(**Note** that the test registry is now at
+xlreg.xlattice.org:55555.)*
 
 The `Go` version of the xlReg client provides functions to read and write
 serialized RegCred files (`xlattice_go.reg.ParseRegCred()` and

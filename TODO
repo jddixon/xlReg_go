@@ -1,8 +1,16 @@
 xlReg_go/TODO
 
+2014-07-25
+    * install current version on EC2/portland), port 55555              * DONE
+    * confirm 'go test' succeeds on EC2                                 * DONE
+    * need to automatically edit private IP address, 192.168.240.4
+        in this cae, to the public IP address, 54.187.133.62
+    * need test here which runs against portland:55555
+
 2014-07-03
     * install current version on EC2 (stockton), port 55555             * DONE
-    * confirm 'go test' succeeds on EC2
+    * confirm 'go test' succeeds on EC2                                 * DONE
+    BUT TEST SUCCEEDS ON PORTLAND:
     * FIX: cluster_member_test.go line 62 gets strconv.NumError
         (Func:"ParseInt", Num:"4592296101443653904", presumably
         because EC2 instances are in some sense 32-bit, whereas
@@ -11,8 +19,8 @@ xlReg_go/TODO
     * need -d/--runDetached switch to make server run detached
     * to start from rc.local need -u/--user option
     * RESOLVE: regCred.dat should include publicly accessible IP
-        address, but on EC2 cloud has to use its 10/8 address to
-        get address to bind
+        address, but on EC2 cloud has to use its private (10/8 or 
+        192.178.*/24) address to get address to bind
         - if 127.0.0.1 is used, clients must be on same host
     * update regCred.dat from stockton                                  * DONE
 
