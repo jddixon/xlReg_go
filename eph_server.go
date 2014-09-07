@@ -7,9 +7,9 @@ import (
 	"crypto/rsa"
 	"encoding/hex"
 	"fmt"
-	xn "github.com/jddixon/xlNode_go"
-	xi "github.com/jddixon/xlNodeID_go"
 	xr "github.com/jddixon/rnglib_go"
+	xi "github.com/jddixon/xlNodeID_go"
+	xn "github.com/jddixon/xlNode_go"
 	xt "github.com/jddixon/xlTransport_go"
 )
 

@@ -10,8 +10,8 @@ import (
 	"fmt"
 	xc "github.com/jddixon/xlCrypto_go"
 	xu "github.com/jddixon/xlUtil_go"
-	"io/ioutil"
 	. "gopkg.in/check.v1"
+	"io/ioutil"
 	"path"
 	"strings"
 )

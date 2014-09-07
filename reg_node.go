@@ -9,9 +9,9 @@ import (
 	"crypto/rsa"
 	"fmt"
 	xc "github.com/jddixon/xlCrypto_go"
-	xm "github.com/jddixon/xlattice_go/msg"
 	xn "github.com/jddixon/xlNode_go"
 	xt "github.com/jddixon/xlTransport_go"
+	xm "github.com/jddixon/xlattice_go/msg"
 	"strings"
 )
 

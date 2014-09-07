@@ -3,8 +3,8 @@ package reg
 import (
 	"encoding/hex"
 	"fmt"
-	xn "github.com/jddixon/xlNode_go"
 	xi "github.com/jddixon/xlNodeID_go"
+	xn "github.com/jddixon/xlNode_go"
 	"strconv"
 	"strings"
 )

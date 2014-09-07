@@ -1,5 +1,10 @@
 xlReg_go/TODO
 
+2014-09-06
+    * implement reg_cluster_test.go uniqueness tests for names,         * DONE
+        - correctness of 'byName index' == RegCluster.MembersByName     * DONE
+        - correctness of 'byID index'   == RegCluster.MembersByID       * DONE
+
 2014-07-25
     * install current version on EC2/portland), port 55555              * DONE
     * confirm 'go test' succeeds on EC2                                 * DONE

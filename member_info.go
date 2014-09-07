@@ -10,8 +10,8 @@ import (
 	"encoding/hex"
 	"fmt"
 	xc "github.com/jddixon/xlCrypto_go"
-	xn "github.com/jddixon/xlNode_go"
 	xi "github.com/jddixon/xlNodeID_go"
+	xn "github.com/jddixon/xlNode_go"
 	"strings"
 )
 

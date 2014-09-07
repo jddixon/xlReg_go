@@ -2,6 +2,9 @@ xlReg_go/CHANGES
 -----------------------------------------------------------------------------
 The version number and date in this file must be kept in sync with version.go
 -----------------------------------------------------------------------------
+v0.5.1
+    2014-09-06
+        * completed TestClusterMaker                                SLOC 3905
 v0.5.0
-    * 2014-05-14
+    2014-05-14
         * split from xlattice_go/reg                                SLOC  

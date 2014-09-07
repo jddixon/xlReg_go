@@ -5,9 +5,9 @@ package reg
 import (
 	// "crypto/rsa"
 	"fmt"
-	xn "github.com/jddixon/xlNode_go"
-	xi "github.com/jddixon/xlNodeID_go"
 	xr "github.com/jddixon/rnglib_go"
+	xi "github.com/jddixon/xlNodeID_go"
+	xn "github.com/jddixon/xlNode_go"
 	xt "github.com/jddixon/xlTransport_go"
 	xu "github.com/jddixon/xlUtil_go"
 	. "gopkg.in/check.v1"
