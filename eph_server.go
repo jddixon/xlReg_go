@@ -92,6 +92,10 @@ func (ms *EphServer) Run() (err error) {
 	return
 }
 
+func (ms *EphServer) GetAcceptor() (acc xt.AcceptorI) {
+	return ms.acc
+}
+
 func (ms *EphServer) Close() {
 	ms.Server.Close()
 }

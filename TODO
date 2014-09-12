@@ -1,5 +1,10 @@
 xlReg_go/TODO
 
+2014-09-12
+    * EphServer.GetAcceptor() needs to be tested
+    * reg_cluster_test.go is incomplete; when paxos_go/pktComms/
+        keep_alive_test.go is working, backport relevant bits
+
 2014-09-06
     * implement reg_cluster_test.go uniqueness tests for names,         * DONE
         - correctness of 'byName index' == RegCluster.MembersByName     * DONE
