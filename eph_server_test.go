@@ -4,7 +4,7 @@ package reg
 //   replaces mock_server_test.go AKA old_server_test.go
 
 // BEING MODIFIED to follow the new approach, whereby
-// 1.  we create an ephemeral registry using NewMockServer()
+// 1.  we create an ephemeral registry using NewEphServer()
 // 2.  we generate a random cluster name and size
 // 3.  run an AdminClient to register the cluster with the registry (which
 //       gives us a cluster ID), and then
@@ -41,7 +41,7 @@ func (s *XLSuite) TestEphServer(c *C) {
 	serverSK := server.GetSigPublicKey()
 	c.Assert(serverEnd, NotNil)
 
-	// start the mock server ------------------------------
+	// start the ephemeral server -------------------------
 	err = es.Run()
 	c.Assert(err, IsNil)
 	defer es.Close() // stop the server by closing its acceptor
@@ -57,20 +57,20 @@ func (s *XLSuite) TestEphServer(c *C) {
 	// 2. create a random cluster name and size ---------------------
 	clusterName := rng.NextFileName(8)
 	clusterAttrs := uint64(rng.Int63())
-	K := 2 + rng.Intn(6) // so the size is 2 .. 7
+	K := uint(2 + rng.Intn(6)) // so the size is 2 .. 7
 
 	// 3. create an AdminClient, use it to get the clusterID
 	an, err := NewAdminClient(serverName, serverID, serverEnd,
-		serverCK, serverSK, clusterName, clusterAttrs, K, 1, nil)
+		serverCK, serverSK, clusterName, clusterAttrs, K, uint(1), nil)
 	c.Assert(err, IsNil)
 
 	an.Run()
 	<-an.DoneCh
 
 	c.Assert(an.ClusterID, NotNil) // the purpose of the exercise
-	c.Assert(an.EpCount, Equals, uint32(1))
+	c.Assert(an.EpCount, Equals, uint(1))
 
-	anID := an.clientID
+	anID := an.ClientID
 	c.Assert(reg.IDCount(), Equals, uint(3)) // regID + anID + clusterID
 
 	// DEBUG
@@ -96,7 +96,7 @@ func (s *XLSuite) TestEphServer(c *C) {
 	uc := make([]*UserClient, K)
 	ucNames := make([]string, K)
 	namesInUse := make(map[string]bool)
-	for i := 0; i < K; i++ {
+	for i := uint(0); i < K; i++ {
 		var ep *xt.TcpEndPoint
 		ep, err = xt.NewTcpEndPoint("127.0.0.1:0")
 		c.Assert(err, IsNil)
@@ -120,19 +120,19 @@ func (s *XLSuite) TestEphServer(c *C) {
 	}
 
 	// 5. start the K clients, each in a separate goroutine ---------
-	for i := 0; i < K; i++ {
+	for i := uint(0); i < K; i++ {
 		uc[i].Run()
 	}
 
 	// wait until all clients are done ------------------------------
-	for i := 0; i < K; i++ {
+	for i := uint(0); i < K; i++ {
 		success := <-uc[i].ClientNode.DoneCh
 		c.Assert(success, Equals, true)
 		// if false, should check an.Err for error
 
 		// XXX NEXT LINE APPARENTLY DOES NOT WORK
 		// nodeID := uc[i].ClientNode.GetNodeID()
-		nodeID := uc[i].clientID
+		nodeID := uc[i].ClientID
 		c.Assert(nodeID, NotNil)
 		found, err := reg.ContainsID(nodeID)
 		c.Assert(err, IsNil)

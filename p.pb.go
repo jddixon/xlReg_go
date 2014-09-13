@@ -2,15 +2,22 @@
 // source: p.proto
 // DO NOT EDIT!
 
+/*
+Package reg is a generated protocol buffer package.
+
+It is generated from these files:
+	p.proto
+
+It has these top-level messages:
+	XLRegMsg
+*/
 package reg
 
 import proto "code.google.com/p/goprotobuf/proto"
-import json "encoding/json"
 import math "math"
 
-// Reference proto, json, and math imports to suppress error if they are not otherwise used.
+// Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
-var _ = &json.SyntaxError{}
 var _ = math.Inf
 
 type XLRegMsg_Tag int32
@@ -20,11 +27,15 @@ const (
 	XLRegMsg_RegCredReply   XLRegMsg_Tag = 2
 	XLRegMsg_Client         XLRegMsg_Tag = 3
 	XLRegMsg_ClientOK       XLRegMsg_Tag = 4
-	XLRegMsg_Create         XLRegMsg_Tag = 5
-	XLRegMsg_CreateReply    XLRegMsg_Tag = 6
-	XLRegMsg_Join           XLRegMsg_Tag = 7
-	XLRegMsg_JoinReply      XLRegMsg_Tag = 8
-	XLRegMsg_GetCluster     XLRegMsg_Tag = 9
+	// size means cluster size, constrained to 1 < n <= 64
+	// epCount is number of menber endPoints, which must be 1 or 2
+	XLRegMsg_Create      XLRegMsg_Tag = 5
+	XLRegMsg_CreateReply XLRegMsg_Tag = 6
+	// Response to Join is clusterID + size + epCount -OR- error
+	XLRegMsg_Join       XLRegMsg_Tag = 7
+	XLRegMsg_JoinReply  XLRegMsg_Tag = 8
+	XLRegMsg_GetCluster XLRegMsg_Tag = 9
+	// Response to Get is a list of known members -OR- error
 	XLRegMsg_ClusterMembers XLRegMsg_Tag = 10
 	XLRegMsg_Bye            XLRegMsg_Tag = 11
 	XLRegMsg_Ack            XLRegMsg_Tag = 12
@@ -70,9 +81,6 @@ func (x XLRegMsg_Tag) Enum() *XLRegMsg_Tag {
 func (x XLRegMsg_Tag) String() string {
 	return proto.EnumName(XLRegMsg_Tag_name, int32(x))
 }
-func (x XLRegMsg_Tag) MarshalJSON() ([]byte, error) {
-	return json.Marshal(x.String())
-}
 func (x *XLRegMsg_Tag) UnmarshalJSON(data []byte) error {
 	value, err := proto.UnmarshalJSONEnum(XLRegMsg_Tag_value, data, "XLRegMsg_Tag")
 	if err != nil {
@@ -113,7 +121,7 @@ func (m *XLRegMsg) GetOp() XLRegMsg_Tag {
 	if m != nil && m.Op != nil {
 		return *m.Op
 	}
-	return 0
+	return XLRegMsg_RegCredRequest
 }
 
 func (m *XLRegMsg) GetAesIV() []byte {
@@ -242,12 +250,16 @@ func (m *XLRegMsg) GetErrDesc() string {
 	return ""
 }
 
+// the Token describes a member
 type XLRegMsg_Token struct {
-	Name             *string  `protobuf:"bytes,1,opt" json:"Name,omitempty"`
-	Attrs            *uint64  `protobuf:"varint,2,opt" json:"Attrs,omitempty"`
-	ID               []byte   `protobuf:"bytes,3,opt" json:"ID,omitempty"`
-	CommsKey         []byte   `protobuf:"bytes,4,opt" json:"CommsKey,omitempty"`
-	SigKey           []byte   `protobuf:"bytes,5,opt" json:"SigKey,omitempty"`
+	Name     *string `protobuf:"bytes,1,opt" json:"Name,omitempty"`
+	Attrs    *uint64 `protobuf:"varint,2,opt" json:"Attrs,omitempty"`
+	ID       []byte  `protobuf:"bytes,3,opt" json:"ID,omitempty"`
+	CommsKey []byte  `protobuf:"bytes,4,opt" json:"CommsKey,omitempty"`
+	SigKey   []byte  `protobuf:"bytes,5,opt" json:"SigKey,omitempty"`
+	// by convention, MyEnds[0] for inter-cluster comms,
+	// MyEnds[1] for cluster-client comms
+	// there must be epCount endPoints present
 	MyEnds           []string `protobuf:"bytes,6,rep" json:"MyEnds,omitempty"`
 	DigSig           []byte   `protobuf:"bytes,7,opt" json:"DigSig,omitempty"`
 	XXX_unrecognized []byte   `json:"-"`

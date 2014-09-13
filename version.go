@@ -10,5 +10,5 @@ package reg
 // into a uint32 in in_handler.go init()
 const (
 	VERSION      = "0.5.2"
-	VERSION_DATE = "2014-09-12"
+	VERSION_DATE = "2014-09-13"
 )

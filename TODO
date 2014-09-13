@@ -1,9 +1,22 @@
 xlReg_go/TODO
 
+2014-09-13
+    * REVIEW: ClientNode.clientID renamed ClientID, other fields
+        not similarly exposed
+        - need to at least adjust version date
+    * REVIEW: ClientNode fields size, epCount were int, now uint
+    * REVIEW: ClusterMember fields SelfIndex, ClusterSize, 
+        EpCount were uint32, now uint
+    * REVIEW: protocol ClusterSize and EndPointCount are uint32,
+        whereas struct fields are uint
+
 2014-09-12
     * EphServer.GetAcceptor() needs to be tested
+        - NO, should be dropped; this is just Server.GetEndPoint(0)
+
     * reg_cluster_test.go is incomplete; when paxos_go/pktComms/
         keep_alive_test.go is working, backport relevant bits
+        - NO, eph_server_test.go is the model to follow
 
 2014-09-06
     * implement reg_cluster_test.go uniqueness tests for names,         * DONE

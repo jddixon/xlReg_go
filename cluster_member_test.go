@@ -44,10 +44,10 @@ func (s *XLSuite) TestClusterMemberSerialization(c *C) {
 		ClusterName:  cl.Name,
 		ClusterAttrs: cl.Attrs,
 		ClusterID:    myClusterID,
-		ClusterSize:  uint32(cl.MaxSize()),
-		SelfIndex:    uint32(0),
+		ClusterSize:  cl.MaxSize(),
+		SelfIndex:    uint(0),
 		Members:      cl.Members, // []*MemberInfo
-		EpCount:      uint32(epCount),
+		EpCount:      epCount,
 		Node:         *myNode,
 	}
 

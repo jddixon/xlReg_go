@@ -18,8 +18,8 @@ type ClusterMember struct {
 	ClusterName  string
 	ClusterAttrs uint64
 	ClusterID    *xi.NodeID
-	ClusterSize  uint32 // this is a FIXED size, aka MaxSize, including self
-	SelfIndex    uint32 // which member we are in the Members slice
+	ClusterSize  uint // this is a FIXED size, aka MaxSize, including self
+	SelfIndex    uint // which member we are in the Members slice
 
 	Members []*MemberInfo // information on (other) cluster members
 
@@ -28,7 +28,7 @@ type ClusterMember struct {
 	// member-member communications and [1] for comms with cluster clients,
 	// should they exist. The first EpCount endPoints are passed
 	// to other cluster members via the registry.
-	EpCount uint32
+	EpCount uint
 
 	xn.Node
 }
@@ -116,10 +116,10 @@ func ParseClusterMemberFromStrings(ss []string) (
 		clusterName  string
 		clusterAttrs uint64
 		clusterID    *xi.NodeID
-		clusterSize  uint32
-		selfIndex    uint32
+		clusterSize  uint
+		selfIndex    uint
 		memberInfos  []*MemberInfo
-		epCount      uint32
+		epCount      uint
 	)
 	line := xn.NextNBLine(&ss)
 	if line != "clusterMember {" {
@@ -186,7 +186,7 @@ func ParseClusterMemberFromStrings(ss []string) (
 			raw := strings.TrimSpace(parts[1])
 			n, err = strconv.Atoi(raw)
 			if err == nil {
-				clusterSize = uint32(n)
+				clusterSize = uint(n)
 			}
 		} else {
 			err = IllFormedClusterMember
@@ -200,7 +200,7 @@ func ParseClusterMemberFromStrings(ss []string) (
 			raw := strings.TrimSpace(parts[1])
 			n, err = strconv.Atoi(raw)
 			if err == nil {
-				selfIndex = uint32(n)
+				selfIndex = uint(n)
 			}
 		} else {
 			err = IllFormedClusterMember
@@ -238,7 +238,7 @@ func ParseClusterMemberFromStrings(ss []string) (
 			raw := strings.TrimSpace(parts[1])
 			n, err = strconv.Atoi(raw)
 			if err == nil {
-				epCount = uint32(n)
+				epCount = uint(n)
 			}
 		} else {
 			err = IllFormedClusterMember

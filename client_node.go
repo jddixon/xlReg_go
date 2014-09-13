@@ -64,7 +64,7 @@ type ClientNode struct {
 	endPoints []xt.EndPointI
 	lfs       string
 	name      string
-	clientID  *xi.NodeID
+	ClientID  *xi.NodeID
 
 	ClusterMember
 }
@@ -86,7 +86,7 @@ func (cn *ClientNode) PersistNode() (err error) {
 		err = os.MkdirAll(pathToCfgDir, 0740)
 	}
 	if err == nil {
-		node, err = xn.New(cn.name, cn.clientID, cn.lfs,
+		node, err = xn.New(cn.name, cn.ClientID, cn.lfs,
 			cn.ckPriv, cn.skPriv, nil, cn.endPoints, nil)
 	}
 	if err == nil {
@@ -116,7 +116,7 @@ func (cn *ClientNode) PersistClusterMember() (err error) {
 		err = os.MkdirAll(pathToCfgDir, 0740)
 	}
 	if err == nil {
-		node, err = xn.New(cn.name, cn.clientID, cn.lfs,
+		node, err = xn.New(cn.name, cn.ClientID, cn.lfs,
 			cn.ckPriv, cn.skPriv, nil, cn.endPoints, nil)
 	}
 	if err == nil {
@@ -137,8 +137,8 @@ func NewClientNode(
 	name, lfs string, ckPriv, skPriv *rsa.PrivateKey, attrs uint64,
 	regName string, regID *xi.NodeID, regEnd xt.EndPointI,
 	regCK, regSK *rsa.PublicKey,
-	clusterName string, clusterAttrs uint64, clusterID *xi.NodeID, size int,
-	epCount int, e []xt.EndPointI) (
+	clusterName string, clusterAttrs uint64, clusterID *xi.NodeID, 
+	size, epCount uint, e []xt.EndPointI) (
 	cn *ClientNode, err error) {
 
 	var (
@@ -157,20 +157,20 @@ func NewClientNode(
 		if err == nil && clusterName == "" {
 			err = MissingClusterNameOrID
 		}
-		if err == nil && size < 1 {
+		if err == nil && size < uint(1) {
 			// err = ClusterMustHaveTwo
 			err = ClusterMustHaveMember
 		}
 	}
 	if err == nil {
 		// if the client is an admin client epCount applies to the cluster
-		if epCount < 1 {
-			epCount = 1
+		if epCount < uint(1) {
+			epCount = uint(1)
 		}
 		if !isAdmin {
 			// XXX There is some confusion here: we don't require that
 			// all members have the same number of endpoints
-			actualEPCount := len(e)
+			actualEPCount := uint(len(e))
 			if actualEPCount == 0 {
 				err = ClientMustHaveEndPoint
 			} else if epCount > actualEPCount {
@@ -195,8 +195,8 @@ func NewClientNode(
 			ClusterName:  clusterName,
 			ClusterAttrs: clusterAttrs,
 			ClusterID:    clusterID,
-			ClusterSize:  uint32(size),
-			EpCount:      uint32(epCount),
+			ClusterSize:  uint(size),
+			EpCount:      uint(epCount),
 			// Members added on the fly
 			Members: make([]*MemberInfo, size),
 
@@ -357,7 +357,7 @@ func (cn *ClientNode) ClientAndOK() (err error) {
 	response, err := cn.readMsg()
 	if err == nil {
 		id := response.GetClientID()
-		cn.clientID, err = xi.New(id)
+		cn.ClientID, err = xi.New(id)
 
 		// XXX err ignored
 
@@ -368,16 +368,19 @@ func (cn *ClientNode) ClientAndOK() (err error) {
 
 func (cn *ClientNode) CreateAndReply() (err error) {
 
+	size    := uint32(cn.ClusterSize)
+	epCount := uint32(cn.EpCount)
 	var response *XLRegMsg
 
 	// Send CREATE MSG ==========================================
+
 	op := XLRegMsg_Create
 	request := &XLRegMsg{
 		Op:            &op,
 		ClusterName:   &cn.ClusterName,
 		ClusterAttrs:  &cn.ClusterAttrs,
-		ClusterSize:   &cn.ClusterSize,
-		EndPointCount: &cn.EpCount,
+		ClusterSize:   &size,
+		EndPointCount: &epCount,
 	}
 	// SHOULD CHECK FOR TIMEOUT
 	err = cn.writeMsg(request)
@@ -391,7 +394,7 @@ func (cn *ClientNode) CreateAndReply() (err error) {
 			id := response.GetClusterID()
 			cn.ClusterID, err = xi.New(id)
 			cn.ClusterAttrs = response.GetClusterAttrs()
-			cn.ClusterSize = response.GetClusterSize()
+			cn.ClusterSize = uint(response.GetClusterSize())
 			// XXX no check on err
 		}
 	}
@@ -418,9 +421,9 @@ func (cn *ClientNode) JoinAndReply() (err error) {
 		op := response.GetOp()
 		_ = op
 
-		epCount := uint32(response.GetEndPointCount())
+		epCount := uint(response.GetEndPointCount())
 		if err == nil {
-			clusterSizeNow := response.GetClusterSize()
+			clusterSizeNow := uint(response.GetClusterSize())
 
 			if cn.ClusterSize != clusterSizeNow {
 				cn.ClusterSize = clusterSizeNow
@@ -523,7 +526,7 @@ func (cn *ClientNode) GetAndMembers() (err error) {
 			// END HERE ///////////////////////////////////
 
 			if bytes.Equal(selfID, memberID) {
-				cn.SelfIndex = uint32(i)
+				cn.SelfIndex = i
 				break
 			}
 		}

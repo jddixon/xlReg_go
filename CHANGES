@@ -3,6 +3,8 @@ xlReg_go/CHANGES
 The version number and date in this file must be kept in sync with version.go
 -----------------------------------------------------------------------------
 v0.5.2
+    2014-09-13
+        * fiddled with various field definitions                    SLOC 3905
     2014-09-12
         * added EphServer.GetAcceptor()                             SLOC 3908
 v0.5.1
