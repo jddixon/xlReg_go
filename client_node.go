@@ -138,7 +138,7 @@ func NewClientNode(
 	regName string, regID *xi.NodeID, regEnd xt.EndPointI,
 	regCK, regSK *rsa.PublicKey,
 	clusterName string, clusterAttrs uint64, clusterID *xi.NodeID, 
-	size, epCount uint, e []xt.EndPointI) (
+	size, epCount uint32, e []xt.EndPointI) (
 	cn *ClientNode, err error) {
 
 	var (
@@ -157,20 +157,20 @@ func NewClientNode(
 		if err == nil && clusterName == "" {
 			err = MissingClusterNameOrID
 		}
-		if err == nil && size < uint(1) {
+		if err == nil && size < uint32(1) {
 			// err = ClusterMustHaveTwo
 			err = ClusterMustHaveMember
 		}
 	}
 	if err == nil {
 		// if the client is an admin client epCount applies to the cluster
-		if epCount < uint(1) {
-			epCount = uint(1)
+		if epCount < uint32(1) {
+			epCount = uint32(1)
 		}
 		if !isAdmin {
 			// XXX There is some confusion here: we don't require that
 			// all members have the same number of endpoints
-			actualEPCount := uint(len(e))
+			actualEPCount := uint32(len(e))
 			if actualEPCount == 0 {
 				err = ClientMustHaveEndPoint
 			} else if epCount > actualEPCount {
@@ -195,8 +195,8 @@ func NewClientNode(
 			ClusterName:  clusterName,
 			ClusterAttrs: clusterAttrs,
 			ClusterID:    clusterID,
-			ClusterSize:  uint(size),
-			EpCount:      uint(epCount),
+			ClusterSize:  size,
+			EpCount:      epCount,
 			// Members added on the fly
 			Members: make([]*MemberInfo, size),
 
@@ -368,8 +368,6 @@ func (cn *ClientNode) ClientAndOK() (err error) {
 
 func (cn *ClientNode) CreateAndReply() (err error) {
 
-	size    := uint32(cn.ClusterSize)
-	epCount := uint32(cn.EpCount)
 	var response *XLRegMsg
 
 	// Send CREATE MSG ==========================================
@@ -379,8 +377,8 @@ func (cn *ClientNode) CreateAndReply() (err error) {
 		Op:            &op,
 		ClusterName:   &cn.ClusterName,
 		ClusterAttrs:  &cn.ClusterAttrs,
-		ClusterSize:   &size,
-		EndPointCount: &epCount,
+		ClusterSize:   &cn.ClusterSize,
+		EndPointCount: &cn.EpCount,
 	}
 	// SHOULD CHECK FOR TIMEOUT
 	err = cn.writeMsg(request)
@@ -394,7 +392,7 @@ func (cn *ClientNode) CreateAndReply() (err error) {
 			id := response.GetClusterID()
 			cn.ClusterID, err = xi.New(id)
 			cn.ClusterAttrs = response.GetClusterAttrs()
-			cn.ClusterSize = uint(response.GetClusterSize())
+			cn.ClusterSize = response.GetClusterSize()
 			// XXX no check on err
 		}
 	}
@@ -421,9 +419,9 @@ func (cn *ClientNode) JoinAndReply() (err error) {
 		op := response.GetOp()
 		_ = op
 
-		epCount := uint(response.GetEndPointCount())
+		epCount := response.GetEndPointCount()
 		if err == nil {
-			clusterSizeNow := uint(response.GetClusterSize())
+			clusterSizeNow := response.GetClusterSize()
 
 			if cn.ClusterSize != clusterSizeNow {
 				cn.ClusterSize = clusterSizeNow
@@ -456,9 +454,10 @@ func (cn *ClientNode) GetAndMembers() (err error) {
 
 		var response *XLRegMsg
 
-		for i := uint(0); i < uint(cn.ClusterSize); i++ {
+		for i := uint32(0); i < uint32(cn.ClusterSize); i++ {
 			if cn.Members[i] != nil {
-				stillToGet = stillToGet.Clear(i)
+				// XXX UNDESIRABLE CAST
+				stillToGet = stillToGet.Clear(uint(i))
 			}
 		}
 
@@ -491,13 +490,15 @@ func (cn *ClientNode) GetAndMembers() (err error) {
 			tokens := response.GetTokens() // a slice
 			if which.Any() {
 				offset := 0
-				for i := uint(0); i < uint(cn.ClusterSize); i++ {
-					if which.Test(i) {
+				for i := uint32(0); i < uint32(cn.ClusterSize); i++ {
+					// XXX UNDESIRABLE CAST
+					if which.Test(uint(i)) {
 						token := tokens[offset]
 						offset++
 						cn.Members[i], err = NewMemberInfoFromToken(
 							token)
-						stillToGet = stillToGet.Clear(i)
+						// XXX UNDESIRABLE CAST
+						stillToGet = stillToGet.Clear(uint(i))
 					}
 				}
 			}
@@ -510,7 +511,7 @@ func (cn *ClientNode) GetAndMembers() (err error) {
 	if err == nil {
 		selfID := cn.regID.Value()
 
-		for i := uint(0); i < uint(cn.ClusterSize); i++ {
+		for i := uint32(0); i < uint32(cn.ClusterSize); i++ {
 
 			member := cn.Members[i]
 			if member == nil {

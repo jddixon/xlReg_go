@@ -16,8 +16,8 @@ func (s *XLSuite) TestClusterMemberSerialization(c *C) {
 	rng := xr.MakeSimpleRNG()
 
 	// Generate a random cluster
-	epCount := uint(1 + rng.Intn(3)) // so from 1 to 3
-	size := uint(2 + rng.Intn(6))    // so from 2 to 7
+	epCount := uint32(1 + rng.Intn(3)) // so from 1 to 3
+	size := uint32(2 + rng.Intn(6))    // so from 2 to 7
 	cl := s.makeACluster(c, rng, epCount, size)
 
 	// We are going to overwrite cluster member zero's attributes
@@ -27,7 +27,7 @@ func (s *XLSuite) TestClusterMemberSerialization(c *C) {
 	myAttrs := cl.Members[0].Attrs
 
 	var myEnds []string
-	for i := uint(0); i < epCount; i++ {
+	for i := uint32(0); i < epCount; i++ {
 		myEnds = append(myEnds, "127.0.0.1:0")
 	}
 	myMemberInfo, err := NewMemberInfo(myNode.GetName(), myNode.GetNodeID(),
@@ -45,7 +45,7 @@ func (s *XLSuite) TestClusterMemberSerialization(c *C) {
 		ClusterAttrs: cl.Attrs,
 		ClusterID:    myClusterID,
 		ClusterSize:  cl.MaxSize(),
-		SelfIndex:    uint(0),
+		SelfIndex:    uint32(0),
 		Members:      cl.Members, // []*MemberInfo
 		EpCount:      epCount,
 		Node:         *myNode,

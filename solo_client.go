@@ -39,7 +39,7 @@ func NewSoloClient(name, lfs string,
 	cn, err := NewClientNode(name, lfs, nil, nil, ATTR_SOLO,
 		serverName, serverID, serverEnd, serverCK, serverSK,
 		"", uint64(0), nil, 0, // no cluster
-		uint(len(e)), e)
+		uint32(len(e)), e)
 
 	if err == nil {
 		// Run() fills in clusterID

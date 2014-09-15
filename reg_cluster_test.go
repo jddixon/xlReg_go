@@ -15,8 +15,8 @@ func (s *XLSuite) TestClusterMaker(c *C) {
 	rng := xr.MakeSimpleRNG()
 
 	// Generate a random cluster
-	epCount := uint(1 + rng.Intn(3)) // so from 1 to 3
-	maxSize := uint(2 + rng.Intn(6)) // so from 2 to 7
+	epCount := uint32(1 + rng.Intn(3)) // so from 1 to 3
+	maxSize := uint32(2 + rng.Intn(6)) // so from 2 to 7
 	cl := s.makeACluster(c, rng, epCount, maxSize)
 
 	c.Assert(cl.MaxSize(), Equals, maxSize)
@@ -25,8 +25,8 @@ func (s *XLSuite) TestClusterMaker(c *C) {
 	// Verify that member names are unique within the cluster
 	ids := make([][]byte, maxSize)
 	names := make([]string, maxSize)
-	nameMap := make(map[string]uint)
-	for i := uint(0); i < maxSize; i++ {
+	nameMap := make(map[string]uint32)
+	for i := uint32(0); i < maxSize; i++ {
 		member := cl.Members[i]
 		names[i] = member.GetName()
 		// fmt.Printf("member[%d]: %s\n", i, names[i])		// DEBUG
@@ -37,18 +37,18 @@ func (s *XLSuite) TestClusterMaker(c *C) {
 		ids[i] = id
 	}
 	// if the names are not unique, map will be smaller
-	c.Assert(maxSize, Equals, uint(len(nameMap)))
+	c.Assert(maxSize, Equals, uint32(len(nameMap)))
 
 	// verify that the RegCluster.MembersByName index is correct
-	for i := uint(0); i < maxSize; i++ {
+	for i := uint32(0); i < maxSize; i++ {
 		name := names[i]
 		member := cl.MembersByName[name]
 		c.Assert(name, Equals, member.GetName())
 	}
 
 	// verify that the RegCluster.MembersByID index is correct
-	count := uint(0)	// number of successful type assertions
-	for i := uint(0); i < maxSize; i++ {
+	count := uint32(0)	// number of successful type assertions
+	for i := uint32(0); i < maxSize; i++ {
 		id := ids[i]
 		mbr, err := cl.MembersByID.Find(id)
 		c.Assert(err, IsNil)
@@ -73,8 +73,8 @@ func (s *XLSuite) TestClusterSerialization(c *C) {
 	rng := xr.MakeSimpleRNG()
 
 	// Generate a random cluster
-	epCount := uint(1 + rng.Intn(3)) // so from 1 to 3
-	size := uint(2 + rng.Intn(6))    // so from 2 to 7
+	epCount := uint32(1 + rng.Intn(3)) // so from 1 to 3
+	size := uint32(2 + rng.Intn(6))    // so from 2 to 7
 	cl := s.makeACluster(c, rng, epCount, size)
 
 	// Serialize it

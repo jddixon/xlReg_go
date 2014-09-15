@@ -171,7 +171,7 @@ func doCreateMsg(h *InHandler) {
 		// XXX THIS NO LONGER MAKES ANY SENSE
 		h.cluster = cluster
 
-		clusterSize = uint32(cluster.maxSize)
+		clusterSize = cluster.maxSize
 		clusterID, _ = xi.New(cluster.ID)
 	} else {
 		h.reg.Logger.Printf("doCreateMsg: new cluster %s\n", clusterName)
@@ -185,7 +185,7 @@ func doCreateMsg(h *InHandler) {
 		clusterID, err = h.reg.UniqueNodeID()
 		if err == nil {
 			cluster, err = NewRegCluster(clusterName, clusterID, attrs,
-				uint(clusterSize), uint(endPointCount))
+				clusterSize, endPointCount)
 			h.reg.Logger.Printf("cluster %s assigning ID %x\n",
 				clusterName, clusterID.Value())
 		}
@@ -298,8 +298,8 @@ func doJoinMsg(h *InHandler) {
 		h.cluster = cluster
 		clusterID = cluster.ID
 		clusterAttrs := cluster.Attrs
-		clusterSize = uint32(h.cluster.maxSize)
-		endPointCount = uint32(h.cluster.epCount)
+		clusterSize = h.cluster.maxSize
+		endPointCount = h.cluster.epCount
 
 		op := XLRegMsg_JoinReply
 		h.msgOut = &XLRegMsg{
@@ -367,19 +367,22 @@ func doGetMsg(h *InHandler) {
 	h.reg.mu.RUnlock() // <-- UNLOCK ----------------------
 
 	if err == nil {
-		size := uint(cluster.Size()) // actual size, not MaxSize
+		size := cluster.Size() // actual size, not MaxSize
 		if size > MAX_CLUSTER_SIZE { // yes, should be impossible
 			size = MAX_CLUSTER_SIZE
 		}
-		weHave := xu.LowNMap(size)
+		// XXX UNDESIRABLE CAST
+		weHave := xu.LowNMap(uint(size))
 		whichToSend := whichRequested.Intersection(weHave)
-		for i := uint(0); i < size; i++ {
-			if whichToSend.Test(i) { // they want this one
+		for i := uint32(0); i < size; i++ {
+			// XXX UNDESIRABLE CAST
+			if whichToSend.Test(uint(i)) { // they want this one
 				member := cluster.Members[i]
 				token, err := member.Token()
 				if err == nil {
 					tokens = append(tokens, token)
-					whichReturned = whichReturned.Set(i)
+					// XXX UNDESIRABLE CAST
+					whichReturned = whichReturned.Set(uint(i))
 				} else {
 					break
 				}

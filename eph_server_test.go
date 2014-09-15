@@ -57,18 +57,18 @@ func (s *XLSuite) TestEphServer(c *C) {
 	// 2. create a random cluster name and size ---------------------
 	clusterName := rng.NextFileName(8)
 	clusterAttrs := uint64(rng.Int63())
-	K := uint(2 + rng.Intn(6)) // so the size is 2 .. 7
+	K := uint32(2 + rng.Intn(6)) // so the size is 2 .. 7
 
 	// 3. create an AdminClient, use it to get the clusterID
 	an, err := NewAdminClient(serverName, serverID, serverEnd,
-		serverCK, serverSK, clusterName, clusterAttrs, K, uint(1), nil)
+		serverCK, serverSK, clusterName, clusterAttrs, K, uint32(1), nil)
 	c.Assert(err, IsNil)
 
 	an.Run()
 	<-an.DoneCh
 
 	c.Assert(an.ClusterID, NotNil) // the purpose of the exercise
-	c.Assert(an.EpCount, Equals, uint(1))
+	c.Assert(an.EpCount, Equals, uint32(1))
 
 	anID := an.ClientID
 	c.Assert(reg.IDCount(), Equals, uint(3)) // regID + anID + clusterID
@@ -96,7 +96,7 @@ func (s *XLSuite) TestEphServer(c *C) {
 	uc := make([]*UserClient, K)
 	ucNames := make([]string, K)
 	namesInUse := make(map[string]bool)
-	for i := uint(0); i < K; i++ {
+	for i := uint32(0); i < K; i++ {
 		var ep *xt.TcpEndPoint
 		ep, err = xt.NewTcpEndPoint("127.0.0.1:0")
 		c.Assert(err, IsNil)
@@ -113,19 +113,19 @@ func (s *XLSuite) TestEphServer(c *C) {
 			nil, nil, // private RSA keys are generated if nil
 			serverName, serverID, serverEnd, serverCK, serverSK,
 			clusterName, an.ClusterAttrs, an.ClusterID,
-			K, 1, e) //1 is endPoint count
+			K, uint32(1), e) //1 is endPoint count
 		c.Assert(err, IsNil)
 		c.Assert(uc[i], NotNil)
 		c.Assert(uc[i].ClusterID, NotNil)
 	}
 
 	// 5. start the K clients, each in a separate goroutine ---------
-	for i := uint(0); i < K; i++ {
+	for i := uint32(0); i < K; i++ {
 		uc[i].Run()
 	}
 
 	// wait until all clients are done ------------------------------
-	for i := uint(0); i < K; i++ {
+	for i := uint32(0); i < K; i++ {
 		success := <-uc[i].ClientNode.DoneCh
 		c.Assert(success, Equals, true)
 		// if false, should check an.Err for error

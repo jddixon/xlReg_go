@@ -30,8 +30,8 @@ type RegCluster struct {
 	Name          string // must be unique
 	ID            []byte // must be unique
 	Attrs         uint64 // a field of bit flags
-	maxSize       uint   // a maximum; must be > 0
-	epCount       uint   // a positive integer, for now is 1 or 2
+	maxSize       uint32   // a maximum; must be > 0
+	epCount       uint32   // a positive integer, for now is 1 or 2
 	Members       []*MemberInfo
 	MembersByName map[string]*MemberInfo
 	MembersByID   *xi.IDMap
@@ -39,7 +39,7 @@ type RegCluster struct {
 }
 
 func NewRegCluster(name string, id *xi.NodeID, attrs uint64,
-	maxSize, epCount uint) (rc *RegCluster, err error) {
+	maxSize, epCount uint32) (rc *RegCluster, err error) {
 
 	var m *xi.IDMap
 
@@ -112,16 +112,16 @@ func (rc *RegCluster) AddMember(member *MemberInfo) (err error) {
 	return
 }
 
-func (rc *RegCluster) EndPointCount() uint {
+func (rc *RegCluster) EndPointCount() uint32 {
 	return rc.epCount
 }
-func (rc *RegCluster) MaxSize() uint {
+func (rc *RegCluster) MaxSize() uint32 {
 	return rc.maxSize
 }
-func (rc *RegCluster) Size() uint {
-	var curSize uint
+func (rc *RegCluster) Size() uint32 {
+	var curSize uint32
 	rc.mu.RLock() // <------------------------------------
-	curSize = uint(len(rc.Members))
+	curSize = uint32(len(rc.Members))
 	rc.mu.RUnlock() // <------------------------------------
 	return curSize
 }
@@ -184,7 +184,7 @@ func (rc *RegCluster) Equal(any interface{}) bool {
 		return false
 	}
 	// Members			[]*MemberInfo
-	for i := uint(0); i < rc.Size(); i++ {
+	for i := uint32(0); i < rc.Size(); i++ {
 		rcMember := rc.Members[i]
 		otherMember := other.Members[i]
 		if !rcMember.Equal(otherMember) {
@@ -233,7 +233,7 @@ func ParseRegClusterFromStrings(ss []string) (
 		attrs            uint64
 		name             string
 		id               *xi.NodeID
-		epCount, maxSize uint
+		epCount, maxSize uint32
 	)
 	rest = ss
 
@@ -283,7 +283,7 @@ func ParseRegClusterFromStrings(ss []string) (
 			var count int
 			count, err = strconv.Atoi(line[9:])
 			if err == nil {
-				epCount = uint(count)
+				epCount = uint32(count)
 			}
 		} else {
 			fmt.Println("BAD END POINT COUNT")
@@ -296,7 +296,7 @@ func ParseRegClusterFromStrings(ss []string) (
 			var size int
 			size, err = strconv.Atoi(line[9:])
 			if err == nil {
-				maxSize = uint(size)
+				maxSize = uint32(size)
 			}
 		} else {
 			fmt.Println("BAD MAX_SIZE")

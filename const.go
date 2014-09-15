@@ -8,8 +8,8 @@ const (
 	DEFAULT_M = uint(20)
 	DEFAULT_K = uint(8)
 
-	MAX_CLUSTER_SIZE = 64 // inclusive
-	MIN_CLUSTER_SIZE = 2
+	MAX_CLUSTER_SIZE = uint32(64) // inclusive
+	MIN_CLUSTER_SIZE = uint32(2)
 
 	SHA1_LEN = 20 // length in bytes of binary hash
 	SHA3_LEN = 32

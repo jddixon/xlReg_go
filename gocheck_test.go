@@ -122,7 +122,7 @@ func (s *XLSuite) makeAMemberInfo(c *C, rng *xr.PRNG) *MemberInfo {
 // Make a RegCluster for test purposes.  Cluster member names are guaranteed
 // to be unique but the name of the cluster itself may not be.
 
-func (s *XLSuite) makeACluster(c *C, rng *xr.PRNG, epCount, size uint) (
+func (s *XLSuite) makeACluster(c *C, rng *xr.PRNG, epCount, size uint32) (
 	rc *RegCluster) {
 
 	var err error
@@ -135,7 +135,7 @@ func (s *XLSuite) makeACluster(c *C, rng *xr.PRNG, epCount, size uint) (
 	rc, err = NewRegCluster(name, id, attrs, size, epCount)
 	c.Assert(err, IsNil)
 
-	for count := uint(0); count < size; count++ {
+	for count := uint32(0); count < size; count++ {
 		cm := s.makeAMemberInfo(c, rng)
 		for {
 			if _, ok := rc.MembersByName[cm.GetName()]; ok {

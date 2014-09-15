@@ -32,7 +32,7 @@ func NewAdminClient(
 	serverName string, serverID *xi.NodeID, serverEnd xt.EndPointI,
 	serverCK, serverSK *rsa.PublicKey,
 	clusterName string, clusterAttrs uint64, 
-	size, epCount uint, e []xt.EndPointI) (
+	size, epCount uint32, e []xt.EndPointI) (
 	ac *AdminClient, err error) {
 
 	cn, err := NewClientNode("admin", "", nil, nil, // name, LFS, keys
