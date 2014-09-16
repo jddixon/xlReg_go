@@ -1,7 +1,11 @@
 xlReg_go/TODO
 
+2014-09-16
+    * MemberNode.{endPoints,lfs,name} appear to be wholly redundant;
+        consider dropping them
+
 2014-09-15
-    * rename AdminClient  -> AdminMember
+    * rename AdminClient  -> AdminMember                                * DONE
     * rename ClientAndOK  -> MemberAndOK                                * DONE
     * rename ClientAttrs  -> MemberAttrs                                * DONE
     * rename ClientID     -> MemberID                                   * DONE
@@ -12,7 +16,7 @@ xlReg_go/TODO
     * rename UserClient   -> UserMember                                 * DONE
     * rename SoloClient   -> SoloMember                                 * DONE
 
-    * these changes must be reflected in executable                     * BUILDS
+    * these changes must be reflected in executable                     * BUILT
         - server on portland must be replaced
         - regCred.dat must be replace in xlreg_*
         - major version number should be bumped                         * DONE

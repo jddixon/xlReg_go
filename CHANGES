@@ -2,9 +2,16 @@ xlReg_go/CHANGES
 -----------------------------------------------------------------------------
 The version number and date in this file must be kept in sync with version.go
 -----------------------------------------------------------------------------
+v1.1.0
+    2014-09-16
+        * MemberNode.JoinAndReply() joins by cluster ID, not name
+        * renamed fields, changed some from private to public       SLOC 3914
+v1.0.0
+    2014-09-15
+
 v0.5.2
     2014-09-14
-        * clusterSize, epCount uint32 to match p.proto              SLCO 3903
+        * clusterSize, epCount uint32 to match p.proto              SLOC 3903
 v0.5.2
     2014-09-13
         * fiddled with various field definitions                    SLOC 3905

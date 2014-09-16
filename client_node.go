@@ -1,6 +1,6 @@
 package reg
 
-// xlReg_go/client_node.go
+// xlReg_go/client_node.go  WILL BECOME memberNode.go
 
 import (
 	"bytes"
@@ -27,49 +27,58 @@ import (
 
 var _ = fmt.Print // DEBUG
 
-// client states
+// member states
 const (
-	CLIENT_START = iota
+	MEMBER_START = iota
 	HELLO_SENT
-	CLIENT_SENT
+	MEMBER_SENT
 	CLUSTER_SENT
 	JOIN_SENT
 	GET_SENT
 	BYE_SENT
-	CLIENT_CLOSED
+	MEMBER_CLOSED
 )
 
 type MemberNode struct {
 	DoneCh          chan bool // if false, check error
 	Err             error
-	proposedAttrs   uint64
-	proposedVersion uint32 // proposed by client
+	ProposedAttrs   uint64
+	ProposedVersion uint32 // proposed by member
 
 	ckPriv, skPriv *rsa.PrivateKey
 	AesCnxHandler
 
 	// RegCred info: registry credentials ---------------------------
-	regName string
-	regID   *xi.NodeID
-	regCK   *rsa.PublicKey
-	regSK   *rsa.PublicKey
-	regEnd  xt.EndPointI
+	RegName string
+	RegID   *xi.NodeID
+	RegCK   *rsa.PublicKey
+	RegSK   *rsa.PublicKey
+	RegEnd  xt.EndPointI
 	// serverVersion xu.DecimalVersion		// missing
 
-	Version uint32 // protocol version used to talk to registry
+	regProtoVersion uint32 // protocol version used to talk to registry
 
 	// REDUNDANT: INFORMATION USED TO BUILD NODE ====================
 	// This is used to build the node and so is persisted as part of
 	// the node when that is saved.
-	endPoints []xt.EndPointI
-	lfs       string
-	name      string
+	EndPoints []xt.EndPointI
+	LFS       string
+	Name      string
 	MemberID  *xi.NodeID
 
 	ClusterMember
 }
 
-// Create just the Node for this client and write it to the conventional
+// Returns a copy of the node's comms private RSA key
+func (cn *MemberNode) GetCKPriv() (rsa.PrivateKey) {
+	return *cn.ckPriv
+}
+// Returns a copy of the node's sig private RSA key
+func (cn *MemberNode) GetSKPriv() (rsa.PrivateKey) {
+	return *cn.skPriv
+}
+
+// Create just the Node for this member and write it to the conventional
 // place in the file system.
 func (cn *MemberNode) PersistNode() (err error) {
 
@@ -79,15 +88,15 @@ func (cn *MemberNode) PersistNode() (err error) {
 	)
 
 	// XXX check attrs, etc
-	pathToCfgDir := path.Join(cn.lfs, ".xlattice")
+	pathToCfgDir := path.Join(cn.LFS, ".xlattice")
 	pathToCfgFile := path.Join(pathToCfgDir, "node.config")
 	found, err := xf.PathExists(pathToCfgDir)
 	if err == nil && !found {
 		err = os.MkdirAll(pathToCfgDir, 0740)
 	}
 	if err == nil {
-		node, err = xn.New(cn.name, cn.MemberID, cn.lfs,
-			cn.ckPriv, cn.skPriv, nil, cn.endPoints, nil)
+		node, err = xn.New(cn.Name, cn.MemberID, cn.LFS,
+			cn.ckPriv, cn.skPriv, nil, cn.EndPoints, nil)
 	}
 	if err == nil {
 		cn.Node = *node
@@ -109,15 +118,15 @@ func (cn *MemberNode) PersistClusterMember() (err error) {
 	)
 
 	// XXX check attrs, etc
-	pathToCfgDir := path.Join(cn.lfs, ".xlattice")
+	pathToCfgDir := path.Join(cn.LFS, ".xlattice")
 	pathToCfgFile := path.Join(pathToCfgDir, "cluster.member.config")
 	found, err := xf.PathExists(pathToCfgDir)
 	if err == nil && !found {
 		err = os.MkdirAll(pathToCfgDir, 0740)
 	}
 	if err == nil {
-		node, err = xn.New(cn.name, cn.MemberID, cn.lfs,
-			cn.ckPriv, cn.skPriv, nil, cn.endPoints, nil)
+		node, err = xn.New(cn.Name, cn.MemberID, cn.LFS,
+			cn.ckPriv, cn.skPriv, nil, cn.EndPoints, nil)
 	}
 	if err == nil {
 		cn.Node = *node
@@ -189,7 +198,7 @@ func NewMemberNode(
 		err = NoNodeNoKeys
 	}
 	if err == nil {
-		cnxHandler := &AesCnxHandler{State: CLIENT_START}
+		cnxHandler := &AesCnxHandler{State: MEMBER_START}
 		cm = &ClusterMember{
 			// Attrs gets negotiated
 			ClusterName:  clusterName,
@@ -203,16 +212,16 @@ func NewMemberNode(
 			// Node NOT YET INITIALIZED
 		}
 		cn = &MemberNode{
-			name:          name,
-			lfs:           lfs, // if blank, node is ephemeral
-			proposedAttrs: attrs,
+			Name:          name,
+			LFS:           lfs, // if blank, node is ephemeral
+			ProposedAttrs: attrs,
 			DoneCh:        make(chan bool, 1),
-			regName:       regName,
-			regID:         regID,
-			regEnd:        regEnd,
-			regCK:         regCK,
-			regSK:         regSK,
-			endPoints:     e,
+			RegName:       regName,
+			RegID:         regID,
+			RegEnd:        regEnd,
+			RegCK:         regCK,
+			RegSK:         regSK,
+			EndPoints:     e,
 
 			ckPriv:        ckPriv,
 			skPriv:        skPriv,
@@ -256,7 +265,7 @@ func (cn *MemberNode) SessionSetup(proposedVersion uint32) (
 		ciphertext2, iv2, key2, salt2         []byte
 	)
 	// Set up connection to server. -----------------------------
-	ctor, err := xt.NewTcpConnector(cn.regEnd)
+	ctor, err := xt.NewTcpConnector(cn.RegEnd)
 	if err == nil {
 		var conn xt.ConnectionI
 		conn, err = ctor.Connect(nil)
@@ -268,7 +277,7 @@ func (cn *MemberNode) SessionSetup(proposedVersion uint32) (
 	if err == nil {
 		cn.Cnx = cnx
 		ciphertext1, iv1, key1, salt1,
-			err = xa.ClientEncodeHello(proposedVersion, cn.regCK)
+			err = xa.ClientEncodeHello(proposedVersion, cn.RegCK)
 	}
 	if err == nil {
 		err = cn.WriteData(ciphertext1)
@@ -288,7 +297,7 @@ func (cn *MemberNode) SessionSetup(proposedVersion uint32) (
 		cn.iv2 = iv2
 		cn.key2 = key2
 		cn.salt2 = salt2
-		cn.Version = decidedVersion
+		cn.regProtoVersion = decidedVersion
 		cn.engine, err = aes.NewCipher(key2)
 		if err == nil {
 			cn.encrypter = cipher.NewCBCEncrypter(cn.engine, iv2)
@@ -308,19 +317,19 @@ func (cn *MemberNode) MemberAndOK() (err error) {
 	)
 	// XXX attrs not actually dealt with
 
-	// Send CLIENT MSG ==========================================
+	// Send MEMBER MSG ==========================================
 	aBytes := make([]byte, 8)
-	binary.LittleEndian.PutUint64(aBytes, cn.proposedAttrs)
+	binary.LittleEndian.PutUint64(aBytes, cn.ProposedAttrs)
 	ckBytes, err = xc.RSAPubKeyToWire(&cn.ckPriv.PublicKey)
 	if err == nil {
 		skBytes, err = xc.RSAPubKeyToWire(&cn.skPriv.PublicKey)
 		if err == nil {
-			for i := 0; i < len(cn.endPoints); i++ {
-				myEnds = append(myEnds, cn.endPoints[i].String())
+			for i := 0; i < len(cn.EndPoints); i++ {
+				myEnds = append(myEnds, cn.EndPoints[i].String())
 			}
 			// calculate hash over fields in canonical order
 			d := sha1.New()
-			d.Write([]byte(cn.name))
+			d.Write([]byte(cn.Name))
 			d.Write(aBytes)
 			d.Write(ckBytes)
 			d.Write(skBytes)
@@ -335,8 +344,8 @@ func (cn *MemberNode) MemberAndOK() (err error) {
 	}
 	if err == nil {
 		token := &XLRegMsg_Token{
-			Name:     &cn.name,
-			Attrs:    &cn.proposedAttrs,
+			Name:     &cn.Name,
+			Attrs:    &cn.ProposedAttrs,
 			CommsKey: ckBytes,
 			SigKey:   skBytes,
 			MyEnds:   myEnds,
@@ -346,7 +355,7 @@ func (cn *MemberNode) MemberAndOK() (err error) {
 		op := XLRegMsg_Member
 		request := &XLRegMsg{
 			Op: &op,
-			// MemberName:  &cn.name, // XXX redundant DROPPED
+			// MemberName:  &cn.Name, // XXX redundant DROPPED
 			MemberSpecs: token,
 		}
 		// SHOULD CHECK FOR TIMEOUT
@@ -357,11 +366,12 @@ func (cn *MemberNode) MemberAndOK() (err error) {
 	response, err := cn.readMsg()
 	if err == nil {
 		id := response.GetMemberID()
-		cn.MemberID, err = xi.New(id)
-
-		// XXX err ignored
-
-		cn.Attrs = response.GetMemberAttrs()
+		var nodeID *xi.NodeID
+		nodeID, err = xi.New(id)
+		if err == nil {
+			cn.MemberID = nodeID
+			cn.Attrs = response.GetMemberAttrs()
+		}
 	}
 	return
 }
@@ -403,9 +413,11 @@ func (cn *MemberNode) JoinAndReply() (err error) {
 
 	// Send JOIN MSG ============================================
 	op := XLRegMsg_Join
+	id := cn.ClusterID.Value()
 	request := &XLRegMsg{
 		Op:          &op,
-		ClusterName: &cn.ClusterName,
+		//ClusterName: &cn.ClusterName,
+		ClusterID:	id,
 	}
 	// SHOULD CHECK FOR TIMEOUT
 	err = cn.writeMsg(request)
@@ -443,7 +455,7 @@ func (cn *MemberNode) GetAndMembers() (err error) {
 
 	if cn.ClusterID == nil {
 		fmt.Printf("** ENTERING GetAndMembers for %s with nil clusterID! **\n",
-			cn.name)
+			cn.Name)
 	}
 	const MAX_GET = 32 // 2014-01-31: was 16
 	if cn.Members == nil {
@@ -509,7 +521,7 @@ func (cn *MemberNode) GetAndMembers() (err error) {
 		}
 	}
 	if err == nil {
-		selfID := cn.regID.Value()
+		selfID := cn.RegID.Value()
 
 		for i := uint32(0); i < uint32(cn.ClusterSize); i++ {
 
