@@ -25,8 +25,8 @@ type XLRegMsg_Tag int32
 const (
 	XLRegMsg_RegCredRequest XLRegMsg_Tag = 1
 	XLRegMsg_RegCredReply   XLRegMsg_Tag = 2
-	XLRegMsg_Client         XLRegMsg_Tag = 3
-	XLRegMsg_ClientOK       XLRegMsg_Tag = 4
+	XLRegMsg_Member         XLRegMsg_Tag = 3
+	XLRegMsg_MemberOK       XLRegMsg_Tag = 4
 	// size means cluster size, constrained to 1 < n <= 64
 	// epCount is number of menber endPoints, which must be 1 or 2
 	XLRegMsg_Create      XLRegMsg_Tag = 5
@@ -45,8 +45,8 @@ const (
 var XLRegMsg_Tag_name = map[int32]string{
 	1:  "RegCredRequest",
 	2:  "RegCredReply",
-	3:  "Client",
-	4:  "ClientOK",
+	3:  "Member",
+	4:  "MemberOK",
 	5:  "Create",
 	6:  "CreateReply",
 	7:  "Join",
@@ -60,8 +60,8 @@ var XLRegMsg_Tag_name = map[int32]string{
 var XLRegMsg_Tag_value = map[string]int32{
 	"RegCredRequest": 1,
 	"RegCredReply":   2,
-	"Client":         3,
-	"ClientOK":       4,
+	"Member":         3,
+	"MemberOK":       4,
 	"Create":         5,
 	"CreateReply":    6,
 	"Join":           7,
@@ -97,10 +97,10 @@ type XLRegMsg struct {
 	Salt1            []byte            `protobuf:"bytes,4,opt" json:"Salt1,omitempty"`
 	Salt2            []byte            `protobuf:"bytes,5,opt" json:"Salt2,omitempty"`
 	Version          *uint32           `protobuf:"varint,6,opt" json:"Version,omitempty"`
-	ClientName       *string           `protobuf:"bytes,8,opt" json:"ClientName,omitempty"`
-	ClientID         []byte            `protobuf:"bytes,9,opt" json:"ClientID,omitempty"`
-	ClientAttrs      *uint64           `protobuf:"varint,10,opt" json:"ClientAttrs,omitempty"`
-	ClientSpecs      *XLRegMsg_Token   `protobuf:"bytes,11,opt" json:"ClientSpecs,omitempty"`
+	MemberName       *string           `protobuf:"bytes,8,opt" json:"MemberName,omitempty"`
+	MemberID         []byte            `protobuf:"bytes,9,opt" json:"MemberID,omitempty"`
+	MemberAttrs      *uint64           `protobuf:"varint,10,opt" json:"MemberAttrs,omitempty"`
+	MemberSpecs      *XLRegMsg_Token   `protobuf:"bytes,11,opt" json:"MemberSpecs,omitempty"`
 	ClusterID        []byte            `protobuf:"bytes,13,opt" json:"ClusterID,omitempty"`
 	ClusterName      *string           `protobuf:"bytes,14,opt" json:"ClusterName,omitempty"`
 	ClusterSize      *uint32           `protobuf:"varint,15,opt" json:"ClusterSize,omitempty"`
@@ -159,30 +159,30 @@ func (m *XLRegMsg) GetVersion() uint32 {
 	return 0
 }
 
-func (m *XLRegMsg) GetClientName() string {
-	if m != nil && m.ClientName != nil {
-		return *m.ClientName
+func (m *XLRegMsg) GetMemberName() string {
+	if m != nil && m.MemberName != nil {
+		return *m.MemberName
 	}
 	return ""
 }
 
-func (m *XLRegMsg) GetClientID() []byte {
+func (m *XLRegMsg) GetMemberID() []byte {
 	if m != nil {
-		return m.ClientID
+		return m.MemberID
 	}
 	return nil
 }
 
-func (m *XLRegMsg) GetClientAttrs() uint64 {
-	if m != nil && m.ClientAttrs != nil {
-		return *m.ClientAttrs
+func (m *XLRegMsg) GetMemberAttrs() uint64 {
+	if m != nil && m.MemberAttrs != nil {
+		return *m.MemberAttrs
 	}
 	return 0
 }
 
-func (m *XLRegMsg) GetClientSpecs() *XLRegMsg_Token {
+func (m *XLRegMsg) GetMemberSpecs() *XLRegMsg_Token {
 	if m != nil {
-		return m.ClientSpecs
+		return m.MemberSpecs
 	}
 	return nil
 }

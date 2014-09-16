@@ -6,9 +6,9 @@ package reg
 // BEING MODIFIED to follow the new approach, whereby
 // 1.  we create an ephemeral registry using NewEphServer()
 // 2.  we generate a random cluster name and size
-// 3.  run an AdminClient to register the cluster with the registry (which
+// 3.  run an AdminMember to register the cluster with the registry (which
 //       gives us a cluster ID), and then
-// 4.  create the appropriate number K of UserClients
+// 4.  create the appropriate number K of UserMembers
 // 5.  do test run in which the K clients exchange details through the registry
 
 import (
@@ -59,8 +59,8 @@ func (s *XLSuite) TestEphServer(c *C) {
 	clusterAttrs := uint64(rng.Int63())
 	K := uint32(2 + rng.Intn(6)) // so the size is 2 .. 7
 
-	// 3. create an AdminClient, use it to get the clusterID
-	an, err := NewAdminClient(serverName, serverID, serverEnd,
+	// 3. create an AdminMember, use it to get the clusterID
+	an, err := NewAdminMember(serverName, serverID, serverEnd,
 		serverCK, serverSK, clusterName, clusterAttrs, K, uint32(1), nil)
 	c.Assert(err, IsNil)
 
@@ -70,7 +70,7 @@ func (s *XLSuite) TestEphServer(c *C) {
 	c.Assert(an.ClusterID, NotNil) // the purpose of the exercise
 	c.Assert(an.EpCount, Equals, uint32(1))
 
-	anID := an.ClientID
+	anID := an.MemberID
 	c.Assert(reg.IDCount(), Equals, uint(3)) // regID + anID + clusterID
 
 	// DEBUG
@@ -93,7 +93,7 @@ func (s *XLSuite) TestEphServer(c *C) {
 
 	// 4. create K clients ------------------------------------------
 
-	uc := make([]*UserClient, K)
+	uc := make([]*UserMember, K)
 	ucNames := make([]string, K)
 	namesInUse := make(map[string]bool)
 	for i := uint32(0); i < K; i++ {
@@ -109,7 +109,7 @@ func (s *XLSuite) TestEphServer(c *C) {
 		}
 		namesInUse[newName] = true
 		ucNames[i] = newName // guaranteed to be LOCALLY unique
-		uc[i], err = NewUserClient(ucNames[i], "",
+		uc[i], err = NewUserMember(ucNames[i], "",
 			nil, nil, // private RSA keys are generated if nil
 			serverName, serverID, serverEnd, serverCK, serverSK,
 			clusterName, an.ClusterAttrs, an.ClusterID,
@@ -126,13 +126,13 @@ func (s *XLSuite) TestEphServer(c *C) {
 
 	// wait until all clients are done ------------------------------
 	for i := uint32(0); i < K; i++ {
-		success := <-uc[i].ClientNode.DoneCh
+		success := <-uc[i].MemberNode.DoneCh
 		c.Assert(success, Equals, true)
 		// if false, should check an.Err for error
 
 		// XXX NEXT LINE APPARENTLY DOES NOT WORK
-		// nodeID := uc[i].ClientNode.GetNodeID()
-		nodeID := uc[i].ClientID
+		// nodeID := uc[i].MemberNode.GetNodeID()
+		nodeID := uc[i].MemberID
 		c.Assert(nodeID, NotNil)
 		found, err := reg.ContainsID(nodeID)
 		c.Assert(err, IsNil)

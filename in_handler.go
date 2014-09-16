@@ -106,7 +106,7 @@ func NewInHandler(reg *Registry, conn xt.ConnectionI) (
 // Convert a protobuf op into a zero-based tag for use in the InHandler's
 // dispatch table.
 func op2tag(op XLRegMsg_Tag) int {
-	return int(op-XLRegMsg_Client) / 2
+	return int(op-XLRegMsg_Member) / 2
 }
 
 // Given a handler associating an open new connection with a registry,

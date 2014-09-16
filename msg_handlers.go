@@ -58,7 +58,7 @@ func doClientMsg(h *InHandler) {
 	// This implementation only accepts a token.
 
 	clientMsg := h.msgIn
-	clientSpecs := clientMsg.GetClientSpecs()
+	clientSpecs := clientMsg.GetMemberSpecs()
 	name = clientSpecs.GetName()
 	attrs = clientSpecs.GetAttrs()
 	ckBytes := clientSpecs.GetCommsKey()
@@ -93,7 +93,7 @@ func doClientMsg(h *InHandler) {
 		if id == nil {
 			nodeID, err = h.reg.UniqueNodeID()
 			id := nodeID.Value()
-			h.reg.Logger.Printf("assigned new ClientID %xi, user %s\n",
+			h.reg.Logger.Printf("assigned new MemberID %xi, user %s\n",
 				id, name)
 		} else {
 			// must be known to the registry
@@ -102,7 +102,7 @@ func doClientMsg(h *InHandler) {
 				var found bool
 				found, err = h.reg.ContainsID(nodeID)
 				if err == nil && !found {
-					err = UnknownClient
+					err = UnknownMember
 				}
 			}
 		}
@@ -120,11 +120,11 @@ func doClientMsg(h *InHandler) {
 		// Prepare reply to client --------------------------------------
 		// In this implementation We simply accept the client's proposed
 		// attrs and ID.
-		op := XLRegMsg_ClientOK
+		op := XLRegMsg_MemberOK
 		h.msgOut = &XLRegMsg{
 			Op:          &op,
-			ClientID:    nodeID.Value(),
-			ClientAttrs: &attrs, // in production, review and limit
+			MemberID:    nodeID.Value(),
+			MemberAttrs: &attrs, // in production, review and limit
 		}
 
 		// Set exit state -----------------------------------------------

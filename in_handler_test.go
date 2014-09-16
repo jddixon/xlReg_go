@@ -14,9 +14,9 @@ func (s *XLSuite) TestInHandler(c *C) {
 
 	// These are the tags that InHandler will accept from a client.
 
-	c.Assert(op2tag(XLRegMsg_Client), Equals, MIN_TAG)
+	c.Assert(op2tag(XLRegMsg_Member), Equals, MIN_TAG)
 
-	c.Assert(op2tag(XLRegMsg_Client), Equals, 0)
+	c.Assert(op2tag(XLRegMsg_Member), Equals, 0)
 	c.Assert(op2tag(XLRegMsg_Create), Equals, 1)
 	c.Assert(op2tag(XLRegMsg_Join), Equals, 2)
 	c.Assert(op2tag(XLRegMsg_GetCluster), Equals, 3)

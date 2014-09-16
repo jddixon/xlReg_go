@@ -11,7 +11,7 @@ import (
 
 var _ = fmt.Print
 
-// In the current implementation, AdminClient's purpose is to register
+// In the current implementation, AdminMember's purpose is to register
 // clusters, so it sets up a session with the registry, (calls SessionSetup),
 // identifies itself with a Client/ClientOK sequence, uses Create/CreateReply
 // to register the cluster, and then ends with Bye/Ack.  It then returns
@@ -21,29 +21,29 @@ var _ = fmt.Print
 // neither saves nor restores its Node; keys and such are generated for
 // each instance.
 
-type AdminClient struct {
-	// In this implementation, AdminClient is a one-shot, launched
+type AdminMember struct {
+	// In this implementation, AdminMember is a one-shot, launched
 	// to create a single cluster
 
-	ClientNode
+	MemberNode
 }
 
-func NewAdminClient(
+func NewAdminMember(
 	serverName string, serverID *xi.NodeID, serverEnd xt.EndPointI,
 	serverCK, serverSK *rsa.PublicKey,
 	clusterName string, clusterAttrs uint64, 
 	size, epCount uint32, e []xt.EndPointI) (
-	ac *AdminClient, err error) {
+	ac *AdminMember, err error) {
 
-	cn, err := NewClientNode("admin", "", nil, nil, // name, LFS, keys
+	cn, err := NewMemberNode("admin", "", nil, nil, // name, LFS, keys
 		ATTR_ADMIN|ATTR_SOLO|ATTR_EPHEMERAL,
 		serverName, serverID, serverEnd, serverCK, serverSK,
 		clusterName, clusterAttrs, nil, size, epCount, e)
 
 	if err == nil {
 		// Run() fills in clusterID
-		ac = &AdminClient{
-			ClientNode: *cn,
+		ac = &AdminMember{
+			MemberNode: *cn,
 		}
 	}
 	return // FOO
@@ -52,9 +52,9 @@ func NewAdminClient(
 // Start the client running in separate goroutine, so that this function
 // is non-blocking.
 
-func (ac *AdminClient) Run() (err error) {
+func (ac *AdminMember) Run() (err error) {
 
-	cn := &ac.ClientNode
+	cn := &ac.MemberNode
 
 	go func() {
 		var (
@@ -63,7 +63,7 @@ func (ac *AdminClient) Run() (err error) {
 		cnx, version2, err := cn.SessionSetup(version1)
 		_ = version2 // not yet used
 		if err == nil {
-			err = cn.ClientAndOK()
+			err = cn.MemberAndOK()
 		}
 		if err == nil {
 			err = cn.CreateAndReply()

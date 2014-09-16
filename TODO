@@ -1,5 +1,22 @@
 xlReg_go/TODO
 
+2014-09-15
+    * rename AdminClient  -> AdminMember
+    * rename ClientAndOK  -> MemberAndOK                                * DONE
+    * rename ClientAttrs  -> MemberAttrs                                * DONE
+    * rename ClientID     -> MemberID                                   * DONE
+    * rename ClientMustHaveEndPoint -> MemberMustHaveEndPoint           * DONE
+    * rename ClientNode   -> MemberNode                                 * DONE
+    * rename ClientSpecs  -> MemberSpecs                                * DONE
+    * rename UnknownClient-> UnknownMember                              * DONE
+    * rename UserClient   -> UserMember                                 * DONE
+    * rename SoloClient   -> SoloMember                                 * DONE
+
+    * these changes must be reflected in executable                     * BUILDS
+        - server on portland must be replaced
+        - regCred.dat must be replace in xlreg_*
+        - major version number should be bumped                         * DONE
+
 2014-09-13
     * REVIEW: ClientNode.clientID renamed ClientID, other fields
         not similarly exposed

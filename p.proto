@@ -8,8 +8,8 @@ message XLRegMsg {
         RegCredRequest  = 1;   
         RegCredReply    = 2;    // version, token (other registry credentials)
 
-        Client      	= 3;    // token OR clientID, digSig
-        ClientOK    	= 4;    // clientID, attrs
+        Member      	= 3;    // token OR clientID, digSig
+        MemberOK    	= 4;    // clientID, attrs
 
         // size means cluster size, constrained to 1 < n <= 64
         // epCount is number of menber endPoints, which must be 1 or 2
@@ -50,10 +50,10 @@ message XLRegMsg {
     optional bytes  Salt2           = 5;    // error if len < 8
     optional uint32 Version         = 6;    // little-endian, so stored D.C.B.A
     
-    optional string ClientName      = 8;
-    optional bytes  ClientID        = 9;
-    optional uint64 ClientAttrs     = 10;
-    optional Token  ClientSpecs     = 11;
+    optional string MemberName      = 8;
+    optional bytes  MemberID        = 9;
+    optional uint64 MemberAttrs     = 10;
+    optional Token  MemberSpecs     = 11;
 
     optional bytes  ClusterID       = 13;       
     optional string ClusterName     = 14; 

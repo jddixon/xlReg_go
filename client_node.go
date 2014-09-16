@@ -39,7 +39,7 @@ const (
 	CLIENT_CLOSED
 )
 
-type ClientNode struct {
+type MemberNode struct {
 	DoneCh          chan bool // if false, check error
 	Err             error
 	proposedAttrs   uint64
@@ -64,14 +64,14 @@ type ClientNode struct {
 	endPoints []xt.EndPointI
 	lfs       string
 	name      string
-	ClientID  *xi.NodeID
+	MemberID  *xi.NodeID
 
 	ClusterMember
 }
 
 // Create just the Node for this client and write it to the conventional
 // place in the file system.
-func (cn *ClientNode) PersistNode() (err error) {
+func (cn *MemberNode) PersistNode() (err error) {
 
 	var (
 		config string
@@ -86,7 +86,7 @@ func (cn *ClientNode) PersistNode() (err error) {
 		err = os.MkdirAll(pathToCfgDir, 0740)
 	}
 	if err == nil {
-		node, err = xn.New(cn.name, cn.ClientID, cn.lfs,
+		node, err = xn.New(cn.name, cn.MemberID, cn.lfs,
 			cn.ckPriv, cn.skPriv, nil, cn.endPoints, nil)
 	}
 	if err == nil {
@@ -101,7 +101,7 @@ func (cn *ClientNode) PersistNode() (err error) {
 
 // Create the Node for this client and write the serialized ClusterMember
 // to the conventional place in the file system.
-func (cn *ClientNode) PersistClusterMember() (err error) {
+func (cn *MemberNode) PersistClusterMember() (err error) {
 
 	var (
 		config string
@@ -116,7 +116,7 @@ func (cn *ClientNode) PersistClusterMember() (err error) {
 		err = os.MkdirAll(pathToCfgDir, 0740)
 	}
 	if err == nil {
-		node, err = xn.New(cn.name, cn.ClientID, cn.lfs,
+		node, err = xn.New(cn.name, cn.MemberID, cn.lfs,
 			cn.ckPriv, cn.skPriv, nil, cn.endPoints, nil)
 	}
 	if err == nil {
@@ -133,13 +133,13 @@ func (cn *ClientNode) PersistClusterMember() (err error) {
 // the client joins the cluster, collects information on the other members,
 // and terminates when it has info on the entire membership.
 
-func NewClientNode(
+func NewMemberNode(
 	name, lfs string, ckPriv, skPriv *rsa.PrivateKey, attrs uint64,
 	regName string, regID *xi.NodeID, regEnd xt.EndPointI,
 	regCK, regSK *rsa.PublicKey,
 	clusterName string, clusterAttrs uint64, clusterID *xi.NodeID, 
 	size, epCount uint32, e []xt.EndPointI) (
-	cn *ClientNode, err error) {
+	cn *MemberNode, err error) {
 
 	var (
 		cm      *ClusterMember
@@ -172,7 +172,7 @@ func NewClientNode(
 			// all members have the same number of endpoints
 			actualEPCount := uint32(len(e))
 			if actualEPCount == 0 {
-				err = ClientMustHaveEndPoint
+				err = MemberMustHaveEndPoint
 			} else if epCount > actualEPCount {
 				epCount = actualEPCount
 			}
@@ -202,7 +202,7 @@ func NewClientNode(
 
 			// Node NOT YET INITIALIZED
 		}
-		cn = &ClientNode{
+		cn = &MemberNode{
 			name:          name,
 			lfs:           lfs, // if blank, node is ephemeral
 			proposedAttrs: attrs,
@@ -225,7 +225,7 @@ func NewClientNode(
 }
 
 // Read the next message over the connection
-func (cn *ClientNode) readMsg() (m *XLRegMsg, err error) {
+func (cn *MemberNode) readMsg() (m *XLRegMsg, err error) {
 	inBuf, err := cn.ReadData()
 	if err == nil && inBuf != nil {
 		m, err = DecryptUnpadDecode(inBuf, cn.decrypter)
@@ -234,7 +234,7 @@ func (cn *ClientNode) readMsg() (m *XLRegMsg, err error) {
 }
 
 // Write a message out over the connection
-func (cn *ClientNode) writeMsg(m *XLRegMsg) (err error) {
+func (cn *MemberNode) writeMsg(m *XLRegMsg) (err error) {
 	var data []byte
 	// serialize, marshal the message
 	data, err = EncodePadEncrypt(m, cn.encrypter)
@@ -246,10 +246,10 @@ func (cn *ClientNode) writeMsg(m *XLRegMsg) (err error) {
 
 // RUN CODE =========================================================
 
-// Subclasses (UserClient, AdminClient, etc) use sequences of calls to
+// Subclasses (UserMember, AdminMember, etc) use sequences of calls to
 // these these functions to accomplish their purposes.
 
-func (cn *ClientNode) SessionSetup(proposedVersion uint32) (
+func (cn *MemberNode) SessionSetup(proposedVersion uint32) (
 	cnx *xt.TcpConnection, decidedVersion uint32, err error) {
 	var (
 		ciphertext1, iv1, key1, salt1, salt1c []byte
@@ -298,7 +298,7 @@ func (cn *ClientNode) SessionSetup(proposedVersion uint32) (
 	return
 }
 
-func (cn *ClientNode) ClientAndOK() (err error) {
+func (cn *MemberNode) MemberAndOK() (err error) {
 
 	var (
 		ckBytes, skBytes []byte
@@ -343,11 +343,11 @@ func (cn *ClientNode) ClientAndOK() (err error) {
 			DigSig:   digSig,
 		}
 
-		op := XLRegMsg_Client
+		op := XLRegMsg_Member
 		request := &XLRegMsg{
 			Op: &op,
-			// ClientName:  &cn.name, // XXX redundant DROPPED
-			ClientSpecs: token,
+			// MemberName:  &cn.name, // XXX redundant DROPPED
+			MemberSpecs: token,
 		}
 		// SHOULD CHECK FOR TIMEOUT
 		err = cn.writeMsg(request)
@@ -356,17 +356,17 @@ func (cn *ClientNode) ClientAndOK() (err error) {
 	// SHOULD CHECK FOR TIMEOUT
 	response, err := cn.readMsg()
 	if err == nil {
-		id := response.GetClientID()
-		cn.ClientID, err = xi.New(id)
+		id := response.GetMemberID()
+		cn.MemberID, err = xi.New(id)
 
 		// XXX err ignored
 
-		cn.Attrs = response.GetClientAttrs()
+		cn.Attrs = response.GetMemberAttrs()
 	}
 	return
 }
 
-func (cn *ClientNode) CreateAndReply() (err error) {
+func (cn *MemberNode) CreateAndReply() (err error) {
 
 	var response *XLRegMsg
 
@@ -399,7 +399,7 @@ func (cn *ClientNode) CreateAndReply() (err error) {
 	return
 }
 
-func (cn *ClientNode) JoinAndReply() (err error) {
+func (cn *MemberNode) JoinAndReply() (err error) {
 
 	// Send JOIN MSG ============================================
 	op := XLRegMsg_Join
@@ -439,7 +439,7 @@ func (cn *ClientNode) JoinAndReply() (err error) {
 }
 
 // Collect information on all cluster members
-func (cn *ClientNode) GetAndMembers() (err error) {
+func (cn *MemberNode) GetAndMembers() (err error) {
 
 	if cn.ClusterID == nil {
 		fmt.Printf("** ENTERING GetAndMembers for %s with nil clusterID! **\n",
@@ -542,7 +542,7 @@ func (cn *ClientNode) GetAndMembers() (err error) {
 
 // Send Bye, wait for and process Ack.
 
-func (cn *ClientNode) ByeAndAck() (err error) {
+func (cn *MemberNode) ByeAndAck() (err error) {
 
 	op := XLRegMsg_Bye
 	request := &XLRegMsg{

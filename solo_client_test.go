@@ -11,7 +11,7 @@ import (
 	"path"
 )
 
-func (s *XLSuite) TestSoloClient(c *C) {
+func (s *XLSuite) TestSoloMember(c *C) {
 	if VERBOSITY > 0 {
 		fmt.Println("TEST_SOLO_CLIENT")
 	}
@@ -54,7 +54,7 @@ func (s *XLSuite) TestSoloClient(c *C) {
 	c.Assert(err, IsNil)
 	e := []xt.EndPointI{ep}
 
-	sc, err := NewSoloClient(name, lfs, serverName, serverID, serverEnd,
+	sc, err := NewSoloMember(name, lfs, serverName, serverID, serverEnd,
 		serverCK, serverSK, e)
 	c.Assert(err, IsNil)
 	c.Assert(sc, NotNil)

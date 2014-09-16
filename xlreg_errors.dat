@@ -2,7 +2,7 @@ BAD_ATTRS_LINE:BadAttrsLine:badly formed attrs line
 BAD_VERSION:BadVersion:badly formated VERSION
 CANT_FIND_CLUSTER_BY_ID:CantFindClusterByID:cannot find cluster with this ID
 CANT_FIND_CLUSTER_BY_NAME:CantFindClusterByName:cannot find cluster with this name
-CLIENT_MUST_HAVE_END_POINT:ClientMustHaveEndPoint:client must have at least one endPoint
+CLIENT_MUST_HAVE_END_POINT:ClientMustHaveEndPoint:member must have at least one endPoint
 CLUSTER_MEMBERS_MUST_HAVE_END_POINT:ClusterMembersMustHaveEndPoint:cluster members must have at least one endPoint
 CLUSTER_MUST_HAVE_MEMBER:ClusterMustHaveMember:cluster must have a member!
 CLUSTER_MUST_HAVE_TWO:ClusterMustHaveTwo:cluster must have at least two members
@@ -28,5 +28,5 @@ NO_NODE_NO_KEYS:NoNodeNoKeys:no node and no keys to build one
 RCVD_INVALID_MSG_FOR_STATE:RcvdInvalidMsgForState:invalid msg type for current state
 TAG_OUT_OF_RANGE:TagOutOfRange:message tag of of range
 UNEXPECTED_MSG_TYPE:UnexpectedMsgType:unexpected message type
-UNKNOWN_CLIENT:UnknownClient:client unknown, not in registry
+UNKNOWN_MEMBER:UnknownMember:member unknown, not in registry
 WRONG_NUMBER_OF_BYTES_IN_ATTRS:WrongNumberOfBytesInAttrs:wrong number of bytes in attrs
