@@ -527,7 +527,11 @@ func (cn *MemberNode) GetAndMembers() (err error) {
 
 			member := cn.Members[i]
 			if member == nil {
-				fmt.Printf("cluster member %d is nil\n", i)
+				msg := fmt.Sprintf("cluster member %d is nil", i)
+				// DEBUG
+				fmt.Println(msg)
+				// END
+				continue
 			}
 
 			// XXX NPE HERE if member is nil

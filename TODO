@@ -3,6 +3,7 @@ xlReg_go/TODO
 2014-09-16
     * MemberNode.{endPoints,lfs,name} appear to be wholly redundant;
         consider dropping them
+    * MemberNode.{c,s}kPriv are redundant given Node.Get{C,S}KPriv()
 
 2014-09-15
     * rename AdminClient  -> AdminMember                                * DONE
