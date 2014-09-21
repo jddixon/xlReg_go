@@ -35,7 +35,7 @@ func NewUserMember(
 	name, lfs string, ckPriv, skPriv *rsa.PrivateKey,
 	serverName string, serverID *xi.NodeID, serverEnd xt.EndPointI,
 	serverCK, serverSK *rsa.PublicKey,
-	clusterName string, clusterAttrs uint64, clusterID *xi.NodeID, 
+	clusterName string, clusterAttrs uint64, clusterID *xi.NodeID,
 	size, epCount uint32, e []xt.EndPointI) (ac *UserMember, err error) {
 
 	var attrs uint64
@@ -104,12 +104,7 @@ func (uc *UserMember) Run() {
 		if cnx != nil {
 			cnx.Close()
 		}
-		if err != nil {
-			cn.Err = err
-			cn.DoneCh <- false
-		} else {
-			cn.DoneCh <- true
-		}
+		cn.DoneCh <- err
 	}()
 	return
 }

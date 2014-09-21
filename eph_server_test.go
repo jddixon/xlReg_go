@@ -126,8 +126,8 @@ func (s *XLSuite) TestEphServer(c *C) {
 
 	// wait until all clients are done ------------------------------
 	for i := uint32(0); i < K; i++ {
-		success := <-uc[i].MemberNode.DoneCh
-		c.Assert(success, Equals, true)
+		doneErr := <-uc[i].MemberNode.DoneCh
+		c.Assert(doneErr, IsNil)
 		// if false, should check an.Err for error
 
 		// XXX NEXT LINE APPARENTLY DOES NOT WORK

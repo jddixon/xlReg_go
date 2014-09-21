@@ -40,8 +40,7 @@ const (
 )
 
 type MemberNode struct {
-	DoneCh          chan bool // if false, check error
-	Err             error
+	DoneCh          chan error
 	ProposedAttrs   uint64
 	ProposedVersion uint32 // proposed by member
 
@@ -70,11 +69,12 @@ type MemberNode struct {
 }
 
 // Returns a copy of the node's comms private RSA key
-func (cn *MemberNode) GetCKPriv() (rsa.PrivateKey) {
+func (cn *MemberNode) GetCKPriv() rsa.PrivateKey {
 	return *cn.ckPriv
 }
+
 // Returns a copy of the node's sig private RSA key
-func (cn *MemberNode) GetSKPriv() (rsa.PrivateKey) {
+func (cn *MemberNode) GetSKPriv() rsa.PrivateKey {
 	return *cn.skPriv
 }
 
@@ -146,7 +146,7 @@ func NewMemberNode(
 	name, lfs string, ckPriv, skPriv *rsa.PrivateKey, attrs uint64,
 	regName string, regID *xi.NodeID, regEnd xt.EndPointI,
 	regCK, regSK *rsa.PublicKey,
-	clusterName string, clusterAttrs uint64, clusterID *xi.NodeID, 
+	clusterName string, clusterAttrs uint64, clusterID *xi.NodeID,
 	size, epCount uint32, e []xt.EndPointI) (
 	cn *MemberNode, err error) {
 
@@ -215,7 +215,7 @@ func NewMemberNode(
 			Name:          name,
 			LFS:           lfs, // if blank, node is ephemeral
 			ProposedAttrs: attrs,
-			DoneCh:        make(chan bool, 1),
+			DoneCh:        make(chan error, 1),
 			RegName:       regName,
 			RegID:         regID,
 			RegEnd:        regEnd,
@@ -415,9 +415,9 @@ func (cn *MemberNode) JoinAndReply() (err error) {
 	op := XLRegMsg_Join
 	id := cn.ClusterID.Value()
 	request := &XLRegMsg{
-		Op:          &op,
+		Op: &op,
 		//ClusterName: &cn.ClusterName,
-		ClusterID:	id,
+		ClusterID: id,
 	}
 	// SHOULD CHECK FOR TIMEOUT
 	err = cn.writeMsg(request)

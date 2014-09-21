@@ -1,5 +1,10 @@
 xlReg_go/TODO
 
+2014-09-20
+    * change MemberNode.DoneChan to chan error
+    * drop MemberNode.Err
+    * review: should SoloMember return err?
+
 2014-09-16
     * MemberNode.{endPoints,lfs,name} appear to be wholly redundant;
         consider dropping them

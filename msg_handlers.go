@@ -367,7 +367,7 @@ func doGetMsg(h *InHandler) {
 	h.reg.mu.RUnlock() // <-- UNLOCK ----------------------
 
 	if err == nil {
-		size := cluster.Size() // actual size, not MaxSize
+		size := cluster.Size()       // actual size, not MaxSize
 		if size > MAX_CLUSTER_SIZE { // yes, should be impossible
 			size = MAX_CLUSTER_SIZE
 		}

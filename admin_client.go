@@ -31,7 +31,7 @@ type AdminMember struct {
 func NewAdminMember(
 	serverName string, serverID *xi.NodeID, serverEnd xt.EndPointI,
 	serverCK, serverSK *rsa.PublicKey,
-	clusterName string, clusterAttrs uint64, 
+	clusterName string, clusterAttrs uint64,
 	size, epCount uint32, e []xt.EndPointI) (
 	ac *AdminMember, err error) {
 
@@ -76,8 +76,7 @@ func (ac *AdminMember) Run() (err error) {
 			cnx.Close()
 		}
 
-		cn.Err = err
-		cn.DoneCh <- true
+		cn.DoneCh <- err
 	}()
 	return
 }

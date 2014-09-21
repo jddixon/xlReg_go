@@ -47,7 +47,7 @@ func (s *XLSuite) TestClusterMaker(c *C) {
 	}
 
 	// verify that the RegCluster.MembersByID index is correct
-	count := uint32(0)	// number of successful type assertions
+	count := uint32(0) // number of successful type assertions
 	for i := uint32(0); i < maxSize; i++ {
 		id := ids[i]
 		mbr, err := cl.MembersByID.Find(id)

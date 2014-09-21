@@ -2,6 +2,10 @@ xlReg_go/CHANGES
 -----------------------------------------------------------------------------
 The version number and date in this file must be kept in sync with version.go
 -----------------------------------------------------------------------------
+v1.1.2
+    2014-09-20
+        * dropped MemberNode.Err
+        * MemberNode.DoneCh becomes chan error                      SLOC 3908
 v1.1.1
     2014-09-17
         * corrected handling of nil member, client_node.go, 

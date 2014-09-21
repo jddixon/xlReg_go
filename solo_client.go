@@ -77,8 +77,7 @@ func (sc *SoloMember) Run() (err error) {
 		// Create the Node and write its configuration to the usual place
 		// in the file system: LFS/.xlattice/node.config.
 		err = cn.PersistNode()
-		cn.Err = err
-		cn.DoneCh <- true
+		cn.DoneCh <- err
 	}()
 	return
 }
