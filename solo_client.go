@@ -53,7 +53,7 @@ func NewSoloMember(name, lfs string,
 // Start the client running in separate goroutine, so that this function
 // is non-blocking.
 
-func (sc *SoloMember) Run() (err error) {
+func (sc *SoloMember) Run() {
 
 	cn := &sc.MemberNode
 
@@ -79,5 +79,4 @@ func (sc *SoloMember) Run() (err error) {
 		err = cn.PersistNode()
 		cn.DoneCh <- err
 	}()
-	return
 }

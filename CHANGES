@@ -2,6 +2,9 @@ xlReg_go/CHANGES
 -----------------------------------------------------------------------------
 The version number and date in this file must be kept in sync with version.go
 -----------------------------------------------------------------------------
+v1.1.3
+    2014-09-22
+        * dropped SoloClient returning error                        SLOCO 3906
 v1.1.2
     2014-09-20
         * dropped MemberNode.Err

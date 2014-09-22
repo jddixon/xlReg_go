@@ -60,9 +60,8 @@ func (s *XLSuite) TestSoloMember(c *C) {
 	c.Assert(sc, NotNil)
 
 	// 3. run the client, which gets a nodeID from the server -------
-	err = sc.Run()
-	c.Assert(err, IsNil)
-	<-sc.DoneCh
+	sc.Run()
+	err = <-sc.DoneCh
 
 	// 4.  verify that the client LFS exists and is correct ---------
 	found, err = xf.PathExists(lfs)
