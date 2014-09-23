@@ -1,5 +1,7 @@
 xlReg_go/TODO
 
+2014-09-23
+    * drop error return in AdminMember                                  * DONE
 2014-09-20
     * change MemberNode.DoneChan to chan error                          * DONE
     * drop MemberNode.Err                                               * DONE

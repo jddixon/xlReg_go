@@ -76,6 +76,9 @@ func (uc *UserMember) Run() {
 		if err == nil {
 			err = cn.MemberAndOK()
 		}
+		if cnx != nil {
+			defer cnx.Close()
+		}
 		// XXX MODIFY TO USE CLUSTER_ID PASSED TO UserMember
 		// 2013-10-12 this is a join by cluster name
 		if err == nil {
@@ -99,12 +102,6 @@ func (uc *UserMember) Run() {
 		if err == nil {
 			err = cn.ByeAndAck()
 		}
-
-		// END OF RUN ===============================================
-		if cnx != nil {
-			cnx.Close()
-		}
 		cn.DoneCh <- err
 	}()
-	return
 }

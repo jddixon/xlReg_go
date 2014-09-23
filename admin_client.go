@@ -52,7 +52,7 @@ func NewAdminMember(
 // Start the client running in separate goroutine, so that this function
 // is non-blocking.
 
-func (ac *AdminMember) Run() (err error) {
+func (ac *AdminMember) Run() {
 
 	cn := &ac.MemberNode
 
@@ -78,5 +78,4 @@ func (ac *AdminMember) Run() (err error) {
 
 		cn.DoneCh <- err
 	}()
-	return
 }
