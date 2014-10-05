@@ -28,7 +28,8 @@ const (
 	DEFAULT_ADDR = "127.0.0.1"
 	DEFAULT_NAME = "xlReg"
 	DEFAULT_LFS  = "/var/app/xlReg"
-	DEFAULT_PORT = 44444 // for the registry, not clients
+	TEST_DEFAULT_PORT = 45678 // for the registry, not clients
+	DEFAULT_PORT = 56789 // for the registry, not clients
 )
 
 var (
@@ -85,7 +86,7 @@ func main() {
 			*lfs = path.Join("tmp", *lfs)
 		}
 		if *port == DEFAULT_PORT || *port == 0 {
-			*port = 33333
+			*port = TEST_DEFAULT_PORT
 		}
 	}
 	addrAndPort := fmt.Sprintf("%s:%d", *address, *port)
