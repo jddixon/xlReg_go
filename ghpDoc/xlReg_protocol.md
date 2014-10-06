@@ -23,16 +23,16 @@ An example follows.
     SigPubKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDcpMhDQWgLHLcaU4Ed8fHBwLmNOa5RKECmci5VeDczF01R/VaxUcLnna58NM6m1fajNJlS3Z7xICiCwmYFOfJjQ8weuvXebqKUKTZMBghVRJqjPiWGmz9C07U/sTtRrEg0kEUZKepZ6Z9M7VN7eUJwoi+Avp99enTAKmgotYFXn47vpoLDGeKaviHAVcqOHXoQRLfT1Q6vjs/b+yg9lnxRon9kyf3tLopz64Sor6itkI0WhwdWZ0PJHDFW5SfkBhStBW1gC8vED0HO5bbi5iU1NRPiG+nUHm4UYjiQD2DY2PQGXeogZeaqL7ADy8+V0A7TYOkWZTSulK/IuYBY8Clz
 
     EndPoints {
-         TcpEndPoint: 50.18.104.7:55555
+         TcpEndPoint: 50.18.104.7:56789
     }
     Version: 0.4.3
 }
 </code></pre>
 
 This particular registry was on stockton.dixons.org, a machine in 
-Amazon's AWS/EC2 cloud.  It listened on `55555`, the port conventionally 
+Amazon's AWS/EC2 cloud.  It listened on `56789`, the port conventionally 
 used by the xlReg server.  *(**Note** that the test registry is now at
-xlreg.xlattice.org:55555.)*
+xlreg.xlattice.org:56789.)*
 
 The `Go` version of the xlReg client provides functions to read and write
 serialized RegCred files (`xlattice_go.reg.ParseRegCred()` and
@@ -99,7 +99,7 @@ The hello message is 60 bytes long and so fits.  We recommend using 1024-bit
 RSA keys for testing but 2048-bit or larger in production.
 
 The Hello message is sent to the server over a TCP connection using its
-well-known address.  Conventionally the xlReg server listens on port 55555.
+well-known address.  Conventionally the xlReg server listens on port 56789.
 
 ### Reply
 

@@ -2,6 +2,9 @@ xlReg_go/CHANGES
 -----------------------------------------------------------------------------
 The version number and date in this file must be kept in sync with version.go
 -----------------------------------------------------------------------------
+v1.1.5
+    2014-10-06
+        * changed default port to 56789 (45678 for testing)         SLOC 3909
 v1.1.4
     2014-09-23
         * dropped AdminClient returning error                       SLOC 3904

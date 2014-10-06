@@ -16,10 +16,9 @@ import (
 	"strings"
 )
 
-// AAAA makes it run first.
-func (s *XLSuite) TestAAAATestDir(c *C) {
+func (s *XLSuite) TestTestDir(c *C) {
 	if VERBOSITY > 0 {
-		fmt.Println("TEST_TEST_DIR")
+		fmt.Println("TEST_DATA_DIR")
 	}
 
 	// 001 READ AND INTERPRET test_dir/regCred.dat //////////////////
@@ -63,6 +62,10 @@ func (s *XLSuite) TestAAAATestDir(c *C) {
 	epFile := path.Join("testData/regCred", "endPoints")
 	epStr, err := ioutil.ReadFile(epFile)
 	c.Assert(err, IsNil)
+	strLen := len(epStr)
+	if (strLen>0) && (epStr[strLen-1] == '\n') {
+		epStr = epStr[:strLen-1]
+	}
 	var eps []string
 	if len(epStr) > 0 {
 		eps = strings.Split(string(epStr), "\n")
