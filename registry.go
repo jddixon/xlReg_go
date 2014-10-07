@@ -7,6 +7,7 @@ package reg
 
 import (
 	"fmt"
+	ha "github.com/jddixon/hamt_go"
 	xf "github.com/jddixon/xlCrypto_go/filters"
 	xi "github.com/jddixon/xlNodeID_go"
 	xt "github.com/jddixon/xlTransport_go"
@@ -32,8 +33,8 @@ type Registry struct {
 	idFilter xf.BloomSHAI
 
 	ClustersByName map[string]*RegCluster // volatile, not serialized
-	ClustersByID   *xi.IDMap              // -ditto-
-	RegMembersByID *xi.IDMap              // -ditto-
+	ClustersByID   ha.HAMT                // -ditto-
+	RegMembersByID ha.HAMT                // -ditto-
 	mu             sync.RWMutex           // -ditto-
 
 	// the extended XLattice node, so id, lfs, keys, etc
@@ -48,7 +49,7 @@ func NewRegistry(clusters []*RegCluster,
 
 	var (
 		idFilter      xf.BloomSHAI
-		m             *xi.IDMap
+		m             ha.HAMT
 		serverVersion xu.DecimalVersion
 	)
 	serverVersion, err = xu.ParseDecimalVersion(VERSION)
@@ -62,7 +63,8 @@ func NewRegistry(clusters []*RegCluster,
 			idFilter, err = xf.NewMappedBloomSHA(opt.M, opt.K, opt.BackingFile)
 		}
 		if err == nil {
-			m, err = xi.NewNewIDMap()
+			// HAMT root table size is 2^opt.T
+			m, err = ha.NewHAMT(DEFAULT_W, opt.T)
 		}
 	}
 	if err == nil {
@@ -102,7 +104,7 @@ func NewRegistry(clusters []*RegCluster,
 			serialized := regCred.String() // shd have terminating CRLF
 			logger.Print(serialized)
 			pathToFile := filepath.Join(myLFS, "regCred.dat")
-			err = ioutil.WriteFile(pathToFile, []byte(serialized), 0640)
+			err = ioutil.WriteFile(pathToFile, []byte(serialized), 0644)
 		}
 	}
 	return
@@ -132,30 +134,37 @@ func (reg *Registry) IDCount() uint {
 
 func (reg *Registry) AddCluster(cluster *RegCluster) (index int, err error) {
 
+	var bKey, cKey ha.BytesKey
 	if cluster == nil {
 		err = NilCluster
 	} else {
 		name := cluster.Name
 		id := cluster.ID // []byte
 
-		reg.mu.Lock()
-		defer reg.mu.Unlock()
-
-		if _, ok := reg.ClustersByName[name]; ok {
-			err = NameAlreadyInUse
-		} else {
-			var whatever interface{}
-			whatever, err = reg.ClustersByID.Find(id)
-			if err == nil && whatever != nil {
-				err = IDAlreadyInUse
-			}
-		}
+		// convert ID into a HAMT BytesKey
+		bKey, err = ha.NewBytesKey(id)
 		if err == nil {
-			index = len(reg.Clusters)
-			reg.Clusters = append(reg.Clusters, cluster)
-			reg.ClustersByName[name] = cluster
-			err = reg.ClustersByID.Insert(
-				cluster.GetNodeID().Value(), cluster)
+			reg.mu.Lock()
+			defer reg.mu.Unlock()
+
+			if _, ok := reg.ClustersByName[name]; ok {
+				err = NameAlreadyInUse
+			} else {
+				var whatever interface{}
+				whatever, err = reg.ClustersByID.Find(bKey)
+				if err == nil && whatever != nil {
+					err = IDAlreadyInUse
+				}
+			}
+			if err == nil {
+				index = len(reg.Clusters)
+				reg.Clusters = append(reg.Clusters, cluster)
+				reg.ClustersByName[name] = cluster
+				cKey, err = ha.NewBytesKey(cluster.GetNodeID().Value())
+				if err == nil {
+					err = reg.ClustersByID.Insert(cKey, cluster)
+				}
+			}
 		}
 	}
 	if err != nil {

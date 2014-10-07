@@ -10,6 +10,7 @@ import (
 	"encoding/hex" // DEBUG
 	e "errors"
 	"fmt"
+	ha "github.com/jddixon/hamt_go"
 	xc "github.com/jddixon/xlCrypto_go"
 	xi "github.com/jddixon/xlNodeID_go"
 	xu "github.com/jddixon/xlUtil_go"
@@ -263,19 +264,23 @@ func doJoinMsg(h *InHandler) {
 	} else if clusterID != nil {
 		var kluster interface{}
 
-		// if an ID has Leen defined, we will try to use that
-		h.reg.mu.RLock()
-		kluster, err = h.reg.ClustersByID.Find(clusterID)
-		h.reg.mu.RUnlock()
-		if kluster == nil {
-			msg := fmt.Sprintf("can't find cluster with ID %s",
-				hex.EncodeToString(clusterID))
-			// DEBUG
-			fmt.Printf("%s\n", msg)
-			// END
-			err = e.New(msg)
-		} else {
-			cluster = kluster.(*RegCluster)
+		// convert the clusterID into a HAMT BytesKey
+		bKey, err := ha.NewBytesKey(clusterID)
+		if err == nil {
+			// if an ID has Leen defined, we will try to use that
+			h.reg.mu.RLock()
+			kluster, err = h.reg.ClustersByID.Find(bKey)
+			h.reg.mu.RUnlock()
+			if kluster == nil {
+				msg := fmt.Sprintf("can't find cluster with ID %s",
+					hex.EncodeToString(clusterID))
+				// DEBUG
+				fmt.Printf("%s\n", msg)
+				// END
+				err = e.New(msg)
+			} else {
+				cluster = kluster.(*RegCluster)
+			}
 		}
 	} else {
 		// we have no ID and clusterName is not nil, so we will try to use that
@@ -352,19 +357,24 @@ func doGetMsg(h *InHandler) {
 	// that the assertion failed because kluster was nil, which should
 	// be impossible.
 
-	h.reg.mu.RLock() // <-- LOCK --------------------------
-	kluster, err := h.reg.ClustersByID.Find(clusterID)
-	if kluster == nil {
-		msg := fmt.Sprintf("doGetMsg: can't find cluster with ID %s",
-			hex.EncodeToString(clusterID))
-		// DEBUG
-		fmt.Printf("%s\n", msg)
-		// END
-		err = e.New(msg)
-	} else {
-		cluster = kluster.(*RegCluster)
+	// convert clusterID into a BytesKey
+	bKey, err := ha.NewBytesKey(clusterID)
+	if err == nil {
+		var kluster interface{}
+		h.reg.mu.RLock() // <-- LOCK --------------------------
+		kluster, err = h.reg.ClustersByID.Find(bKey)
+		if kluster == nil {
+			msg := fmt.Sprintf("doGetMsg: can't find cluster with ID %s",
+				hex.EncodeToString(clusterID))
+			// DEBUG
+			fmt.Printf("%s\n", msg)
+			// END
+			err = e.New(msg)
+		} else {
+			cluster = kluster.(*RegCluster)
+		}
+		h.reg.mu.RUnlock() // <-- UNLOCK ----------------------
 	}
-	h.reg.mu.RUnlock() // <-- UNLOCK ----------------------
 
 	if err == nil {
 		size := cluster.Size()       // actual size, not MaxSize

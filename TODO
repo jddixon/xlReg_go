@@ -1,5 +1,11 @@
 xlReg_go/TODO
 
+2014-10-06
+    * /var/app/xlReg/regCred.dat is 0640, should be 0644                * DONE
+    * replace xi.IDMap with HAMT
+        - this means we need a way to specify w and t
+            * default to 6
+
 2014-10-05
     * change DEFAULT_PORT to 56789                                      * DONE
         - if testing defaults to TEST_DEFAULT_PORT, 45678               * DONE

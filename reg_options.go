@@ -22,5 +22,6 @@ type RegOptions struct {
 	Name        string
 	Port        string
 	Testing     bool
+	T           uint
 	Verbose     bool
 }

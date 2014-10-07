@@ -25,11 +25,11 @@ func Usage() {
 }
 
 const (
-	DEFAULT_ADDR = "127.0.0.1"
-	DEFAULT_NAME = "xlReg"
-	DEFAULT_LFS  = "/var/app/xlReg"
+	DEFAULT_ADDR      = "127.0.0.1"
+	DEFAULT_NAME      = "xlReg"
+	DEFAULT_LFS       = "/var/app/xlReg"
 	TEST_DEFAULT_PORT = 45678 // for the registry, not clients
-	DEFAULT_PORT = 56789 // for the registry, not clients
+	DEFAULT_PORT      = 56789 // for the registry, not clients
 )
 
 var (
@@ -42,18 +42,20 @@ var (
 		"server is ephemeral, does not persist data")
 	justShow = flag.Bool("j", false,
 		"display option settings and exit")
-	k = flag.Int("k", int(reg.DEFAULT_K),
+	k = flag.Uint("k", reg.DEFAULT_K,
 		"number of hash functions in Bloom filter")
 	lfs = flag.String("lfs", DEFAULT_LFS,
 		"path to work directory")
 	logFile = flag.String("l", "log",
 		"path to log file")
-	m = flag.Int("m", int(reg.DEFAULT_M),
+	m = flag.Uint("m", reg.DEFAULT_M,
 		"exponent in Bloom filter")
 	name = flag.String("n", DEFAULT_NAME,
 		"registry name")
 	port = flag.Int("p", DEFAULT_PORT,
 		"registry listening port")
+	t = flag.Uint("t", reg.DEFAULT_W,
+		"number of cells in root HAMT table, exponent of 2")
 	testing = flag.Bool("T", false,
 		"this is a test run")
 	verbose = flag.Bool("v", false,
@@ -161,6 +163,7 @@ func main() {
 		opt.M = uint(*m)
 		opt.Lfs = *lfs
 		opt.Port = fmt.Sprintf("%d", *port)
+		opt.T = *t
 		opt.Testing = *testing
 		opt.Verbose = *verbose
 

@@ -63,7 +63,7 @@ func (s *XLSuite) TestTestDir(c *C) {
 	epStr, err := ioutil.ReadFile(epFile)
 	c.Assert(err, IsNil)
 	strLen := len(epStr)
-	if (strLen>0) && (epStr[strLen-1] == '\n') {
+	if (strLen > 0) && (epStr[strLen-1] == '\n') {
 		epStr = epStr[:strLen-1]
 	}
 	var eps []string

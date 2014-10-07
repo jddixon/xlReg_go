@@ -10,6 +10,7 @@ import (
 	"crypto/rsa"
 	"encoding/hex"
 	"fmt"
+	ha "github.com/jddixon/hamt_go"
 	xi "github.com/jddixon/xlNodeID_go"
 	xn "github.com/jddixon/xlNode_go"
 	xo "github.com/jddixon/xlOverlay_go"
@@ -34,14 +35,14 @@ type RegCluster struct {
 	epCount       uint32 // a positive integer, for now is 1 or 2
 	Members       []*MemberInfo
 	MembersByName map[string]*MemberInfo
-	MembersByID   *xi.IDMap
+	MembersByID   ha.HAMT
 	mu            sync.RWMutex
 }
 
 func NewRegCluster(name string, id *xi.NodeID, attrs uint64,
 	maxSize, epCount uint32) (rc *RegCluster, err error) {
 
-	var m *xi.IDMap
+	var m ha.HAMT
 
 	if name == "" {
 		name = "xlCluster"
@@ -54,7 +55,7 @@ func NewRegCluster(name string, id *xi.NodeID, attrs uint64,
 		//err = ClusterMustHaveTwo
 		err = ClusterMustHaveMember
 	} else {
-		m, err = xi.NewNewIDMap()
+		m, err = ha.NewHAMT(DEFAULT_W, DEFAULT_W)
 	}
 	if err == nil {
 		rc = &RegCluster{
@@ -97,7 +98,7 @@ func (rc *RegCluster) AddMember(member *MemberInfo) (err error) {
 		fmt.Printf("AddMember: ATTEMPT TO ADD EXISTING MEMBER %s\n", name)
 		return
 	}
-	// XXX CHECK FOR ENTRY IN IDMap
+	// XXX CHECK FOR ENTRY IN HAMT
 
 	// XXX STUB
 
@@ -106,7 +107,10 @@ func (rc *RegCluster) AddMember(member *MemberInfo) (err error) {
 	_ = index                // we might want to use this
 	rc.Members = append(rc.Members, member)
 	rc.MembersByName[name] = member
-	err = rc.MembersByID.Insert(member.GetNodeID().Value(), member)
+	bKey, err := ha.NewBytesKey(member.GetNodeID().Value())
+	if err == nil {
+		err = rc.MembersByID.Insert(bKey, member)
+	}
 	rc.mu.Unlock() // <------------------------------------
 
 	return

@@ -51,7 +51,7 @@ func (s *XLSuite) TestMmap(c *C) {
 	err := ioutil.WriteFile(pathToFile, data, 0644)
 	c.Assert(err, IsNil)
 
-	f, err := os.OpenFile(pathToFile, os.O_CREATE|os.O_RDWR, 0640)
+	f, err := os.OpenFile(pathToFile, os.O_CREATE|os.O_RDWR, 0644)
 	c.Assert(err, IsNil)
 
 	// XXX Changing this from gm.MAP_PRIVATE to gm.MAP_SHARED made

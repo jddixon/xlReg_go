@@ -4,6 +4,7 @@ package reg
 
 import (
 	"fmt"
+	ha "github.com/jddixon/hamt_go"
 	xr "github.com/jddixon/rnglib_go"
 	. "gopkg.in/check.v1"
 )
@@ -12,6 +13,7 @@ func (s *XLSuite) TestClusterMaker(c *C) {
 	if VERBOSITY > 0 {
 		fmt.Println("TEST_CLUSTER_MAKER")
 	}
+	var err error
 	rng := xr.MakeSimpleRNG()
 
 	// Generate a random cluster
@@ -50,7 +52,10 @@ func (s *XLSuite) TestClusterMaker(c *C) {
 	count := uint32(0) // number of successful type assertions
 	for i := uint32(0); i < maxSize; i++ {
 		id := ids[i]
-		mbr, err := cl.MembersByID.Find(id)
+		var bKey ha.BytesKey
+		bKey, err = ha.NewBytesKey(id)
+		c.Assert(err, IsNil)
+		mbr, err := cl.MembersByID.Find(bKey)
 		c.Assert(err, IsNil)
 		var member *MemberInfo
 		// verify that the type assertion succeeds

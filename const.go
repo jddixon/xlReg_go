@@ -7,6 +7,7 @@ const (
 
 	DEFAULT_M = uint(20)
 	DEFAULT_K = uint(8)
+	DEFAULT_W = uint(6) // default HAMT w parameter
 
 	MAX_CLUSTER_SIZE = uint32(64) // inclusive
 	MIN_CLUSTER_SIZE = uint32(2)
