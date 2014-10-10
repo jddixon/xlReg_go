@@ -36,16 +36,16 @@ containing</p>
     SigPubKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDcpMhDQWgLHLcaU4Ed8fHBwLmNOa5RKECmci5VeDczF01R/VaxUcLnna58NM6m1fajNJlS3Z7xICiCwmYFOfJjQ8weuvXebqKUKTZMBghVRJqjPiWGmz9C07U/sTtRrEg0kEUZKepZ6Z9M7VN7eUJwoi+Avp99enTAKmgotYFXn47vpoLDGeKaviHAVcqOHXoQRLfT1Q6vjs/b+yg9lnxRon9kyf3tLopz64Sor6itkI0WhwdWZ0PJHDFW5SfkBhStBW1gC8vED0HO5bbi5iU1NRPiG+nUHm4UYjiQD2DY2PQGXeogZeaqL7ADy8+V0A7TYOkWZTSulK/IuYBY8Clz
 
     EndPoints {
-         TcpEndPoint: 50.18.104.7:55555
+         TcpEndPoint: 50.18.104.7:56789
     }
     Version: 0.4.3
 }
 </code></pre>
 
 <p>This particular registry was on stockton.dixons.org, a machine in
-Amazon&rsquo;s AWS/EC2 cloud.  It listened on <code>55555</code>, the port conventionally
+Amazon&rsquo;s AWS/EC2 cloud.  It listened on <code>56789</code>, the port conventionally
 used by the xlReg server.  <em>(<strong>Note</strong> that the test registry is now at
-xlreg.xlattice.org:55555.)</em></p>
+xlreg.xlattice.org:56789.)</em></p>
 
 <p>The <code>Go</code> version of the xlReg client provides functions to read and write
 serialized RegCred files (<code>xlattice_go.reg.ParseRegCred()</code> and
@@ -116,7 +116,7 @@ is</p>
 RSA keys for testing but 2048-bit or larger in production.</p>
 
 <p>The Hello message is sent to the server over a TCP connection using its
-well-known address.  Conventionally the xlReg server listens on port 55555.</p>
+well-known address.  Conventionally the xlReg server listens on port 56789.</p>
 
 <h3>Reply</h3>
 
