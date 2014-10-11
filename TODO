@@ -1,10 +1,26 @@
 xlReg_go/TODO
 
+2014-10-07
+    * FIX: README.md currently is more or less a duplicate of           * DONE
+        ghpDoc/index.md (drops last para), but this is silly, because   * DONE
+        the text references other files in ghpDoc/ using relative       * DONE
+        paths.  Fix by simply dropping the link(s).                     * DONE
+
+2014-10-07 (-07-25, edited)
+    * install current version 1.2.0 on EC2/portland), port 56789              
+    * confirm 'go test' succeeds on EC2                                 * DONE
+    * regenerate /var/app/xlReg/.xlattice and regCred.dat               * DONE
+    * regenerate xlreg_* documentation, which includes regCred.dat      * DONE
+    * need to automatically edit private IP address, 192.168.240.4
+        in this case, to the public IP address, 54.187.133.62
+        - sed
+    * need test here which runs against portland:56789
+
 2014-10-06
-    * /var/app/xlReg/regCred.dat is 0640, should be 0644                * DONE
-    * replace xi.IDMap with HAMT
-        - this means we need a way to specify w and t
-            * default to 6
+    * /var/app/xlReg/regCred.dat is 0640, should be 0644                * FIXED
+    * replace xi.IDMap with HAMT                                        * DONE
+        - this means we need a way to specify w and t                   * DONE
+            * default to 6                                              * DONE
 
 2014-10-05
     * change DEFAULT_PORT to 56789                                      * DONE
@@ -12,34 +28,10 @@ xlReg_go/TODO
         - go build && go install                                        * DONE
     * add port 56789 to EC2 security groups in the four regions         * DONE
 
-2014-09-23
-    * drop error return in AdminMember                                  * DONE
-2014-09-20
-    * change MemberNode.DoneChan to chan error                          * DONE
-    * drop MemberNode.Err                                               * DONE
-    * review: should SoloMember return err?                             * FIXED
-
 2014-09-16
     * MemberNode.{endPoints,lfs,name} appear to be wholly redundant;
         consider dropping them
     * MemberNode.{c,s}kPriv are redundant given Node.Get{C,S}KPriv()
-
-2014-09-15
-    * rename AdminClient  -> AdminMember                                * DONE
-    * rename ClientAndOK  -> MemberAndOK                                * DONE
-    * rename ClientAttrs  -> MemberAttrs                                * DONE
-    * rename ClientID     -> MemberID                                   * DONE
-    * rename ClientMustHaveEndPoint -> MemberMustHaveEndPoint           * DONE
-    * rename ClientNode   -> MemberNode                                 * DONE
-    * rename ClientSpecs  -> MemberSpecs                                * DONE
-    * rename UnknownClient-> UnknownMember                              * DONE
-    * rename UserClient   -> UserMember                                 * DONE
-    * rename SoloClient   -> SoloMember                                 * DONE
-
-    * these changes must be reflected in executable                     * BUILT
-        - server on portland must be replaced
-        - regCred.dat must be replace in xlreg_*
-        - major version number should be bumped                         * DONE
 
 2014-09-13
     * REVIEW: ClientNode.clientID renamed ClientID, other fields
@@ -59,21 +51,7 @@ xlReg_go/TODO
         keep_alive_test.go is working, backport relevant bits
         - NO, eph_server_test.go is the model to follow
 
-2014-09-06
-    * implement reg_cluster_test.go uniqueness tests for names,         * DONE
-        - correctness of 'byName index' == RegCluster.MembersByName     * DONE
-        - correctness of 'byID index'   == RegCluster.MembersByID       * DONE
-
-2014-07-25
-    * install current version on EC2/portland), port 55555              * DONE
-    * confirm 'go test' succeeds on EC2                                 * DONE
-    * need to automatically edit private IP address, 192.168.240.4
-        in this cae, to the public IP address, 54.187.133.62
-    * need test here which runs against portland:55555
-
 2014-07-03
-    * install current version on EC2 (stockton), port 55555             * DONE
-    * confirm 'go test' succeeds on EC2                                 * DONE
     BUT TEST SUCCEEDS ON PORTLAND:
     * FIX: cluster_member_test.go line 62 gets strconv.NumError
         (Func:"ParseInt", Num:"4592296101443653904", presumably
@@ -86,26 +64,10 @@ xlReg_go/TODO
         address, but on EC2 cloud has to use its private (10/8 or 
         192.178.*/24) address to get address to bind
         - if 127.0.0.1 is used, clients must be on same host
-    * update regCred.dat from stockton                                  * DONE
 
 2014-05-14
-    * get xlReg server from xlattice_go (cmd/xlReg)                     * DONE
     * review whether reg_node.go actually needs xlattice_go/msg
-    * review whether registry.go needs 'xl' import                      * GONE
-    * review whether in_handler.go needs 'xl' import                    * GONE
     * website needs new reg_cred before this is deployed
-
-2014-03-16
-    * correct other (semi-)infinite loops in other tests
-        - eph_server_test.go                                            * DONE
-        - gocheck.go                                                    * DONE
-            * cluster_member_test, which uses gocheck                   * DONE
-            * reg_node_test, which uses                                 * DONE
-        - mmap_test.go                                                  * OK
-        - reg_cred_test.go                                              * OK
-
-2014-03-15
-    * fix INFINITE LOOP in solo_client_test.go                          * DONE
 
 2014-02-24
     * write testData_test.go exercising data in test_dir as model for
@@ -130,22 +92,12 @@ xlReg_go/TODO
         - EITHER token with digSig but without clientID
         - OR clientID plus salt plus digSig
 
-2014-02-03
-    * get Stockton regCred                                              * DONE
-    * add to ../doc/xlReg_protocol.md                                   * DONE
-
 2013-12-06
     * NewRegistry must populate indexes if clusters supplied
 
 2013-12-05
     * UserClient.Run() may return error, especially EOF, in which case
         we need to try again; using code needs to be fixed
-
-2013-12-01
-    * xlReg fails in upax_go tests occasionally for no obvious reason:  * DONE?
-        need to locate and fix bug					                    * DONE ?
-        - at least sometimes appears as nil nodeID pointer				* DONE ?
-            * we have asked for a nodeID and didn't get one				* DONE ?
 
 2013-11-22
     * modify client_node.go to use SetupSessionKey()
