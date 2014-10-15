@@ -25,7 +25,7 @@ type AdminMember struct {
 	// In this implementation, AdminMember is a one-shot, launched
 	// to create a single cluster
 
-	MemberNode
+	MemberMaker
 }
 
 func NewAdminMember(
@@ -35,7 +35,7 @@ func NewAdminMember(
 	size, epCount uint32, e []xt.EndPointI) (
 	ac *AdminMember, err error) {
 
-	cn, err := NewMemberNode("admin", "", nil, nil, // name, LFS, keys
+	cn, err := NewMemberMaker("admin", "", nil, nil, // name, LFS, keys
 		ATTR_ADMIN|ATTR_SOLO|ATTR_EPHEMERAL,
 		serverName, serverID, serverEnd, serverCK, serverSK,
 		clusterName, clusterAttrs, nil, size, epCount, e)
@@ -43,7 +43,7 @@ func NewAdminMember(
 	if err == nil {
 		// Run() fills in clusterID
 		ac = &AdminMember{
-			MemberNode: *cn,
+			MemberMaker: *cn,
 		}
 	}
 	return // FOO
@@ -54,7 +54,7 @@ func NewAdminMember(
 
 func (ac *AdminMember) Run() {
 
-	cn := &ac.MemberNode
+	cn := &ac.MemberMaker
 
 	go func() {
 		var (

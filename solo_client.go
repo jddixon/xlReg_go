@@ -27,7 +27,7 @@ type SoloMember struct {
 	// In this implementation, SoloMember is a one-shot, launched
 	// to create a solitary node.
 
-	MemberNode
+	MemberMaker
 }
 
 func NewSoloMember(name, lfs string,
@@ -36,7 +36,7 @@ func NewSoloMember(name, lfs string,
 	e []xt.EndPointI) (
 	sc *SoloMember, err error) {
 
-	cn, err := NewMemberNode(name, lfs, nil, nil, ATTR_SOLO,
+	cn, err := NewMemberMaker(name, lfs, nil, nil, ATTR_SOLO,
 		serverName, serverID, serverEnd, serverCK, serverSK,
 		"", uint64(0), nil, 0, // no cluster
 		uint32(len(e)), e)
@@ -44,7 +44,7 @@ func NewSoloMember(name, lfs string,
 	if err == nil {
 		// Run() fills in clusterID
 		sc = &SoloMember{
-			MemberNode: *cn,
+			MemberMaker: *cn,
 		}
 	}
 	return
@@ -55,7 +55,7 @@ func NewSoloMember(name, lfs string,
 
 func (sc *SoloMember) Run() {
 
-	cn := &sc.MemberNode
+	cn := &sc.MemberMaker
 
 	go func() {
 		var (

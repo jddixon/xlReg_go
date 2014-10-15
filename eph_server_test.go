@@ -16,6 +16,9 @@ import (
 	xr "github.com/jddixon/rnglib_go"
 	xt "github.com/jddixon/xlTransport_go"
 	. "gopkg.in/check.v1"
+	"os"
+	"path"
+	"strings"
 )
 
 func (s *XLSuite) TestEphServer(c *C) {
@@ -54,8 +57,22 @@ func (s *XLSuite) TestEphServer(c *C) {
 	found, err := reg.ContainsID(regID)
 	c.Assert(found, Equals, true)
 
-	// 2. create a random cluster name and size ---------------------
+	// 2. create a random cluster name, size, scratch directory -----
 	clusterName := rng.NextFileName(8)
+	clusterDir := path.Join("tmp", clusterName)
+	for {
+		if _, err = os.Stat(clusterDir); os.IsNotExist(err) {
+			break
+		}
+		clusterName = rng.NextFileName(8)
+		clusterDir = path.Join("tmp", clusterName)
+	}
+	err = os.MkdirAll(clusterDir, 0740)
+	c.Assert(err, IsNil)
+
+	// DEBUG
+	fmt.Printf("CLUSTER NAME: %s\n", clusterName)
+	// END
 	clusterAttrs := uint64(rng.Int63())
 	K := uint32(2 + rng.Intn(6)) // so the size is 2 .. 7
 
@@ -91,16 +108,20 @@ func (s *XLSuite) TestEphServer(c *C) {
 	c.Assert(err, IsNil)
 	// c.Assert(found, Equals, true)				// XXX FALSE
 
-	// 4. create K clients ------------------------------------------
+	// 4. create K members ------------------------------------------
 
 	uc := make([]*UserMember, K)
 	ucNames := make([]string, K)
 	namesInUse := make(map[string]bool)
+	epCount := uint32(2)
 	for i := uint32(0); i < K; i++ {
-		var ep *xt.TcpEndPoint
-		ep, err = xt.NewTcpEndPoint("127.0.0.1:0")
-		c.Assert(err, IsNil)
-		e := []xt.EndPointI{ep}
+		var endPoints []xt.EndPointI
+		for j := uint32(0); j < epCount; j++ {
+			var ep *xt.TcpEndPoint
+			ep, err = xt.NewTcpEndPoint("127.0.0.1:0")
+			c.Assert(err, IsNil)
+			endPoints = append(endPoints, ep)
+		}
 		newName := rng.NextFileName(8)
 		_, ok := namesInUse[newName]
 		for ok {
@@ -109,30 +130,33 @@ func (s *XLSuite) TestEphServer(c *C) {
 		}
 		namesInUse[newName] = true
 		ucNames[i] = newName // guaranteed to be LOCALLY unique
-		uc[i], err = NewUserMember(ucNames[i], "",
+		lfs := path.Join(clusterDir, newName)
+		// DEBUG
+		fmt.Printf("cluster %s member %-8s has lfs %s\n",
+			clusterName, newName, lfs)
+		// END
+		uc[i], err = NewUserMember(ucNames[i], lfs,
 			nil, nil, // private RSA keys are generated if nil
 			serverName, serverID, serverEnd, serverCK, serverSK,
 			clusterName, an.ClusterAttrs, an.ClusterID,
-			K, uint32(1), e) //1 is endPoint count
+			K, epCount, endPoints)
 		c.Assert(err, IsNil)
 		c.Assert(uc[i], NotNil)
 		c.Assert(uc[i].ClusterID, NotNil)
 	}
 
-	// 5. start the K clients, each in a separate goroutine ---------
+	// 5. initialize the K members, each in a separate goroutine ----
 	for i := uint32(0); i < K; i++ {
 		uc[i].Run()
 	}
 
-	// wait until all clients are done ------------------------------
+	// wait until all members are initialized -----------------------
 	for i := uint32(0); i < K; i++ {
-		doneErr := <-uc[i].MemberNode.DoneCh
+		doneErr := <-uc[i].MemberMaker.DoneCh
 		c.Assert(doneErr, IsNil)
-		// if false, should check an.Err for error
-
-		// XXX NEXT LINE APPARENTLY DOES NOT WORK
-		// nodeID := uc[i].MemberNode.GetNodeID()
-		nodeID := uc[i].MemberID
+		// among other things, the Persist makes the nodes start listening
+		uc[i].MemberMaker.PersistClusterMember()
+		nodeID := uc[i].MemberMaker.GetNodeID()
 		c.Assert(nodeID, NotNil)
 		found, err := reg.ContainsID(nodeID)
 		c.Assert(err, IsNil)
@@ -140,9 +164,30 @@ func (s *XLSuite) TestEphServer(c *C) {
 	}
 	c.Assert(reg.IDCount(), Equals, uint(3+K)) // regID + anID + clusterID + K
 
-	//
-	// verify that results are as expected --------------------------
-	//
-	// XXX STUB XXX
+	// 6. verify that the nodes are live ----------------------------
+	for i := uint32(0); i < K; i++ {
+		mn := uc[i].MemberMaker
+		cm := mn.ClusterMember
+		mnEPCount := uint32(len(mn.EndPoints))
+		c.Assert(mnEPCount, Equals, epCount)
+		actualEPCount := uint32(mn.SizeEndPoints())
+		c.Assert(actualEPCount, Equals, epCount)
+		actualAccCount := uint32(mn.SizeAcceptors())
+		c.Assert(actualAccCount, Equals, epCount)
+		for j := uint32(0); j < epCount; j++ {
+			nodeEP := cm.GetEndPoint(int(j)).String()
+			nodeAcc := cm.GetAcceptor(int(j)).String()
+			c.Assert(strings.HasSuffix(nodeEP, ".0"), Equals, false)
+			c.Assert(strings.HasSuffix(nodeAcc, nodeEP), Equals, true)
+			// DEBUG
+			fmt.Printf("node %d: endPoint %d is %s\n",
+				i, j, cm.GetEndPoint(int(j)).String())
+			// END
+		}
 
+	}
+
+	// verify that results are as expected --------------------------
+
+	// XXX STUB XXX
 }

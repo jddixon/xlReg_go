@@ -28,7 +28,7 @@ var _ = fmt.Print
 type UserMember struct {
 	// members []MemberInfo		// XXX Nowhere used
 
-	MemberNode
+	MemberMaker
 }
 
 func NewUserMember(
@@ -43,7 +43,7 @@ func NewUserMember(
 	if lfs == "" {
 		attrs |= ATTR_EPHEMERAL
 	}
-	cn, err := NewMemberNode(name, lfs, ckPriv, skPriv, attrs,
+	mn, err := NewMemberMaker(name, lfs, ckPriv, skPriv, attrs,
 		serverName, serverID, serverEnd,
 		serverCK, serverSK, //  *rsa.PublicKey,
 		clusterName, clusterAttrs, clusterID, size,
@@ -52,29 +52,29 @@ func NewUserMember(
 	if err == nil {
 		// Run() fills in clusterID
 		ac = &UserMember{
-			MemberNode: *cn,
+			MemberMaker: *mn,
 		}
 	}
 	return
 
 }
 
-// Start the client running in separate goroutine, so that this function
+// Start the member running in separate goroutine, so that this function
 // is non-blocking.
 
 func (uc *UserMember) Run() {
 
-	cn := &uc.MemberNode
+	mn := &uc.MemberMaker
 
 	go func() {
 		var (
 			err      error
 			version1 uint32
 		)
-		cnx, version2, err := cn.SessionSetup(version1)
+		cnx, version2, err := mn.SessionSetup(version1)
 		_ = version2 // not yet used
 		if err == nil {
-			err = cn.MemberAndOK()
+			err = mn.MemberAndOK()
 		}
 		if cnx != nil {
 			defer cnx.Close()
@@ -82,10 +82,10 @@ func (uc *UserMember) Run() {
 		// XXX MODIFY TO USE CLUSTER_ID PASSED TO UserMember
 		// 2013-10-12 this is a join by cluster name
 		if err == nil {
-			err = cn.JoinAndReply()
+			err = mn.JoinAndReply()
 		}
 		if err == nil {
-			err = cn.GetAndMembers()
+			err = mn.GetAndMembers()
 		}
 		// DEBUG
 		var nilMembers []int
@@ -100,8 +100,8 @@ func (uc *UserMember) Run() {
 		}
 		// END
 		if err == nil {
-			err = cn.ByeAndAck()
+			err = mn.ByeAndAck()
 		}
-		cn.DoneCh <- err
+		mn.DoneCh <- err
 	}()
 }

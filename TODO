@@ -1,5 +1,23 @@
 xlReg_go/TODO
 
+2014-10-15
+    * FIX: epCount at end of clusterMember serialization is wrong
+    * FIX: endPoint ports in clusterMember serialization are wrong
+
+    * to reduce confusion, rename MemberNode MemberMaker                * DONE
+    * verify that references to cluster member endPoints use
+        GetEndPoint(n) or GetAcceptor(n)
+
+2014-10-14
+    * memberNode.go: 
+        - split MemberNode into container (MemberMaker) and the bits
+            that get serialized (ClusterMember + what?)
+            * if what? is not an empty set, add its bits to 
+                ClusterMember
+        - notice overlap with existing function PersistNode()
+        - and PersistClusterMember(), which is nowhere used             * FALSE
+    * xlReg_go version then becomes v1.3 or 2.0
+
 2014-10-07
     * FIX: README.md currently is more or less a duplicate of           * DONE
         ghpDoc/index.md (drops last para), but this is silly, because   * DONE

@@ -2,6 +2,10 @@ package reg
 
 // xlReg_go/client_node.go  WILL BECOME memberNode.go
 
+///////////////////////////
+// XX RENAME NewMemberMaker XX
+///////////////////////////
+
 import (
 	"bytes"
 	"crypto"
@@ -39,20 +43,22 @@ const (
 	MEMBER_CLOSED
 )
 
-type MemberNode struct {
+type MemberMaker struct {
+
+	// EPHEMERAL INFORMATION: should not be serialized ==============
 	DoneCh          chan error
 	ProposedAttrs   uint64
 	ProposedVersion uint32 // proposed by member
 
-	ckPriv, skPriv *rsa.PrivateKey
 	AesCnxHandler
 
-	// RegCred info: registry credentials ---------------------------
+	// RegCred info: registry credentials -----------------
 	RegName string
 	RegID   *xi.NodeID
 	RegCK   *rsa.PublicKey
 	RegSK   *rsa.PublicKey
 	RegEnd  xt.EndPointI
+
 	// serverVersion xu.DecimalVersion		// missing
 
 	regProtoVersion uint32 // protocol version used to talk to registry
@@ -60,27 +66,28 @@ type MemberNode struct {
 	// REDUNDANT: INFORMATION USED TO BUILD NODE ====================
 	// This is used to build the node and so is persisted as part of
 	// the node when that is saved.
-	EndPoints []xt.EndPointI
-	LFS       string
-	Name      string
-	MemberID  *xi.NodeID
+	ckPriv, skPriv *rsa.PrivateKey
+	EndPoints      []xt.EndPointI
+	LFS            string
+	Name           string
+	MemberID       *xi.NodeID
 
 	ClusterMember
 }
 
 // Returns a copy of the node's comms private RSA key
-func (cn *MemberNode) GetCKPriv() rsa.PrivateKey {
+func (cn *MemberMaker) GetCKPriv() rsa.PrivateKey {
 	return *cn.ckPriv
 }
 
 // Returns a copy of the node's sig private RSA key
-func (cn *MemberNode) GetSKPriv() rsa.PrivateKey {
+func (cn *MemberMaker) GetSKPriv() rsa.PrivateKey {
 	return *cn.skPriv
 }
 
 // Create just the Node for this member and write it to the conventional
 // place in the file system.
-func (cn *MemberNode) PersistNode() (err error) {
+func (cn *MemberMaker) PersistNode() (err error) {
 
 	var (
 		config string
@@ -110,7 +117,7 @@ func (cn *MemberNode) PersistNode() (err error) {
 
 // Create the Node for this client and write the serialized ClusterMember
 // to the conventional place in the file system.
-func (cn *MemberNode) PersistClusterMember() (err error) {
+func (mn *MemberMaker) PersistClusterMember() (err error) {
 
 	var (
 		config string
@@ -118,23 +125,52 @@ func (cn *MemberNode) PersistClusterMember() (err error) {
 	)
 
 	// XXX check attrs, etc
-	pathToCfgDir := path.Join(cn.LFS, ".xlattice")
+	pathToCfgDir := path.Join(mn.LFS, ".xlattice")
 	pathToCfgFile := path.Join(pathToCfgDir, "cluster.member.config")
-	found, err := xf.PathExists(pathToCfgDir)
-	if err == nil && !found {
+
+	// DEBUG
+	fmt.Printf("member %-8s: config file is %s\n", mn.Name, pathToCfgFile)
+	// END
+
+	_, err = os.Stat(pathToCfgDir)
+	if os.IsNotExist(err) {
 		err = os.MkdirAll(pathToCfgDir, 0740)
+		// DEBUG
+		fmt.Printf("  member %-8s: error from MkdirAll %s is %v\n",
+			mn.Name, pathToCfgFile, err)
+		// END
+	} else if err != nil {
+		// DEBUG
+		fmt.Printf("  member %-8s: error from Stat %s is %v\n",
+			mn.Name, pathToCfgFile, err)
+		// END
+	}
+
+	if err == nil {
+		// DEBUG
+		fmt.Printf("  member %-8s: creating Node\n", mn.Name)
+		// END
+		node, err = xn.New(mn.Name, mn.MemberID, mn.LFS,
+			mn.ckPriv, mn.skPriv, nil, mn.EndPoints, nil)
 	}
 	if err == nil {
-		node, err = xn.New(cn.Name, cn.MemberID, cn.LFS,
-			cn.ckPriv, cn.skPriv, nil, cn.EndPoints, nil)
+		// DEBUG
+		fmt.Printf("  member %-8s: serializing\n", mn.Name)
+		// END
+		mn.Node = *node
+		config = mn.ClusterMember.String()
 	}
 	if err == nil {
-		cn.Node = *node
-		config = cn.ClusterMember.String() // XXX sometimes panics
-	}
-	if err == nil {
+		// DEBUG
+		fmt.Printf("  member %-8s: writing config file\n", mn.Name)
+		// END
 		err = ioutil.WriteFile(pathToCfgFile, []byte(config), 0600)
 	}
+	// DEBUG
+	if err != nil {
+		fmt.Printf("  member %-8s: ERROR %s\n", mn.Name, err.Error())
+	}
+	// END
 	return
 }
 
@@ -142,13 +178,13 @@ func (cn *MemberNode) PersistClusterMember() (err error) {
 // the client joins the cluster, collects information on the other members,
 // and terminates when it has info on the entire membership.
 
-func NewMemberNode(
+func NewMemberMaker(
 	name, lfs string, ckPriv, skPriv *rsa.PrivateKey, attrs uint64,
 	regName string, regID *xi.NodeID, regEnd xt.EndPointI,
 	regCK, regSK *rsa.PublicKey,
 	clusterName string, clusterAttrs uint64, clusterID *xi.NodeID,
 	size, epCount uint32, e []xt.EndPointI) (
-	cn *MemberNode, err error) {
+	cn *MemberMaker, err error) {
 
 	var (
 		cm      *ClusterMember
@@ -211,7 +247,7 @@ func NewMemberNode(
 
 			// Node NOT YET INITIALIZED
 		}
-		cn = &MemberNode{
+		cn = &MemberMaker{
 			Name:          name,
 			LFS:           lfs, // if blank, node is ephemeral
 			ProposedAttrs: attrs,
@@ -234,7 +270,7 @@ func NewMemberNode(
 }
 
 // Read the next message over the connection
-func (cn *MemberNode) readMsg() (m *XLRegMsg, err error) {
+func (cn *MemberMaker) readMsg() (m *XLRegMsg, err error) {
 	inBuf, err := cn.ReadData()
 	if err == nil && inBuf != nil {
 		m, err = DecryptUnpadDecode(inBuf, cn.decrypter)
@@ -243,7 +279,7 @@ func (cn *MemberNode) readMsg() (m *XLRegMsg, err error) {
 }
 
 // Write a message out over the connection
-func (cn *MemberNode) writeMsg(m *XLRegMsg) (err error) {
+func (cn *MemberMaker) writeMsg(m *XLRegMsg) (err error) {
 	var data []byte
 	// serialize, marshal the message
 	data, err = EncodePadEncrypt(m, cn.encrypter)
@@ -258,7 +294,7 @@ func (cn *MemberNode) writeMsg(m *XLRegMsg) (err error) {
 // Subclasses (UserMember, AdminMember, etc) use sequences of calls to
 // these these functions to accomplish their purposes.
 
-func (cn *MemberNode) SessionSetup(proposedVersion uint32) (
+func (cn *MemberMaker) SessionSetup(proposedVersion uint32) (
 	cnx *xt.TcpConnection, decidedVersion uint32, err error) {
 	var (
 		ciphertext1, iv1, key1, salt1, salt1c []byte
@@ -307,7 +343,7 @@ func (cn *MemberNode) SessionSetup(proposedVersion uint32) (
 	return
 }
 
-func (cn *MemberNode) MemberAndOK() (err error) {
+func (cn *MemberMaker) MemberAndOK() (err error) {
 
 	var (
 		ckBytes, skBytes []byte
@@ -376,7 +412,7 @@ func (cn *MemberNode) MemberAndOK() (err error) {
 	return
 }
 
-func (cn *MemberNode) CreateAndReply() (err error) {
+func (cn *MemberMaker) CreateAndReply() (err error) {
 
 	var response *XLRegMsg
 
@@ -409,7 +445,7 @@ func (cn *MemberNode) CreateAndReply() (err error) {
 	return
 }
 
-func (cn *MemberNode) JoinAndReply() (err error) {
+func (cn *MemberMaker) JoinAndReply() (err error) {
 
 	// Send JOIN MSG ============================================
 	op := XLRegMsg_Join
@@ -451,7 +487,7 @@ func (cn *MemberNode) JoinAndReply() (err error) {
 }
 
 // Collect information on all cluster members
-func (cn *MemberNode) GetAndMembers() (err error) {
+func (cn *MemberMaker) GetAndMembers() (err error) {
 
 	if cn.ClusterID == nil {
 		fmt.Printf("** ENTERING GetAndMembers for %s with nil clusterID! **\n",
@@ -558,7 +594,7 @@ func (cn *MemberNode) GetAndMembers() (err error) {
 
 // Send Bye, wait for and process Ack.
 
-func (cn *MemberNode) ByeAndAck() (err error) {
+func (cn *MemberMaker) ByeAndAck() (err error) {
 
 	op := XLRegMsg_Bye
 	request := &XLRegMsg{
