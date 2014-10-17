@@ -41,7 +41,7 @@ func (s *XLSuite) makeRegCred(c *C, rng *xr.PRNG) (rc *RegCred) {
 }
 func (s *XLSuite) TestRegCred(c *C) {
 	if VERBOSITY > 0 {
-		fmt.Println("TEST_REG_CRED_TEST")
+		fmt.Println("\nTEST_REG_CRED_TEST")
 	}
 	rng := xr.MakeSimpleRNG()
 	for i := 0; i < 4; i++ {

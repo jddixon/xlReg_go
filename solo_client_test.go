@@ -5,6 +5,8 @@ package reg
 import (
 	"fmt"
 	xr "github.com/jddixon/rnglib_go"
+	xi "github.com/jddixon/xlNodeID_go"
+	xn "github.com/jddixon/xlNode_go"
 	xt "github.com/jddixon/xlTransport_go"
 	xf "github.com/jddixon/xlUtil_go/lfs"
 	. "gopkg.in/check.v1"
@@ -13,7 +15,7 @@ import (
 
 func (s *XLSuite) TestSoloMember(c *C) {
 	if VERBOSITY > 0 {
-		fmt.Println("TEST_SOLO_CLIENT")
+		fmt.Println("\nTEST_SOLO_CLIENT")
 	}
 
 	rng := xr.MakeSimpleRNG()
@@ -54,12 +56,18 @@ func (s *XLSuite) TestSoloMember(c *C) {
 	c.Assert(err, IsNil)
 	e := []xt.EndPointI{ep}
 
-	sc, err := NewSoloMember(name, lfs, serverName, serverID, serverEnd,
+	nodeID, err := xi.New(nil)
+	c.Assert(err, IsNil)
+
+	node, err := xn.NewNew(name, nodeID, lfs)
+	c.Assert(err, IsNil)
+
+	sc, err := NewSoloMember(node, serverName, serverID, serverEnd,
 		serverCK, serverSK, e)
 	c.Assert(err, IsNil)
 	c.Assert(sc, NotNil)
 
-	// 3. run the client, which gets a nodeID from the server -------
+	// 3. run the client
 	sc.Run()
 	err = <-sc.DoneCh
 

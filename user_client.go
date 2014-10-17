@@ -6,6 +6,7 @@ import (
 	"crypto/rsa"
 	"fmt"
 	xi "github.com/jddixon/xlNodeID_go"
+	xn "github.com/jddixon/xlNode_go"
 	xt "github.com/jddixon/xlTransport_go"
 )
 
@@ -40,19 +41,26 @@ func NewUserMember(
 
 	var attrs uint64
 
-	if lfs == "" {
-		attrs |= ATTR_EPHEMERAL
-	}
-	mn, err := NewMemberMaker(name, lfs, ckPriv, skPriv, attrs,
-		serverName, serverID, serverEnd,
-		serverCK, serverSK, //  *rsa.PublicKey,
-		clusterName, clusterAttrs, clusterID, size,
-		epCount, e)
-
+	nodeID, err := xi.New(nil)
 	if err == nil {
-		// Run() fills in clusterID
-		ac = &UserMember{
-			MemberMaker: *mn,
+		if lfs == "" {
+			attrs |= ATTR_EPHEMERAL
+		}
+		node, err := xn.New(name, nodeID, lfs, ckPriv, skPriv, nil, nil, nil)
+		if err == nil {
+			mn, err := NewMemberMaker(node,
+				attrs,
+				serverName, serverID, serverEnd,
+				serverCK, serverSK, //  *rsa.PublicKey,
+				clusterName, clusterAttrs, clusterID, size,
+				epCount, e)
+
+			if err == nil {
+				// Run() fills in clusterID
+				ac = &UserMember{
+					MemberMaker: *mn,
+				}
+			}
 		}
 	}
 	return
@@ -72,12 +80,12 @@ func (uc *UserMember) Run() {
 			version1 uint32
 		)
 		cnx, version2, err := mn.SessionSetup(version1)
+		if cnx != nil {
+			defer cnx.Close()
+		}
 		_ = version2 // not yet used
 		if err == nil {
 			err = mn.MemberAndOK()
-		}
-		if cnx != nil {
-			defer cnx.Close()
 		}
 		// XXX MODIFY TO USE CLUSTER_ID PASSED TO UserMember
 		// 2013-10-12 this is a join by cluster name
@@ -102,6 +110,7 @@ func (uc *UserMember) Run() {
 		if err == nil {
 			err = mn.ByeAndAck()
 		}
+
 		mn.DoneCh <- err
 	}()
 }

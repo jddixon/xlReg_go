@@ -11,7 +11,7 @@ import (
 
 func (s *XLSuite) TestClusterMemberSerialization(c *C) {
 	if VERBOSITY > 0 {
-		fmt.Println("TEST_CLUSTER_MEMBER_SERIALIZATION")
+		fmt.Println("\nTEST_CLUSTER_MEMBER_SERIALIZATION")
 	}
 	rng := xr.MakeSimpleRNG()
 
@@ -47,7 +47,7 @@ func (s *XLSuite) TestClusterMemberSerialization(c *C) {
 		ClusterSize:  cl.MaxSize(),
 		SelfIndex:    uint32(0),
 		Members:      cl.Members, // []*MemberInfo
-		EpCount:      epCount,
+		EPCount:      epCount,
 		Node:         *myNode,
 	}
 

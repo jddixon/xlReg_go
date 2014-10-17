@@ -11,7 +11,7 @@ import (
 
 func (s *XLSuite) TestClusterMaker(c *C) {
 	if VERBOSITY > 0 {
-		fmt.Println("TEST_CLUSTER_MAKER")
+		fmt.Println("\nTEST_CLUSTER_MAKER")
 	}
 	var err error
 	rng := xr.MakeSimpleRNG()
@@ -73,7 +73,7 @@ func (s *XLSuite) TestClusterMaker(c *C) {
 }
 func (s *XLSuite) TestClusterSerialization(c *C) {
 	if VERBOSITY > 0 {
-		fmt.Println("TEST_CLUSTER_SERIALIZATION")
+		fmt.Println("\nTEST_CLUSTER_SERIALIZATION")
 	}
 	rng := xr.MakeSimpleRNG()
 

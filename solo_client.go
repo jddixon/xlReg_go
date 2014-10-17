@@ -6,6 +6,7 @@ import (
 	"crypto/rsa"
 	"fmt"
 	xi "github.com/jddixon/xlNodeID_go"
+	xn "github.com/jddixon/xlNode_go"
 	xt "github.com/jddixon/xlTransport_go"
 )
 
@@ -30,13 +31,13 @@ type SoloMember struct {
 	MemberMaker
 }
 
-func NewSoloMember(name, lfs string,
+func NewSoloMember(node *xn.Node,
 	serverName string, serverID *xi.NodeID, serverEnd xt.EndPointI,
 	serverCK, serverSK *rsa.PublicKey,
 	e []xt.EndPointI) (
 	sc *SoloMember, err error) {
 
-	cn, err := NewMemberMaker(name, lfs, nil, nil, ATTR_SOLO,
+	cn, err := NewMemberMaker(node, ATTR_SOLO,
 		serverName, serverID, serverEnd, serverCK, serverSK,
 		"", uint64(0), nil, 0, // no cluster
 		uint32(len(e)), e)
@@ -63,20 +64,19 @@ func (sc *SoloMember) Run() {
 		)
 		cnx, version2, err := cn.SessionSetup(version1)
 		_ = version2 // not yet used
+		defer cnx.Close()
 		if err == nil {
 			err = cn.MemberAndOK()
+			if err == nil {
+				err = cn.ByeAndAck()
+				// END OF RUN =======================================
+				if err == nil {
+					// Write configuration to // the usual place in the
+					// file system:   LFS/.xlattice/node.config.
+					err = cn.PersistNode()
+				}
+			}
 		}
-		if err == nil {
-			err = cn.ByeAndAck()
-		}
-		// END OF RUN ===============================================
-
-		if cnx != nil {
-			cnx.Close()
-		}
-		// Create the Node and write its configuration to the usual place
-		// in the file system: LFS/.xlattice/node.config.
-		err = cn.PersistNode()
 		cn.DoneCh <- err
 	}()
 }

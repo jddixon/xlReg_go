@@ -9,6 +9,6 @@ import (
 
 func (s *XLSuite) TestRegistry(c *C) {
 	if VERBOSITY > 0 {
-		fmt.Println("TEST_REGISTRY")
+		fmt.Println("\nTEST_REGISTRY")
 	}
 }

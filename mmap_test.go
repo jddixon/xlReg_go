@@ -39,7 +39,7 @@ func (s *XLSuite) scratchFileName(c *C, rng *xr.PRNG, dirName string) (fileName 
 }
 func (s *XLSuite) TestMmap(c *C) {
 	if VERBOSITY > 0 {
-		fmt.Println("TEST_MMAP")
+		fmt.Println("\nTEST_MMAP")
 	}
 
 	rng := xr.MakeSimpleRNG()

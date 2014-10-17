@@ -11,14 +11,14 @@ import (
 
 func (s *XLSuite) TestRegNode(c *C) {
 	if VERBOSITY > 0 {
-		fmt.Println("TEST_REG_NODE")
+		fmt.Println("\nTEST_REG_NODE")
 	}
 }
 
 // TEST SERIALIZATION ///////////////////////////////////////////////
 func (s *XLSuite) TestRegNodeSerialization(c *C) {
 	if VERBOSITY > 0 {
-		fmt.Println("TEST_REG_NODE_SERIALIZATION")
+		fmt.Println("\nTEST_REG_NODE_SERIALIZATION")
 	}
 	rng := xr.MakeSimpleRNG()
 

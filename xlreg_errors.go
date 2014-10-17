@@ -33,7 +33,7 @@ var (
 	NilRegistry                    = e.New("nil registry argument")
 	NilRegNode                     = e.New("nil RegNode argument")
 	NilToken                       = e.New("nil XLRegMsg_Token argument")
-	NoNodeNoKeys                   = e.New("no node and no keys to build one")
+	MissingNode                    = e.New("missing node parameter")
 	RcvdInvalidMsgForState         = e.New("invalid msg type for current state")
 	TagOutOfRange                  = e.New("message tag of of range")
 	UnexpectedMsgType              = e.New("unexpected message type")

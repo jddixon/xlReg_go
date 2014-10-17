@@ -6,6 +6,7 @@ import (
 	"crypto/rsa"
 	"fmt"
 	xi "github.com/jddixon/xlNodeID_go"
+	xn "github.com/jddixon/xlNode_go"
 	xt "github.com/jddixon/xlTransport_go"
 )
 
@@ -35,18 +36,25 @@ func NewAdminMember(
 	size, epCount uint32, e []xt.EndPointI) (
 	ac *AdminMember, err error) {
 
-	cn, err := NewMemberMaker("admin", "", nil, nil, // name, LFS, keys
-		ATTR_ADMIN|ATTR_SOLO|ATTR_EPHEMERAL,
-		serverName, serverID, serverEnd, serverCK, serverSK,
-		clusterName, clusterAttrs, nil, size, epCount, e)
-
+	nodeID, err := xi.New(nil)
 	if err == nil {
-		// Run() fills in clusterID
-		ac = &AdminMember{
-			MemberMaker: *cn,
+		node, err := xn.NewNew("admin", nodeID, "") // name, id, lfs
+		if err == nil {
+
+			cn, err := NewMemberMaker(node,
+				ATTR_ADMIN|ATTR_SOLO|ATTR_EPHEMERAL,
+				serverName, serverID, serverEnd, serverCK, serverSK,
+				clusterName, clusterAttrs, nil, size, epCount, e)
+
+			if err == nil {
+				// Run() fills in clusterID
+				ac = &AdminMember{
+					MemberMaker: *cn,
+				}
+			}
 		}
 	}
-	return // FOO
+	return
 }
 
 // Start the client running in separate goroutine, so that this function

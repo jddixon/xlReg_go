@@ -9,7 +9,7 @@ import (
 
 func (s *XLSuite) TestErrorConst(c *C) {
 	if VERBOSITY > 0 {
-		fmt.Println("TEST_ERROR_CONSTS")
+		fmt.Println("\nTEST_ERROR_CONSTS")
 	}
 	c.Assert(BAD_ATTRS_LINE, Equals, -1)
 	c.Assert(BAD_VERSION, Equals, -2)

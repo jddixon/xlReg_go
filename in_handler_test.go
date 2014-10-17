@@ -9,7 +9,7 @@ import (
 
 func (s *XLSuite) TestInHandler(c *C) {
 	if VERBOSITY > 0 {
-		fmt.Println("TEST_IN_HANDLER")
+		fmt.Println("\nTEST_IN_HANDLER")
 	}
 
 	// These are the tags that InHandler will accept from a client.

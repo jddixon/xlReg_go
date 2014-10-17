@@ -18,7 +18,7 @@ import (
 
 func (s *XLSuite) TestTestDir(c *C) {
 	if VERBOSITY > 0 {
-		fmt.Println("TEST_DATA_DIR")
+		fmt.Println("\nTEST_DATA_DIR")
 	}
 
 	// 001 READ AND INTERPRET test_dir/regCred.dat //////////////////

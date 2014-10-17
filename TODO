@@ -1,12 +1,48 @@
 xlReg_go/TODO
 
+2014-10-16
+    * change NewMemberMaker() to take node as an argument, with a
+        consequent requirement that the nodeID is set
+
+    * GOAL: MemberInfo should be merged with or become Peer
+    * Then cluster members should be added to Node.peers[]
+
+    * Calls to MkdirAll(lfs) should be replaced by 
+        xf.CheckLFS(lfs, perm)
+        - this requires a change to the CheckLFS() interface
+
+    * URGENT: reg.ContainsID() is failing (eg eph_server_test.go)
+
 2014-10-15
     * FIX: epCount at end of clusterMember serialization is wrong
+    * in the definition of ClusterMember struct (line 26 or so) it 
+        claims that the EPCount is potentially different from the 
+        count of endpoints passed to xn.New(), but this is nowhere 
+        enforced
+
     * FIX: endPoint ports in clusterMember serialization are wrong
+        - the clusterMember's ports are correct but the port 
+            numbers in MemberInfo are wrong, because port numbers
+            are reported to the registry before they have been bound
+            * fix is to initialize clusterMember xlNode *before* 
+                the call to xlReg
+                - this can only be done after the MemberAndOK()
+                    call, which picks up the nodeID from the registry
+                    * called by AdminMember, SoloMember, and UserMember
+
+    * FIX: clusterMember serialization: indentation of memberInfo{} 
+        within members{} is wrong
 
     * to reduce confusion, rename MemberNode MemberMaker                * DONE
     * verify that references to cluster member endPoints use
         GetEndPoint(n) or GetAcceptor(n)
+
+    * SoloMember should NOT persist a ClusterMember and in fact
+        it just calls PersistNode()
+    * AdminMember is completely ephemeral; it does not persist anything
+    * UserMember also doesn't persist anything; its mission is to 
+        collect MemberInfo.  Callers can persist the information, but
+        the endPoints will necessarily be WRONG, as discussed above.
 
 2014-10-14
     * memberNode.go: 

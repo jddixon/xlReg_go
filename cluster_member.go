@@ -23,12 +23,12 @@ type ClusterMember struct {
 
 	Members []*MemberInfo // information on (other) cluster members
 
-	// EpCount is the number of endPoints dedicated to use for cluster-
+	// EPCount is the number of endPoints dedicated to use for cluster-
 	// related purposes.  By convention endPoints[0] is used for
 	// member-member communications and [1] for comms with cluster clients,
-	// should they exist. The first EpCount endPoints are passed
+	// should they exist. The first EPCount endPoints are passed
 	// to other cluster members via the registry.
-	EpCount uint32
+	EPCount uint32
 
 	xn.Node
 }
@@ -53,7 +53,7 @@ func (cm *ClusterMember) Equal(any interface{}) bool {
 
 	if cm.Attrs != other.Attrs || cm.ClusterName != other.ClusterName ||
 		cm.ClusterAttrs != other.ClusterAttrs ||
-		cm.ClusterSize != other.ClusterSize || cm.EpCount != other.EpCount {
+		cm.ClusterSize != other.ClusterSize || cm.EPCount != other.EPCount {
 		return false
 	}
 	if !cm.ClusterID.Equal(other.ClusterID) {
@@ -93,13 +93,14 @@ func (cm *ClusterMember) Strings() (ss []string) {
 		}
 	}
 	ss = append(ss, fmt.Sprintf("%s}", INDENT))
-	ss = append(ss, fmt.Sprintf("%sepCount: %d", INDENT, cm.EpCount))
+	ss = append(ss, fmt.Sprintf("%sepCount: %d", INDENT, cm.EPCount))
 	ss = append(ss, "}")
 	return
 }
 func (cm *ClusterMember) String() string {
 	return strings.Join(cm.Strings(), "\n")
 }
+
 func ParseClusterMember(s string) (
 	cm *ClusterMember, rest []string, err error) {
 
@@ -140,7 +141,7 @@ func ParseClusterMemberFromStrings(ss []string) (
 		} else {
 			err = IllFormedClusterMember
 		}
-	} // FOO
+	}
 	if err == nil {
 		line = xn.NextNBLine(&rest)
 		parts := strings.Split(line, ": ")
@@ -205,7 +206,7 @@ func ParseClusterMemberFromStrings(ss []string) (
 		} else {
 			err = IllFormedClusterMember
 		}
-	} // GEEP
+	}
 
 	if err == nil {
 		line = xn.NextNBLine(&rest)
@@ -259,7 +260,7 @@ func ParseClusterMemberFromStrings(ss []string) (
 			ClusterSize:  clusterSize,
 			SelfIndex:    selfIndex,
 			Members:      memberInfos,
-			EpCount:      epCount,
+			EPCount:      epCount,
 			Node:         *node,
 		}
 	}

@@ -10,7 +10,7 @@ import (
 
 func (s *XLSuite) TestMISerialization(c *C) {
 	if VERBOSITY > 0 {
-		fmt.Println("TEST_MI_SERIALIZATION")
+		fmt.Println("\nTEST_MI_SERIALIZATION")
 	}
 	rng := xr.MakeSimpleRNG()
 
@@ -31,7 +31,7 @@ func (s *XLSuite) TestMISerialization(c *C) {
 
 func (s *XLSuite) TestMemberInfoAndTokens(c *C) {
 	if VERBOSITY > 0 {
-		fmt.Println("TEST_MEMBER_INFO_AND_TOKENS")
+		fmt.Println("\nTEST_MEMBER_INFO_AND_TOKENS")
 	}
 	rng := xr.MakeSimpleRNG()
 
