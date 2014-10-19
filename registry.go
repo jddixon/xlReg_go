@@ -112,16 +112,31 @@ func NewRegistry(clusters []*RegCluster,
 
 func (reg *Registry) ContainsID(n *xi.NodeID) (found bool, err error) {
 	found, _, err = reg.idFilter.IsMember(n.Value())
+
+	// DEBUG
+	fmt.Printf("Registry.ContainsID(%x) returning %v, %v\n",
+		n.Value(), found, err)
+	// END
 	return
 }
 func (reg *Registry) InsertID(n *xi.NodeID) (err error) {
 	b := n.Value()
+	// DEBUG
+	fmt.Printf("Registry.InsertID(%x)\n", b)
+	// END
 	found, _, err := reg.idFilter.IsMember(b)
-	if err == nil && found {
-		err = IDAlreadyInUse
-	}
 	if err == nil {
-		reg.idFilter.Insert(b)
+		if found {
+			// DEBUG
+			fmt.Printf("  id is already registered\n")
+			// END
+			err = IDAlreadyInUse
+		} else {
+			err = reg.idFilter.Insert(b)
+			// DEBUG
+			fmt.Printf("  added %x to registry; err is %v\n", b, err)
+			// END
+		}
 	}
 	return
 }

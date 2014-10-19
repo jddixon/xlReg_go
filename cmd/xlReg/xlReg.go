@@ -109,7 +109,7 @@ func main() {
 		if *k < 2 {
 			*k = 8
 		}
-		err = xf.CheckLFS(*lfs) // tries to create if it doesn't exist
+		err = xf.CheckLFS(*lfs, 0700) // tries to create if it doesn't exist
 		if err == nil {
 			if *logFile != "" {
 				*logFile = path.Join(*lfs, *logFile)

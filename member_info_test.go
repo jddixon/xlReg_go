@@ -20,6 +20,10 @@ func (s *XLSuite) TestMISerialization(c *C) {
 	// Serialize it
 	serialized := cm.String()
 
+	// DEBUG
+	fmt.Printf("SERIALIZED MemberInfo:\n%s\n", serialized)
+	// END
+
 	// Reverse the serialization
 	deserialized, rest, err := ParseMemberInfo(serialized)
 	c.Assert(err, IsNil)

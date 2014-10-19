@@ -53,7 +53,7 @@ func doClientMsg(h *InHandler) {
 		ck, sk *rsa.PublicKey
 		myEnds []string
 		hash   []byte
-		cm     *MemberInfo
+		cm     *ClientInfo
 	)
 	// XXX We should accept EITHER clientName + token OR clientID
 	// This implementation only accepts a token.
@@ -96,6 +96,7 @@ func doClientMsg(h *InHandler) {
 			id := nodeID.Value()
 			h.reg.Logger.Printf("assigned new MemberID %xi, user %s\n",
 				id, name)
+			err = h.reg.InsertID(nodeID)
 		} else {
 			// must be known to the registry
 			nodeID, err = xi.New(id)
@@ -112,9 +113,9 @@ func doClientMsg(h *InHandler) {
 	if err == nil {
 		// The appropriate action is to hang a token for this client off
 		// the InHandler.
-		cm, err = NewMemberInfo(name, nodeID, ck, sk, attrs, myEnds)
+		cm, err = NewClientInfo(name, nodeID, ck, sk, attrs, myEnds)
 		if err == nil {
-			h.thisMember = cm
+			h.thisClient = cm
 		}
 	}
 	if err == nil {
@@ -247,10 +248,10 @@ func doJoinMsg(h *InHandler) {
 
 	if clusterID != nil {
 		h.reg.Logger.Printf("JOIN: cluster %x, new member %s\n",
-			clusterID, h.thisMember.GetName())
+			clusterID, h.thisClient.GetName())
 	} else {
 		h.reg.Logger.Printf("JOIN: cluster %s, new member %s\n",
-			clusterName, h.thisMember.GetName())
+			clusterName, h.thisClient.GetName())
 	}
 
 	if clusterID == nil && clusterName == "" {
@@ -293,11 +294,11 @@ func doJoinMsg(h *InHandler) {
 	}
 	if err == nil {
 		// if we get here, cluster is not nil
-		err = cluster.AddMember(h.thisMember)
+		err = cluster.AddMember(h.thisClient)
 	}
 	if err == nil {
 		h.reg.Logger.Printf("cluster %x, new member %s\n",
-			cluster.ID, h.thisMember.GetName())
+			cluster.ID, h.thisClient.GetName())
 
 		// Prepare reply to client ----------------------------------
 		h.cluster = cluster
@@ -319,7 +320,7 @@ func doJoinMsg(h *InHandler) {
 	}
 	if err != nil {
 		h.reg.Logger.Printf("cluster %x, new member %s, ERROR %s\n",
-			cluster.ID, h.thisMember.GetName(), err.Error())
+			cluster.ID, h.thisClient.GetName(), err.Error())
 	}
 }
 

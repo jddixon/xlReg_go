@@ -2,43 +2,49 @@ package reg
 
 // xlReg_go/member_info.go
 
-// This file contains functions and structures used to describe
-// and manage the cluster data managed by the registry.
+// This file contains functions and structures used by registry clients
+// to manage information about clusters and their members.
 
 import (
-	"crypto/rsa"
+	//"crypto/rsa"
 	"encoding/hex"
 	"fmt"
 	xc "github.com/jddixon/xlCrypto_go"
 	xi "github.com/jddixon/xlNodeID_go"
 	xn "github.com/jddixon/xlNode_go"
+	xt "github.com/jddixon/xlTransport_go"
 	"strings"
 )
 
 var _ = fmt.Print
 
 type MemberInfo struct {
-	Attrs       uint64   //  bit flags are defined in const.go
-	MyEnds      []string // serialized EndPointI
-	xn.BaseNode          // name and ID must be unique
+	Attrs uint64 //  bit flags are defined in const.go
+	//MyEnds      []string // serialized EndPointI
+	//xn.BaseNode          // name and ID must be unique within the cluster
+	Peer xn.Peer
 }
 
-func NewMemberInfo(name string, id *xi.NodeID,
-	commsPubKey, sigPubKey *rsa.PublicKey, attrs uint64, myEnds []string) (
-	member *MemberInfo, err error) {
+//func NewMemberInfo(name string, id *xi.NodeID,
+//	commsPubKey, sigPubKey *rsa.PublicKey, attrs uint64, myEnds []string) (
+
+func NewMemberInfo(attrs uint64, peer *xn.Peer) (
+	mi *MemberInfo, err error) {
 
 	// all attrs bits are zero by default
 
-	// DEBUG
-	// fmt.Printf("NewMemberInfo for server %s\n", name)
-	// END
-	base, err := xn.NewBaseNode(name, id, commsPubKey, sigPubKey, nil)
-	if err == nil {
-		member = &MemberInfo{
-			Attrs:    attrs,
-			MyEnds:   myEnds,
-			BaseNode: *base,
-		}
+	//base, err := xn.NewBaseNode(name, id, commsPubKey, sigPubKey, nil)
+	//if err == nil {
+	//	member = &MemberInfo{
+	//		Attrs:    attrs,
+	//		MyEnds:   myEnds,
+	//		BaseNode: *base,
+	//	}
+	//}
+
+	mi = &MemberInfo{
+		Attrs: attrs,
+		Peer:  *peer,
 	}
 	return
 }
@@ -48,7 +54,13 @@ func NewMemberInfo(name string, id *xi.NodeID,
 func NewMemberInfoFromToken(token *XLRegMsg_Token) (
 	m *MemberInfo, err error) {
 
-	var nodeID *xi.NodeID
+	var (
+		ctor   xt.ConnectorI
+		ctors  []xt.ConnectorI
+		farEnd xt.EndPointI
+		nodeID *xi.NodeID
+		peer   *xn.Peer
+	)
 	if token == nil {
 		err = NilToken
 	} else {
@@ -58,9 +70,34 @@ func NewMemberInfoFromToken(token *XLRegMsg_Token) (
 			if err == nil {
 				sk, err := xc.RSAPubKeyFromWire(token.GetSigKey())
 				if err == nil {
-					m, err = NewMemberInfo(token.GetName(), nodeID,
-						ck, sk, token.GetAttrs(), token.GetMyEnds())
+					attrs := token.GetAttrs()
+					myEnds := token.GetMyEnds()
+					for i := 0; i < len(myEnds); i++ {
+						farEnd, err = xt.NewTcpEndPoint(myEnds[i])
+						if err != nil {
+							break
+						}
+						ctor, err = xt.NewTcpConnector(farEnd)
+						if err != nil {
+							break
+						}
+						ctors = append(ctors, ctor)
+					}
+					if err == nil {
+						peer, err = xn.NewPeer(token.GetName(), nodeID,
+							ck, sk, nil, ctors)
+						if err == nil {
+							m = &MemberInfo{
+								Attrs: attrs,
+								Peer:  *peer,
+							}
+						}
+					}
 				}
+				//if err == nil {
+				//	m, err = NewMemberInfo(token.GetName(), nodeID,
+				//		ck, sk, token.GetAttrs(), token.GetMyEnds())
+				//}
 			}
 		}
 	}
@@ -72,24 +109,29 @@ func (mi *MemberInfo) Token() (token *XLRegMsg_Token, err error) {
 
 	var ckBytes, skBytes []byte
 
-	ck := mi.GetCommsPublicKey()
+	ck := mi.Peer.GetCommsPublicKey()
 	// DEBUG
 	if ck == nil {
-		fmt.Printf("MemberInfo.Token: %s commsPubKey is nil\n", mi.GetName())
+		fmt.Printf("MemberInfo.Token: %s commsPubKey is nil\n",
+			mi.Peer.GetName())
 	}
 	// END
 	ckBytes, err = xc.RSAPubKeyToWire(ck)
 	if err == nil {
-		skBytes, err = xc.RSAPubKeyToWire(mi.GetSigPublicKey())
+		skBytes, err = xc.RSAPubKeyToWire(mi.Peer.GetSigPublicKey())
 		if err == nil {
-			name := mi.GetName()
+			name := mi.Peer.GetName()
+			var myEnds []string
+			for i := 0; i < mi.Peer.SizeConnectors(); i++ {
+				myEnds = append(myEnds, mi.Peer.GetConnector(i).String())
+			}
 			token = &XLRegMsg_Token{
 				Name:     &name,
 				Attrs:    &mi.Attrs,
-				ID:       mi.GetNodeID().Value(),
+				ID:       mi.Peer.GetNodeID().Value(),
 				CommsKey: ckBytes,
 				SigKey:   skBytes,
-				MyEnds:   mi.MyEnds,
+				MyEnds:   myEnds,
 			}
 		}
 	}
@@ -116,41 +158,35 @@ func (mi *MemberInfo) Equal(any interface{}) bool {
 	if mi.Attrs != other.Attrs {
 		return false
 	}
-	if mi.MyEnds == nil {
-		if other.MyEnds != nil {
-			return false
-		}
+	if mi.Peer.SizeConnectors() != other.Peer.SizeConnectors() {
+		return false
 	} else {
-		if other.MyEnds == nil {
-			return false
-		}
-		if len(mi.MyEnds) != len(other.MyEnds) {
-			return false
-		}
-		for i := 0; i < len(mi.MyEnds); i++ {
-			if mi.MyEnds[i] != other.MyEnds[i] {
+		count := mi.Peer.SizeConnectors()
+		for i := 0; i < count; i++ {
+			if mi.Peer.GetConnector(i).String() !=
+				other.Peer.GetConnector(i).String() {
 				return false
 			}
 		}
 	}
 	// WARNING: panics without the ampersand !
-	return mi.BaseNode.Equal(&other.BaseNode)
+	return mi.Peer.BaseNode.Equal(&other.Peer.BaseNode)
 }
 
 // SERIALIZATION ////////////////////////////////////////////////////
 
 func (mi *MemberInfo) Strings() (ss []string) {
 	ss = []string{"memberInfo {"}
-	bns := mi.BaseNode.Strings()
+	bns := mi.Peer.BaseNode.Strings()
 	for i := 0; i < len(bns); i++ {
 		ss = append(ss, "    "+bns[i])
 	}
-	ss = append(ss, fmt.Sprintf("    attrs: 0x%016x", mi.Attrs))
-	ss = append(ss, "    endPoints {")
-	for i := 0; i < len(mi.MyEnds); i++ {
-		ss = append(ss, "        "+mi.MyEnds[i])
+	ss = append(ss, "    connectors {")
+	for i := 0; i < mi.Peer.SizeConnectors(); i++ {
+		ss = append(ss, "        "+mi.Peer.GetConnector(i).String())
 	}
 	ss = append(ss, "    }")
+	ss = append(ss, fmt.Sprintf("    attrs: 0x%016x", mi.Attrs))
 	ss = append(ss, "}")
 	return
 }
@@ -184,28 +220,30 @@ func collectAttrs(mi *MemberInfo, ss []string) (rest []string, err error) {
 	}
 	return
 }
-func collectMyEnds(mi *MemberInfo, ss []string) (rest []string, err error) {
-	rest = ss
-	line := xn.NextNBLine(&rest)
-	if line == "endPoints {" {
-		for {
-			line = strings.TrimSpace(rest[0]) // peek
-			if line == "}" {
-				break
-			}
-			line = xn.NextNBLine(&rest)
-			// XXX NO CHECK THAT THIS IS A VALID ENDPOINT
-			mi.MyEnds = append(mi.MyEnds, line)
-		}
-		line = xn.NextNBLine(&rest)
-		if line != "}" {
-			err = MissingClosingBrace
-		}
-	} else {
-		err = MissingEndPointsSection
-	}
-	return
-}
+
+//func collectMyEnds(mi *MemberInfo, ss []string) (rest []string, err error) {
+//	rest = ss
+//	line := xn.NextNBLine(&rest)
+//	if line == "endPoints {" {
+//		for {
+//			line = strings.TrimSpace(rest[0]) // peek
+//			if line == "}" {
+//				break
+//			}
+//			line = xn.NextNBLine(&rest)
+//			// XXX NO CHECK THAT THIS IS A VALID ENDPOINT
+//			mi.MyEnds = append(mi.MyEnds, line)
+//		}
+//		line = xn.NextNBLine(&rest)
+//		if line != "}" {
+//			err = MissingClosingBrace
+//		}
+//	} else {
+//		err = MissingEndPointsSection
+//	}
+//	return
+//} // GEEP
+
 func ParseMemberInfo(s string) (
 	mi *MemberInfo, rest []string, err error) {
 
@@ -218,13 +256,16 @@ func ParseMemberInfoFromStrings(ss []string) (
 
 	bn, rest, err := xn.ParseBNFromStrings(ss, "memberInfo")
 	if err == nil {
-		mi = &MemberInfo{BaseNode: *bn}
-		rest, err = collectAttrs(mi, rest)
-		if err == nil {
-			rest, err = collectMyEnds(mi, rest)
+		peerPart := &xn.Peer{
+			BaseNode: *bn,
 		}
+		mi = &MemberInfo{
+			Peer: *peerPart,
+		}
+		// expect and consume a closing brace
+		rest, err = xn.CollectConnectors(peerPart, rest)
 		if err == nil {
-			// expect and consume a closing brace
+			rest, err = collectAttrs(mi, rest)
 			line := xn.NextNBLine(&rest)
 			if line != "}" {
 				err = MissingClosingBrace

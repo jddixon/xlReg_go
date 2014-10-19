@@ -33,8 +33,8 @@ type RegCluster struct {
 	Attrs         uint64 // a field of bit flags
 	maxSize       uint32 // a maximum; must be > 0
 	epCount       uint32 // a positive integer, for now is 1 or 2
-	Members       []*MemberInfo
-	MembersByName map[string]*MemberInfo
+	Members       []*ClientInfo
+	MembersByName map[string]*ClientInfo
 	MembersByID   ha.HAMT
 	mu            sync.RWMutex
 }
@@ -47,7 +47,7 @@ func NewRegCluster(name string, id *xi.NodeID, attrs uint64,
 	if name == "" {
 		name = "xlCluster"
 	}
-	nameMap := make(map[string]*MemberInfo)
+	nameMap := make(map[string]*ClientInfo)
 	if epCount < 1 {
 		err = ClusterMembersMustHaveEndPoint
 	}
@@ -75,7 +75,7 @@ func (rc *RegCluster) AddToCluster(name string, id *xi.NodeID,
 	commsPubKey, sigPubKey *rsa.PublicKey, attrs uint64, myEnds []string) (
 	err error) {
 
-	member, err := NewMemberInfo(
+	member, err := NewClientInfo(
 		name, id, commsPubKey, sigPubKey, attrs, myEnds)
 	if err == nil {
 		err = rc.AddMember(member)
@@ -83,7 +83,7 @@ func (rc *RegCluster) AddToCluster(name string, id *xi.NodeID,
 	return
 }
 
-func (rc *RegCluster) AddMember(member *MemberInfo) (err error) {
+func (rc *RegCluster) AddMember(member *ClientInfo) (err error) {
 
 	// verify no existing member has the same name
 	name := member.GetName()
@@ -187,7 +187,7 @@ func (rc *RegCluster) Equal(any interface{}) bool {
 		// END
 		return false
 	}
-	// Members			[]*MemberInfo
+	// Members			[]*ClientInfo
 	for i := uint32(0); i < rc.Size(); i++ {
 		rcMember := rc.Members[i]
 		otherMember := other.Members[i]
@@ -318,8 +318,8 @@ func ParseRegClusterFromStrings(ss []string) (
 				if line == "}" {
 					break
 				}
-				var member *MemberInfo
-				member, rest, err = ParseMemberInfoFromStrings(rest)
+				var member *ClientInfo
+				member, rest, err = ParseClientInfoFromStrings(rest)
 				if err != nil {
 					break
 				}

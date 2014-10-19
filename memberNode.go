@@ -58,16 +58,6 @@ type MemberMaker struct {
 	// serverVersion xu.DecimalVersion		// missing
 
 	regProtoVersion uint32 // protocol version used to talk to registry
-
-	// REDUNDANT: INFORMATION USED TO BUILD NODE ====================
-	// This is used to build the node and so is persisted as part of
-	// the node when that is saved.
-	//ckPriv, skPriv *rsa.PrivateKey
-	//EndPoints      []xt.EndPointI
-	//LFS            string
-	//Name           string
-	//MemberID       *xi.NodeID
-
 	ClusterMember
 }
 
@@ -97,7 +87,7 @@ func (mm *MemberMaker) PersistNode() (err error) {
 	pathToCfgFile := path.Join(pathToCfgDir, "node.config")
 	found, err := xf.PathExists(pathToCfgDir)
 	if err == nil && !found {
-		err = os.MkdirAll(pathToCfgDir, 0740)
+		err = xf.CheckLFS(pathToCfgDir, 0750)
 	}
 	if err == nil {
 		//mm.Node = *node
@@ -131,7 +121,7 @@ func (mn *MemberMaker) PersistClusterMember() (err error) {
 
 	_, err = os.Stat(pathToCfgDir)
 	if os.IsNotExist(err) {
-		err = os.MkdirAll(pathToCfgDir, 0740)
+		err = xf.CheckLFS(pathToCfgDir, 0740)
 	} else if err != nil {
 		// DEBUG
 		fmt.Printf("  member %-8s: error from Stat %s is %v\n",
@@ -165,11 +155,8 @@ func (mn *MemberMaker) PersistClusterMember() (err error) {
 // and terminates when it has info on the entire membership.
 
 func NewMemberMaker(
-	// XXX next line becomes node *xn.Node
-	// name, lfs string, ckPriv, skPriv *rsa.PrivateKey,
-	node *xn.Node,
-	// END next line
-	attrs uint64, regName string, regID *xi.NodeID, regEnd xt.EndPointI,
+	node *xn.Node, attrs uint64,
+	regName string, regID *xi.NodeID, regEnd xt.EndPointI,
 	regCK, regSK *rsa.PublicKey,
 	clusterName string, clusterAttrs uint64, clusterID *xi.NodeID,
 	size, epCount uint32, endPoints []xt.EndPointI) (
@@ -183,7 +170,7 @@ func NewMemberMaker(
 	// DEBUG
 	name := node.GetName()
 	fmt.Printf("NewMemberMaker name %s, attrs 0x%x, epCount = %d\n",
-		node.GetName(), attrs, epCount)
+		name, attrs, epCount)
 	// END
 
 	// sanity checks on parameter list
@@ -204,9 +191,6 @@ func NewMemberMaker(
 						err = ClusterMustHaveMember
 					}
 				}
-				// DEBUG
-				fmt.Printf("  %s is NOT a solo member\n", name)
-				// END
 				if err == nil {
 					// if the client is an admin client epCount applies
 					// to the cluster
@@ -223,18 +207,10 @@ func NewMemberMaker(
 							epCount = actualEPCount
 						}
 						for i := 0; i < int(epCount); i++ {
-							// DEBUG
-							fmt.Printf("ADDING ENDPOINT %d: %s\n",
-								i, endPoints[i].String())
-							// END
 							_, err = node.AddEndPoint(endPoints[i])
 						}
 					}
 				}
-				// DEBUG
-			} else {
-				fmt.Println("SOLO MEMBER")
-				// END
 			}
 		}
 	}
@@ -563,23 +539,19 @@ func (mm *MemberMaker) GetAndMembers() (err error) {
 
 		for i := uint32(0); i < uint32(mm.ClusterSize); i++ {
 
-			member := mm.Members[i]
-			if member == nil {
-				msg := fmt.Sprintf("cluster member %d is nil", i)
+			mi := mm.Members[i]
+			if mi == nil {
 				// DEBUG
+				msg := fmt.Sprintf("cluster member %d is nil", i)
 				fmt.Println(msg)
 				// END
 				continue
 			}
-
-			// XXX NPE HERE if member is nil
-			id := member.GetNodeID()
+			id := mi.Peer.GetNodeID()
 			if id == nil {
 				fmt.Printf("member has no nodeID!\n")
 			}
 			memberID := id.Value()
-			// END HERE ///////////////////////////////////
-
 			if bytes.Equal(selfID, memberID) {
 				mm.SelfIndex = i
 				break

@@ -102,10 +102,15 @@ func (s *XLSuite) makeHostAndKeys(c *C, rng *xr.PRNG,
 	return n, ckPriv, skPriv
 }
 
+// Make a client, a cluster member as seen by the registry server.
 // Using functions must check to ensure members have unique names
 
-func (s *XLSuite) makeAMemberInfo(c *C, rng *xr.PRNG) *MemberInfo {
+func (s *XLSuite) makeAClientInfo(c *C, rng *xr.PRNG, epCount uint32) *ClientInfo {
 	attrs := uint64(rng.Int63())
+	var myEnds []string
+	for i := uint32(0); i < epCount; i++ {
+		myEnds = append(myEnds, "127.0.0.1:0")
+	}
 	bn, err := xn.NewBaseNode(
 		rng.NextFileName(8),
 		s.makeANodeID(c, rng),
@@ -113,11 +118,31 @@ func (s *XLSuite) makeAMemberInfo(c *C, rng *xr.PRNG) *MemberInfo {
 		&s.makeAnRSAKey(c).PublicKey,
 		nil) // overlays
 	c.Assert(err, IsNil)
-	return &MemberInfo{
+	return &ClientInfo{
 		Attrs:    attrs,
+		MyEnds:   myEnds,
 		BaseNode: *bn,
 	}
 }
+
+// Make a cluster member as seen by registry clients.
+// Using functions must check to ensure members have unique names
+
+func (s *XLSuite) makeAMemberInfo(c *C, rng *xr.PRNG) *MemberInfo {
+	attrs := uint64(rng.Int63())
+	peer, err := xn.NewPeer(
+		rng.NextFileName(8),
+		s.makeANodeID(c, rng),
+		&s.makeAnRSAKey(c).PublicKey,
+		&s.makeAnRSAKey(c).PublicKey,
+		nil, // overlays
+		nil) // XXX CONNECTORS
+	c.Assert(err, IsNil)
+	return &MemberInfo{
+		Attrs: attrs,
+		Peer:  *peer,
+	}
+} // GEEP
 
 // Make a RegCluster for test purposes.  Cluster member names are guaranteed
 // to be unique but the name of the cluster itself may not be.
@@ -136,11 +161,11 @@ func (s *XLSuite) makeACluster(c *C, rng *xr.PRNG, epCount, size uint32) (
 	c.Assert(err, IsNil)
 
 	for count := uint32(0); count < size; count++ {
-		cm := s.makeAMemberInfo(c, rng)
+		cm := s.makeAClientInfo(c, rng, epCount)
 		for {
 			if _, ok := rc.MembersByName[cm.GetName()]; ok {
 				// name is in use, so try again
-				cm = s.makeAMemberInfo(c, rng)
+				cm = s.makeAClientInfo(c, rng, epCount)
 			} else {
 				err = rc.AddMember(cm)
 				c.Assert(err, IsNil)

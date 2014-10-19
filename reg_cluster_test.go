@@ -57,9 +57,9 @@ func (s *XLSuite) TestClusterMaker(c *C) {
 		c.Assert(err, IsNil)
 		mbr, err := cl.MembersByID.Find(bKey)
 		c.Assert(err, IsNil)
-		var member *MemberInfo
+		var member *ClientInfo
 		// verify that the type assertion succeeds
-		if m, ok := mbr.(*MemberInfo); ok {
+		if m, ok := mbr.(*ClientInfo); ok {
 			member = m
 			mID := member.GetNodeID().Value()
 			c.Assert(len(id), Equals, len(mID))

@@ -15,6 +15,7 @@ import (
 	"fmt"
 	xr "github.com/jddixon/rnglib_go"
 	xt "github.com/jddixon/xlTransport_go"
+	xf "github.com/jddixon/xlUtil_go/lfs"
 	. "gopkg.in/check.v1"
 	"os"
 	"path"
@@ -67,7 +68,7 @@ func (s *XLSuite) TestEphServer(c *C) {
 		clusterName = rng.NextFileName(8)
 		clusterDir = path.Join("tmp", clusterName)
 	}
-	err = os.MkdirAll(clusterDir, 0740)
+	err = xf.CheckLFS(clusterDir, 0750)
 	c.Assert(err, IsNil)
 
 	// DEBUG
@@ -91,9 +92,10 @@ func (s *XLSuite) TestEphServer(c *C) {
 	c.Assert(reg.IDCount(), Equals, uint(3)) // regID + anID + clusterID
 
 	// DEBUG
-	//fmt.Printf("regID     %s\n", regID.String())
-	//fmt.Printf("anID      %s\n", anID.String())
-	//fmt.Printf("clusterID %s\n", an.ClusterID.String())
+	fmt.Println("ADMIN MEMBER GETS:")
+	fmt.Printf("  regID     %s\n", regID.String())
+	fmt.Printf("  anID      %s\n", anID.String())
+	fmt.Printf("  clusterID %s\n", an.ClusterID.String())
 	// END
 
 	found, err = reg.ContainsID(regID)
@@ -102,7 +104,7 @@ func (s *XLSuite) TestEphServer(c *C) {
 
 	found, err = reg.ContainsID(anID)
 	c.Assert(err, IsNil)
-	// c.Assert(found, Equals, true)				// XXX FALSE
+	c.Assert(found, Equals, true) // XXX FAILS
 
 	found, err = reg.ContainsID(an.ClusterID)
 	c.Assert(err, IsNil)
@@ -110,6 +112,9 @@ func (s *XLSuite) TestEphServer(c *C) {
 
 	// 4. create K members ------------------------------------------
 
+	// DEBUG
+	fmt.Printf("CREATING %d MEMBERS\n", K)
+	// END
 	uc := make([]*UserMember, K)
 	ucNames := make([]string, K)
 	namesInUse := make(map[string]bool)

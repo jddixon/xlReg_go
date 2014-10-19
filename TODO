@@ -1,17 +1,24 @@
 xlReg_go/TODO
 
+2014-10-18
+    * two test errors remain
+
+2014-10-17
+    * distinguish ClientInfo (as seen by the registry) from MemberInfo
+        (as seen by the registry clients)
+
 2014-10-16
-    * change NewMemberMaker() to take node as an argument, with a
-        consequent requirement that the nodeID is set
+    * change NewMemberMaker() to take node as an argument, with a       * DONE
+        consequent requirement that the nodeID is set                   * DONE
 
     * GOAL: MemberInfo should be merged with or become Peer
     * Then cluster members should be added to Node.peers[]
 
-    * Calls to MkdirAll(lfs) should be replaced by 
-        xf.CheckLFS(lfs, perm)
-        - this requires a change to the CheckLFS() interface
+    * Calls to MkdirAll(lfs) should be replaced by                      * DONE
+        xf.CheckLFS(lfs, perm)                                          * DONE
+        - this requires a change to the CheckLFS() interface            * DONE
 
-    * URGENT: reg.ContainsID() is failing (eg eph_server_test.go)
+    * URGENT: reg.ContainsID() is failing (eg eph_server_test.go        * FALSE
 
 2014-10-15
     * FIX: epCount at end of clusterMember serialization is wrong

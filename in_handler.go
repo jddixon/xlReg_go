@@ -62,9 +62,12 @@ func init() {
 	}
 }
 
+/**
+ * Handler for connections incoming to the registry server from clients.
+ */
 type InHandler struct {
 	reg        *Registry
-	thisMember *MemberInfo
+	thisClient *ClientInfo
 	cluster    *RegCluster
 	version    uint32 // protocol version used in session
 	known      uint64 // a bit vector:
