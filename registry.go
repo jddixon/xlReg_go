@@ -68,10 +68,6 @@ func NewRegistry(clusters []*RegCluster,
 		}
 	}
 	if err == nil {
-		// registry's own ID added to Bloom filter
-		err = idFilter.Insert(rn.GetNodeID().Value())
-	}
-	if err == nil {
 		logger := opt.Logger
 		if logger == nil {
 			logger = log.New(os.Stderr, "", log.Ldate|log.Ltime)
@@ -107,6 +103,14 @@ func NewRegistry(clusters []*RegCluster,
 			err = ioutil.WriteFile(pathToFile, []byte(serialized), 0644)
 		}
 	}
+	if err == nil {
+		// registry's own ID added to Bloom filter
+		regID := rn.GetNodeID()
+		// DEBUG
+		fmt.Printf("\ninserting registry ID %x\n", regID)
+		// END
+		err = reg.InsertID(regID)
+	}
 	return
 }
 
@@ -140,8 +144,11 @@ func (reg *Registry) InsertID(n *xi.NodeID) (err error) {
 	}
 	return
 }
-func (reg *Registry) IDCount() uint {
-	return reg.idFilter.Size()
+func (reg *Registry) IDCount() (count uint) {
+	reg.mu.Lock()
+	defer reg.mu.Unlock()
+	count = reg.idFilter.Size()
+	return
 }
 
 // XXX RegMembersByID is not being updated!  This is the redundant and so
@@ -191,7 +198,7 @@ func (reg *Registry) AddCluster(cluster *RegCluster) (index int, err error) {
 // This function generates a good-quality random NodeID (a 32-byte
 // value) that is not already known to the registry and then adds
 // the new NodeID to the registry's Bloom filter.
-func (reg *Registry) UniqueNodeID() (nodeID *xi.NodeID, err error) {
+func (reg *Registry) InsertUniqueNodeID() (nodeID *xi.NodeID, err error) {
 
 	nodeID, err = xi.New(nil)
 	found, err := reg.ContainsID(nodeID)
@@ -201,7 +208,10 @@ func (reg *Registry) UniqueNodeID() (nodeID *xi.NodeID, err error) {
 	}
 	if err == nil {
 		err = reg.idFilter.Insert(nodeID.Value())
-	}
+	 }
+	// DEBUG
+	fmt.Printf("InsertUniqueNodeID returning %x, %v\n", nodeID.Value(), err)
+	// END
 	return
 }
 

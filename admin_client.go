@@ -37,6 +37,9 @@ func NewAdminMember(
 	ac *AdminMember, err error) {
 
 	nodeID, err := xi.New(nil)
+	// DEBUG
+	fmt.Printf("  admin ID %x\n", nodeID.Value())
+	// END
 	if err == nil {
 		node, err := xn.NewNew("admin", nodeID, "") // name, id, lfs
 		if err == nil {
@@ -62,28 +65,28 @@ func NewAdminMember(
 
 func (ac *AdminMember) Run() {
 
-	cn := &ac.MemberMaker
+	mm := &ac.MemberMaker
 
 	go func() {
 		var (
 			version1 uint32
 		)
-		cnx, version2, err := cn.SessionSetup(version1)
+		cnx, version2, err := mm.SessionSetup(version1)
 		_ = version2 // not yet used
 		if err == nil {
-			err = cn.MemberAndOK()
+			err = mm.MemberAndOK()
 		}
 		if err == nil {
-			err = cn.CreateAndReply()
+			err = mm.CreateAndReply()
 		}
 		if err == nil {
-			err = cn.ByeAndAck()
+			err = mm.ByeAndAck()
 		}
 		// END OF RUN ===============================================
 		if cnx != nil {
 			cnx.Close()
 		}
 
-		cn.DoneCh <- err
+		mm.DoneCh <- err
 	}()
 }

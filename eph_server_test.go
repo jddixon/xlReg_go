@@ -57,6 +57,7 @@ func (s *XLSuite) TestEphServer(c *C) {
 	c.Assert(reg.IDCount(), Equals, uint(1)) // the registry's own ID
 	found, err := reg.ContainsID(regID)
 	c.Assert(found, Equals, true)
+	c.Assert(reg.IDCount(), Equals, uint(1))
 
 	// 2. create a random cluster name, size, scratch directory -----
 	clusterName := rng.NextFileName(8)
@@ -78,21 +79,24 @@ func (s *XLSuite) TestEphServer(c *C) {
 	K := uint32(2 + rng.Intn(6)) // so the size is 2 .. 7
 
 	// 3. create an AdminMember, use it to get the clusterID
+	// DEBUG
+	fmt.Printf("\nADMIN\n")
+	// END
+
 	an, err := NewAdminMember(serverName, serverID, serverEnd,
 		serverCK, serverSK, clusterName, clusterAttrs, K, uint32(1), nil)
 	c.Assert(err, IsNil)
 
 	an.Run()
 	<-an.DoneCh
-
+	c.Check(reg.IDCount(), Equals, uint(2))	// FAILS
 	c.Assert(an.ClusterID, NotNil) // the purpose of the exercise
 	c.Assert(an.EPCount, Equals, uint32(1))
 
 	anID := an.ClusterMember.Node.GetNodeID()
-	c.Assert(reg.IDCount(), Equals, uint(3)) // regID + anID + clusterID
 
 	// DEBUG
-	fmt.Println("ADMIN MEMBER GETS:")
+	fmt.Println("\nADMIN MEMBER GETS:")
 	fmt.Printf("  regID     %s\n", regID.String())
 	fmt.Printf("  anID      %s\n", anID.String())
 	fmt.Printf("  clusterID %s\n", an.ClusterID.String())
@@ -102,13 +106,15 @@ func (s *XLSuite) TestEphServer(c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(found, Equals, true)
 
+	found, err = reg.ContainsID(an.ClusterID)	
+	c.Assert(err, IsNil)
+	c.Assert(found, Equals, true) // XXX FALSE <--------------------- !!!
+
 	found, err = reg.ContainsID(anID)
 	c.Assert(err, IsNil)
-	c.Assert(found, Equals, true) // XXX FAILS
+	c.Assert(found, Equals, true) // XXX FALSE <--------------------- !!!
 
-	found, err = reg.ContainsID(an.ClusterID)
-	c.Assert(err, IsNil)
-	c.Assert(found, Equals, true) // XXX FALSE
+	c.Assert(reg.IDCount(), Equals, uint(3)) // regID + anID + clusterID
 
 	// 4. create K members ------------------------------------------
 

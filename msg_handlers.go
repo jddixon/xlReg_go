@@ -45,6 +45,12 @@ func doClientMsg(h *InHandler) {
 	defer func() {
 		h.errOut = err
 	}()
+
+	// DEBUG
+	regName := h.reg.GetName()
+	fmt.Printf("doClientMsg: regName is %s\n", regName)
+	// END
+
 	// Examine incoming message -------------------------------------
 	var (
 		name   string
@@ -55,6 +61,7 @@ func doClientMsg(h *InHandler) {
 		hash   []byte
 		cm     *ClientInfo
 	)
+	
 	// XXX We should accept EITHER clientName + token OR clientID
 	// This implementation only accepts a token.
 
@@ -91,12 +98,24 @@ func doClientMsg(h *InHandler) {
 	}
 	if err == nil {
 		id := clientSpecs.GetID()
+		// DEBUG
 		if id == nil {
-			nodeID, err = h.reg.UniqueNodeID()
-			id := nodeID.Value()
-			h.reg.Logger.Printf("assigned new MemberID %xi, user %s\n",
-				id, name)
-			err = h.reg.InsertID(nodeID)
+			fmt.Println("  doClientMsg: id from Specs is NIL")
+		} else {
+			fmt.Printf("  doClientMsg: id from Specs is %x\n", id)
+		}
+		// END
+		if id == nil {
+			nodeID, err = h.reg.InsertUniqueNodeID()
+			// DEBUG
+			fmt.Printf("  doClientMsg: inserting %x returned %v\n", id, err)
+			// END
+			if err == nil {
+				id := nodeID.Value()
+				// this is echoed to the console
+				h.reg.Logger.Printf("doClientMsg: assigning new MemberID %xi, user %s",
+					id, name)
+			}
 		} else {
 			// must be known to the registry
 			nodeID, err = xi.New(id)
@@ -110,7 +129,7 @@ func doClientMsg(h *InHandler) {
 		}
 	}
 	// Take appropriate action --------------------------------------
-	if err == nil {
+	if err == nil || err == IDAlreadyInUse {
 		// The appropriate action is to hang a token for this client off
 		// the InHandler.
 		cm, err = NewClientInfo(name, nodeID, ck, sk, attrs, myEnds)
@@ -169,12 +188,17 @@ func doCreateMsg(h *InHandler) {
 	h.reg.mu.RUnlock()
 
 	if exists {
-		h.reg.Logger.Printf("doCreateMsg: cluster %s already exists!\n", clusterName)
-		// XXX THIS NO LONGER MAKES ANY SENSE
-		h.cluster = cluster
-
+		h.reg.Logger.Printf("doCreateMsg: cluster %s already exists\n", clusterName)
 		clusterSize = cluster.maxSize
-		clusterID, _ = xi.New(cluster.ID)
+		clusterAttrs = cluster.Attrs
+		endPointCount = cluster.epCount
+		if cluster.ID == nil {
+			fmt.Println("  no ID for cluster %s\n", clusterName)
+			clusterID, _ = xi.New(nil)
+		} else {
+			clusterID, _ = xi.New(cluster.ID)
+		}
+		// XXX index not assigned
 	} else {
 		h.reg.Logger.Printf("doCreateMsg: new cluster %s\n", clusterName)
 		attrs := uint64(0)
@@ -184,7 +208,7 @@ func doCreateMsg(h *InHandler) {
 			clusterSize = MAX_CLUSTER_SIZE
 		}
 		// Assign a quasi-random cluster ID, adding it to the registry
-		clusterID, err = h.reg.UniqueNodeID()
+		clusterID, err = h.reg.InsertUniqueNodeID()
 		if err == nil {
 			cluster, err = NewRegCluster(clusterName, clusterID, attrs,
 				clusterSize, endPointCount)
@@ -202,7 +226,7 @@ func doCreateMsg(h *InHandler) {
 	if err == nil {
 		// Prepare reply to client --------------------------------------
 		op := XLRegMsg_CreateReply
-		id := clusterID.Value() // XXX blows up
+		id := clusterID.Value() 
 		h.msgOut = &XLRegMsg{
 			Op:            &op,
 			ClusterID:     id,

@@ -239,6 +239,10 @@ func NewMemberMaker(
 			AesCnxHandler: *cnxHandler,
 			ClusterMember: *cm,
 		}
+		// DEBUG
+		fmt.Printf("MemberMaker: node %s has ID %x\n",
+			node.GetName(), node.GetNodeID().Value())
+		// END
 	}
 	return
 }
@@ -323,11 +327,17 @@ func (mm *MemberMaker) MemberAndOK() (err error) {
 		ckBytes, skBytes []byte
 		digSig           []byte
 		hash             []byte
-		myEnds           []string
+		id				 []byte
+	
+	myEnds           []string
 	)
 	// XXX attrs not actually dealt with
 
 	node := mm.ClusterMember.Node
+	nodeID := node.GetNodeID()
+	if nodeID != nil {
+		id = nodeID.Value()
+	}
 	name := node.GetName()
 	ckPriv := node.GetCommsPrivateKey()
 	skPriv := node.GetSigPrivateKey()
@@ -360,6 +370,7 @@ func (mm *MemberMaker) MemberAndOK() (err error) {
 	if err == nil {
 		token := &XLRegMsg_Token{
 			Name:     &name,
+			ID:			id,
 			Attrs:    &mm.ProposedAttrs,
 			CommsKey: ckBytes,
 			SigKey:   skBytes,
