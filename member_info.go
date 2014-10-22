@@ -6,7 +6,7 @@ package reg
 // to manage information about clusters and their members.
 
 import (
-	//"crypto/rsa"
+	"crypto/rsa"
 	"encoding/hex"
 	"fmt"
 	xc "github.com/jddixon/xlCrypto_go"
@@ -55,6 +55,7 @@ func NewMemberInfoFromToken(token *XLRegMsg_Token) (
 	m *MemberInfo, err error) {
 
 	var (
+		ck, sk *rsa.PublicKey
 		ctor   xt.ConnectorI
 		ctors  []xt.ConnectorI
 		farEnd xt.EndPointI
@@ -66,14 +67,23 @@ func NewMemberInfoFromToken(token *XLRegMsg_Token) (
 	} else {
 		nodeID, err = xi.New(token.GetID())
 		if err == nil {
-			ck, err := xc.RSAPubKeyFromWire(token.GetCommsKey())
+			ck, err = xc.RSAPubKeyFromWire(token.GetCommsKey())
 			if err == nil {
-				sk, err := xc.RSAPubKeyFromWire(token.GetSigKey())
+				sk, err = xc.RSAPubKeyFromWire(token.GetSigKey())
 				if err == nil {
 					attrs := token.GetAttrs()
 					myEnds := token.GetMyEnds()
 					for i := 0; i < len(myEnds); i++ {
-						farEnd, err = xt.NewTcpEndPoint(myEnds[i])
+						myEnd := myEnds[i]
+						if strings.HasPrefix(myEnd, "TcpEndPoint: ") {
+							myEnd = myEnd[13:]
+						}
+						// DEBUG
+						fmt.Printf("...FromToken: myEnds[%d] is %s\n",
+							i, myEnd)
+						// END
+
+						farEnd, err = xt.NewTcpEndPoint(myEnd)
 						if err != nil {
 							break
 						}
@@ -87,6 +97,10 @@ func NewMemberInfoFromToken(token *XLRegMsg_Token) (
 						peer, err = xn.NewPeer(token.GetName(), nodeID,
 							ck, sk, nil, ctors)
 						if err == nil {
+							// DEBUG
+							fmt.Printf("  mi.Name %s\n  ID   %x\n",
+								peer.GetName(), peer.GetNodeID().Value())
+							// END
 							m = &MemberInfo{
 								Attrs: attrs,
 								Peer:  *peer,
@@ -101,6 +115,11 @@ func NewMemberInfoFromToken(token *XLRegMsg_Token) (
 			}
 		}
 	}
+	// DEBUG
+	fmt.Printf("NewMemberInfoFromToken returning err = %v\n", err)
+	//fmt.Printf("  Name %s\n  ID   %x\n",
+	//	m.Peer.GetName(), m.Peer.GetNodeID().Value())
+	// END
 	return
 }
 

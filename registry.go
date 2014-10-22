@@ -107,7 +107,7 @@ func NewRegistry(clusters []*RegCluster,
 		// registry's own ID added to Bloom filter
 		regID := rn.GetNodeID()
 		// DEBUG
-		fmt.Printf("\ninserting registry ID %x\n", regID)
+		reg.Logger.Printf("\ninserting registry ID %x\n", regID.Value())
 		// END
 		err = reg.InsertID(regID)
 	}
@@ -118,7 +118,7 @@ func (reg *Registry) ContainsID(n *xi.NodeID) (found bool, err error) {
 	found, _, err = reg.idFilter.IsMember(n.Value())
 
 	// DEBUG
-	fmt.Printf("Registry.ContainsID(%x) returning %v, %v\n",
+	reg.Logger.Printf("Registry.ContainsID(%x) returning %v, %v\n",
 		n.Value(), found, err)
 	// END
 	return
@@ -126,19 +126,19 @@ func (reg *Registry) ContainsID(n *xi.NodeID) (found bool, err error) {
 func (reg *Registry) InsertID(n *xi.NodeID) (err error) {
 	b := n.Value()
 	// DEBUG
-	fmt.Printf("Registry.InsertID(%x)\n", b)
+	reg.Logger.Printf("Registry.InsertID(%x)\n", b)
 	// END
 	found, _, err := reg.idFilter.IsMember(b)
 	if err == nil {
 		if found {
 			// DEBUG
-			fmt.Printf("  id is already registered\n")
+			reg.Logger.Printf("  id is already registered\n")
 			// END
 			err = IDAlreadyInUse
 		} else {
 			err = reg.idFilter.Insert(b)
 			// DEBUG
-			fmt.Printf("  added %x to registry; err is %v\n", b, err)
+			reg.Logger.Printf("  added %x to registry; err is %v\n", b, err)
 			// END
 		}
 	}
@@ -208,9 +208,10 @@ func (reg *Registry) InsertUniqueNodeID() (nodeID *xi.NodeID, err error) {
 	}
 	if err == nil {
 		err = reg.idFilter.Insert(nodeID.Value())
-	 }
+	}
 	// DEBUG
-	fmt.Printf("InsertUniqueNodeID returning %x, %v\n", nodeID.Value(), err)
+	reg.Logger.Printf("InsertUniqueNodeID returning %x, %v\n",
+		nodeID.Value(), err)
 	// END
 	return
 }

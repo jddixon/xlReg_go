@@ -95,7 +95,7 @@ func (uc *UserMember) Run() {
 		if err == nil {
 			err = mn.GetAndMembers()
 		}
-		// DEBUG
+		// DEBUG ====================================================
 		var nilMembers []int
 		for i := 0; i < len(uc.Members); i++ {
 			if uc.Members[i] == nil {
@@ -106,7 +106,8 @@ func (uc *UserMember) Run() {
 			fmt.Printf("UserMember.Run() after Get finds nil members: %v\n",
 				nilMembers)
 		}
-		// END
+		// END ======================================================
+
 		if err == nil {
 			err = mn.ByeAndAck()
 		}

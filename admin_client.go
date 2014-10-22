@@ -73,20 +73,32 @@ func (ac *AdminMember) Run() {
 		)
 		cnx, version2, err := mm.SessionSetup(version1)
 		_ = version2 // not yet used
+		// DEBUG
+		fmt.Printf("  after SessionSetup err is %v\n", err)
+		// END
 		if err == nil {
 			err = mm.MemberAndOK()
-		}
-		if err == nil {
-			err = mm.CreateAndReply()
-		}
-		if err == nil {
-			err = mm.ByeAndAck()
+			// DEBUG
+			fmt.Printf("  after MemberAndOK err is %v\n", err)
+			// END
+			if err == nil {
+				err = mm.CreateAndReply()
+				// DEBUG
+				fmt.Printf("  after CreateAndReply err is %v\n", err)
+				// END
+				if err == nil {
+					err = mm.ByeAndAck()
+				}
+			}
 		}
 		// END OF RUN ===============================================
 		if cnx != nil {
 			cnx.Close()
 		}
-
+		// DEBUG
+		fmt.Printf("AdminMember.Run() : exiting; err %v\n", err)
+		fmt.Printf("  ClusterID %x\n", mm.ClusterID.Value())
+		// END
 		mm.DoneCh <- err
 	}()
 }

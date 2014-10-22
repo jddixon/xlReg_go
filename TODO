@@ -1,11 +1,15 @@
 xlReg_go/TODO
 
+2014-10-21
+    * neew xlTransport function to strip off things like
+        "TcpEndPoint: "; this caused problems in memberNode.go
+
 2014-10-18
-    * two test errors remain
+    * two test errors remain                                            * FIXED
 
 2014-10-17
-    * distinguish ClientInfo (as seen by the registry) from MemberInfo
-        (as seen by the registry clients)
+    * distinguish ClientInfo (as seen by the registry) from MemberInfo  * DONE
+        (as seen by the registry clients)                               * DONE
 
 2014-10-16
     * change NewMemberMaker() to take node as an argument, with a       * DONE

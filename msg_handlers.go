@@ -48,7 +48,7 @@ func doClientMsg(h *InHandler) {
 
 	// DEBUG
 	regName := h.reg.GetName()
-	fmt.Printf("doClientMsg: regName is %s\n", regName)
+	h.reg.Logger.Printf("doClientMsg: regName is %s\n", regName)
 	// END
 
 	// Examine incoming message -------------------------------------
@@ -61,7 +61,7 @@ func doClientMsg(h *InHandler) {
 		hash   []byte
 		cm     *ClientInfo
 	)
-	
+
 	// XXX We should accept EITHER clientName + token OR clientID
 	// This implementation only accepts a token.
 
@@ -100,15 +100,15 @@ func doClientMsg(h *InHandler) {
 		id := clientSpecs.GetID()
 		// DEBUG
 		if id == nil {
-			fmt.Println("  doClientMsg: id from Specs is NIL")
+			h.reg.Logger.Println("  doClientMsg: id from Specs is NIL")
 		} else {
-			fmt.Printf("  doClientMsg: id from Specs is %x\n", id)
+			h.reg.Logger.Printf("  doClientMsg: id from Specs is %x\n", id)
 		}
 		// END
 		if id == nil {
 			nodeID, err = h.reg.InsertUniqueNodeID()
 			// DEBUG
-			fmt.Printf("  doClientMsg: inserting %x returned %v\n", id, err)
+			h.reg.Logger.Printf("  doClientMsg: inserting %x returned %v\n", id, err)
 			// END
 			if err == nil {
 				id := nodeID.Value()
@@ -123,7 +123,7 @@ func doClientMsg(h *InHandler) {
 				var found bool
 				found, err = h.reg.ContainsID(nodeID)
 				if err == nil && !found {
-					err = UnknownMember
+					err = h.reg.InsertID(nodeID)
 				}
 			}
 		}
@@ -193,7 +193,7 @@ func doCreateMsg(h *InHandler) {
 		clusterAttrs = cluster.Attrs
 		endPointCount = cluster.epCount
 		if cluster.ID == nil {
-			fmt.Println("  no ID for cluster %s\n", clusterName)
+			h.reg.Logger.Println("  no ID for cluster %s\n", clusterName)
 			clusterID, _ = xi.New(nil)
 		} else {
 			clusterID, _ = xi.New(cluster.ID)
@@ -226,7 +226,7 @@ func doCreateMsg(h *InHandler) {
 	if err == nil {
 		// Prepare reply to client --------------------------------------
 		op := XLRegMsg_CreateReply
-		id := clusterID.Value() 
+		id := clusterID.Value()
 		h.msgOut = &XLRegMsg{
 			Op:            &op,
 			ClusterID:     id,
@@ -300,7 +300,7 @@ func doJoinMsg(h *InHandler) {
 				msg := fmt.Sprintf("can't find cluster with ID %s",
 					hex.EncodeToString(clusterID))
 				// DEBUG
-				fmt.Printf("%s\n", msg)
+				h.reg.Logger.Printf("%s\n", msg)
 				// END
 				err = e.New(msg)
 			} else {
@@ -392,7 +392,7 @@ func doGetMsg(h *InHandler) {
 			msg := fmt.Sprintf("doGetMsg: can't find cluster with ID %s",
 				hex.EncodeToString(clusterID))
 			// DEBUG
-			fmt.Printf("%s\n", msg)
+			h.reg.Logger.Printf("%s\n", msg)
 			// END
 			err = e.New(msg)
 		} else {

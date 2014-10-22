@@ -19,6 +19,7 @@ import (
 	xt "github.com/jddixon/xlTransport_go"
 	xu "github.com/jddixon/xlUtil_go"
 	xf "github.com/jddixon/xlUtil_go/lfs"
+	"io"
 	"io/ioutil"
 	"os"
 	"path"
@@ -264,6 +265,9 @@ func (mm *MemberMaker) writeMsg(m *XLRegMsg) (err error) {
 	if err == nil {
 		err = mm.WriteData(data)
 	}
+	// DEBUG
+	fmt.Printf("MemberMaker.writeMsg: err is %v\n", err)
+	// END
 	return
 }
 
@@ -327,9 +331,9 @@ func (mm *MemberMaker) MemberAndOK() (err error) {
 		ckBytes, skBytes []byte
 		digSig           []byte
 		hash             []byte
-		id				 []byte
-	
-	myEnds           []string
+		id               []byte
+
+		myEnds []string
 	)
 	// XXX attrs not actually dealt with
 
@@ -359,6 +363,10 @@ func (mm *MemberMaker) MemberAndOK() (err error) {
 			d.Write(ckBytes)
 			d.Write(skBytes)
 			for i := 0; i < len(myEnds); i++ {
+				// DEBUG
+				fmt.Printf("MemberAndOK: myEnds[%d] is %s\n",
+					i, myEnds[i])
+				// END
 				d.Write([]byte(myEnds[i]))
 			}
 			hash = d.Sum(nil)
@@ -370,7 +378,7 @@ func (mm *MemberMaker) MemberAndOK() (err error) {
 	if err == nil {
 		token := &XLRegMsg_Token{
 			Name:     &name,
-			ID:			id,
+			ID:       id,
 			Attrs:    &mm.ProposedAttrs,
 			CommsKey: ckBytes,
 			SigKey:   skBytes,
@@ -405,6 +413,10 @@ func (mm *MemberMaker) CreateAndReply() (err error) {
 
 	var response *XLRegMsg
 
+	// DEBUG
+	fmt.Println("\nCreateAndReply")
+	// END
+
 	// Send CREATE MSG ==========================================
 
 	op := XLRegMsg_Create
@@ -417,18 +429,34 @@ func (mm *MemberMaker) CreateAndReply() (err error) {
 	}
 	// SHOULD CHECK FOR TIMEOUT
 	err = mm.writeMsg(request)
+	// DEBUG
+	fmt.Printf("  CreateAndReply: after writeMsg err is %v\n", err)
+	// END
 	if err == nil {
 		// Process CREATE REPLY -------------------------------------
 		// SHOULD CHECK FOR TIMEOUT AND VERIFY THAT IT'S A CREATE REPLY
 		response, err = mm.readMsg()
-		op = response.GetOp()
-		_ = op
+		if err == io.EOF {
+			err = nil
+		}
 		if err == nil {
-			id := response.GetClusterID()
-			mm.ClusterID, err = xi.New(id)
-			mm.ClusterAttrs = response.GetClusterAttrs()
-			mm.ClusterSize = response.GetClusterSize()
-			// XXX no check on err
+			op = response.GetOp()
+			_ = op
+			if err == nil {
+				id := response.GetClusterID()
+				// DEBUG
+				if id == nil {
+					fmt.Println("  CreateAndReply: ClusterID is NIL")
+				} else {
+					fmt.Printf("  CreateAndReply: ClusterID is %x\n", id)
+				}
+				// END
+				mm.ClusterID, err = xi.New(id)
+				if err == nil {
+					mm.ClusterAttrs = response.GetClusterAttrs()
+					mm.ClusterSize = response.GetClusterSize()
+				}
+			}
 		}
 	}
 	return
@@ -478,6 +506,10 @@ func (mm *MemberMaker) JoinAndReply() (err error) {
 // Collect information on all cluster members
 func (mm *MemberMaker) GetAndMembers() (err error) {
 
+	// DEBUG
+	fmt.Printf("Entering GetAndMembers()\n")
+	// END
+
 	if mm.ClusterID == nil {
 		fmt.Printf("** ENTERING GetAndMembers for %s with nil clusterID! **\n",
 			mm.ClusterMember.Node.GetName())
@@ -489,6 +521,10 @@ func (mm *MemberMaker) GetAndMembers() (err error) {
 	stillToGet := xu.LowNMap(uint(mm.ClusterSize))
 	for count := 0; count < MAX_GET && stillToGet.Any(); count++ {
 
+		// DEBUG
+		fmt.Printf("  GET count %d; stillToGet 0x%x\n", count, stillToGet.Bits)
+		// END
+
 		var response *XLRegMsg
 
 		for i := uint32(0); i < uint32(mm.ClusterSize); i++ {
@@ -497,6 +533,10 @@ func (mm *MemberMaker) GetAndMembers() (err error) {
 				stillToGet = stillToGet.Clear(uint(i))
 			}
 		}
+		// DEBUG
+		fmt.Printf("  after checking cluster members, stillToGet 0x%x\n",
+			stillToGet.Bits)
+		// END
 
 		// Send GET MSG =========================================
 		op := XLRegMsg_GetCluster
@@ -524,6 +564,10 @@ func (mm *MemberMaker) GetAndMembers() (err error) {
 			id := response.GetClusterID()
 			_ = id // XXX ignore for now
 			which := xu.NewBitMap64(response.GetWhich())
+			// DEBUG
+			fmt.Printf("response contains tokens 0x%x (a bit map)\n",
+				which.Bits)
+			// END
 			tokens := response.GetTokens() // a slice
 			if which.Any() {
 				offset := 0
@@ -534,11 +578,22 @@ func (mm *MemberMaker) GetAndMembers() (err error) {
 						offset++
 						mm.Members[i], err = NewMemberInfoFromToken(
 							token)
-						// XXX UNDESIRABLE CAST
-						stillToGet = stillToGet.Clear(uint(i))
+						// DEBUG
+						fmt.Printf("  set %d-th peer from token; err = %v\n",
+							i, err)
+						// END
+
+						if err == nil {
+							// XXX UNDESIRABLE CAST
+							stillToGet = stillToGet.Clear(uint(i))
+						}
 					}
 				}
 			}
+			// DEBUG
+			fmt.Printf("  after checking response, stillToGet 0x%x\n",
+				stillToGet.Bits)
+			// END
 			if stillToGet.None() {
 				break
 			}
@@ -546,7 +601,7 @@ func (mm *MemberMaker) GetAndMembers() (err error) {
 		}
 	}
 	if err == nil {
-		selfID := mm.RegID.Value()
+		selfID := mm.GetNodeID().Value()
 
 		for i := uint32(0); i < uint32(mm.ClusterSize); i++ {
 

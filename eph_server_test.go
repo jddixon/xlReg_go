@@ -89,9 +89,6 @@ func (s *XLSuite) TestEphServer(c *C) {
 
 	an.Run()
 	<-an.DoneCh
-	c.Check(reg.IDCount(), Equals, uint(2))	// FAILS
-	c.Assert(an.ClusterID, NotNil) // the purpose of the exercise
-	c.Assert(an.EPCount, Equals, uint32(1))
 
 	anID := an.ClusterMember.Node.GetNodeID()
 
@@ -99,27 +96,35 @@ func (s *XLSuite) TestEphServer(c *C) {
 	fmt.Println("\nADMIN MEMBER GETS:")
 	fmt.Printf("  regID     %s\n", regID.String())
 	fmt.Printf("  anID      %s\n", anID.String())
-	fmt.Printf("  clusterID %s\n", an.ClusterID.String())
+	if an.ClusterID == nil {
+		fmt.Printf("  ClusterID NIL\n")
+	} else {
+		fmt.Printf("  ClusterID %s\n", an.ClusterID.String())
+	}
 	// END
+
+	c.Check(reg.IDCount(), Equals, uint(3))
+	c.Assert(an.ClusterID, NotNil) // the purpose of the exercise
+	c.Assert(an.EPCount, Equals, uint32(1))
 
 	found, err = reg.ContainsID(regID)
 	c.Assert(err, IsNil)
 	c.Assert(found, Equals, true)
 
-	found, err = reg.ContainsID(an.ClusterID)	
-	c.Assert(err, IsNil)
-	c.Assert(found, Equals, true) // XXX FALSE <--------------------- !!!
-
 	found, err = reg.ContainsID(anID)
 	c.Assert(err, IsNil)
-	c.Assert(found, Equals, true) // XXX FALSE <--------------------- !!!
+	c.Check(found, Equals, true) // XXX FALSE <--------------------- !!!
 
-	c.Assert(reg.IDCount(), Equals, uint(3)) // regID + anID + clusterID
+	found, err = reg.ContainsID(an.ClusterID)
+	c.Assert(err, IsNil)
+	c.Check(found, Equals, true) // XXX FALSE <--------------------- !!!
+
+	c.Check(reg.IDCount(), Equals, uint(3)) // regID + anID + clusterID
 
 	// 4. create K members ------------------------------------------
 
 	// DEBUG
-	fmt.Printf("CREATING %d MEMBERS\n", K)
+	fmt.Printf("\nCREATING %d MEMBERS\n", K)
 	// END
 	uc := make([]*UserMember, K)
 	ucNames := make([]string, K)
