@@ -75,14 +75,6 @@ func NewMemberInfoFromToken(token *XLRegMsg_Token) (
 					myEnds := token.GetMyEnds()
 					for i := 0; i < len(myEnds); i++ {
 						myEnd := myEnds[i]
-						if strings.HasPrefix(myEnd, "TcpEndPoint: ") {
-							myEnd = myEnd[13:]
-						}
-						// DEBUG
-						fmt.Printf("...FromToken: myEnds[%d] is %s\n",
-							i, myEnd)
-						// END
-
 						farEnd, err = xt.NewTcpEndPoint(myEnd)
 						if err != nil {
 							break
@@ -97,10 +89,6 @@ func NewMemberInfoFromToken(token *XLRegMsg_Token) (
 						peer, err = xn.NewPeer(token.GetName(), nodeID,
 							ck, sk, nil, ctors)
 						if err == nil {
-							// DEBUG
-							fmt.Printf("  mi.Name %s\n  ID   %x\n",
-								peer.GetName(), peer.GetNodeID().Value())
-							// END
 							m = &MemberInfo{
 								Attrs: attrs,
 								Peer:  *peer,
@@ -115,11 +103,6 @@ func NewMemberInfoFromToken(token *XLRegMsg_Token) (
 			}
 		}
 	}
-	// DEBUG
-	fmt.Printf("NewMemberInfoFromToken returning err = %v\n", err)
-	//fmt.Printf("  Name %s\n  ID   %x\n",
-	//	m.Peer.GetName(), m.Peer.GetNodeID().Value())
-	// END
 	return
 }
 
@@ -129,12 +112,6 @@ func (mi *MemberInfo) Token() (token *XLRegMsg_Token, err error) {
 	var ckBytes, skBytes []byte
 
 	ck := mi.Peer.GetCommsPublicKey()
-	// DEBUG
-	if ck == nil {
-		fmt.Printf("MemberInfo.Token: %s commsPubKey is nil\n",
-			mi.Peer.GetName())
-	}
-	// END
 	ckBytes, err = xc.RSAPubKeyToWire(ck)
 	if err == nil {
 		skBytes, err = xc.RSAPubKeyToWire(mi.Peer.GetSigPublicKey())
@@ -239,29 +216,6 @@ func collectAttrs(mi *MemberInfo, ss []string) (rest []string, err error) {
 	}
 	return
 }
-
-//func collectMyEnds(mi *MemberInfo, ss []string) (rest []string, err error) {
-//	rest = ss
-//	line := xn.NextNBLine(&rest)
-//	if line == "endPoints {" {
-//		for {
-//			line = strings.TrimSpace(rest[0]) // peek
-//			if line == "}" {
-//				break
-//			}
-//			line = xn.NextNBLine(&rest)
-//			// XXX NO CHECK THAT THIS IS A VALID ENDPOINT
-//			mi.MyEnds = append(mi.MyEnds, line)
-//		}
-//		line = xn.NextNBLine(&rest)
-//		if line != "}" {
-//			err = MissingClosingBrace
-//		}
-//	} else {
-//		err = MissingEndPointsSection
-//	}
-//	return
-//} // GEEP
 
 func ParseMemberInfo(s string) (
 	mi *MemberInfo, rest []string, err error) {

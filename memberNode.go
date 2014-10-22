@@ -23,6 +23,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"strings"
 	"time"
 )
 
@@ -115,46 +116,24 @@ func (mn *MemberMaker) PersistClusterMember() (err error) {
 	pathToCfgDir := path.Join(lfs, ".xlattice")
 	pathToCfgFile := path.Join(pathToCfgDir, "cluster.member.config")
 
-	// DEBUG
-	name := mn.ClusterMember.Node.GetName()
-	fmt.Printf("member %-8s: config file is %s\n", name, pathToCfgFile)
-	// END
-
 	_, err = os.Stat(pathToCfgDir)
 	if os.IsNotExist(err) {
 		err = xf.CheckLFS(pathToCfgDir, 0740)
-	} else if err != nil {
-		// DEBUG
-		fmt.Printf("  member %-8s: error from Stat %s is %v\n",
-			name, pathToCfgFile, err)
-		// END
 	}
 
 	if err == nil {
-		// DEBUG
-		//fmt.Printf("  member %-8s: serializing\n", mn.Name)
-		// END
 		// mn.Node = *node
 		config = mn.ClusterMember.String()
 		if err == nil {
-			// DEBUG
-			//fmt.Printf("  member %-8s: writing config file\n", mn.Name)
-			// END
 			err = ioutil.WriteFile(pathToCfgFile, []byte(config), 0600)
 		}
 	}
-	// DEBUG
-	//if err != nil {
-	//	fmt.Printf("  member %-8s: ERROR %s\n", mn.Name, err.Error())
-	//}
-	// END
 	return
 }
 
 // Given contact information for a registry and the name of a cluster,
 // the client joins the cluster, collects information on the other members,
 // and terminates when it has info on the entire membership.
-
 func NewMemberMaker(
 	node *xn.Node, attrs uint64,
 	regName string, regID *xi.NodeID, regEnd xt.EndPointI,
@@ -167,13 +146,6 @@ func NewMemberMaker(
 		cm      *ClusterMember
 		isAdmin = (attrs & ATTR_ADMIN) != 0
 	)
-
-	// DEBUG
-	name := node.GetName()
-	fmt.Printf("NewMemberMaker name %s, attrs 0x%x, epCount = %d\n",
-		name, attrs, epCount)
-	// END
-
 	// sanity checks on parameter list
 	if node == nil {
 		err = MissingNode
@@ -240,10 +212,6 @@ func NewMemberMaker(
 			AesCnxHandler: *cnxHandler,
 			ClusterMember: *cm,
 		}
-		// DEBUG
-		fmt.Printf("MemberMaker: node %s has ID %x\n",
-			node.GetName(), node.GetNodeID().Value())
-		// END
 	}
 	return
 }
@@ -265,9 +233,6 @@ func (mm *MemberMaker) writeMsg(m *XLRegMsg) (err error) {
 	if err == nil {
 		err = mm.WriteData(data)
 	}
-	// DEBUG
-	fmt.Printf("MemberMaker.writeMsg: err is %v\n", err)
-	// END
 	return
 }
 
@@ -354,7 +319,11 @@ func (mm *MemberMaker) MemberAndOK() (err error) {
 		skBytes, err = xc.RSAPubKeyToWire(&skPriv.PublicKey)
 		if err == nil {
 			for i := 0; i < node.SizeEndPoints(); i++ {
-				myEnds = append(myEnds, node.GetEndPoint(i).String())
+				myEnd := node.GetEndPoint(i).String()
+				if strings.HasPrefix(myEnd, "TcpEndPoint: ") {
+					myEnd = myEnd[13:]
+				}
+				myEnds = append(myEnds, myEnd)
 			}
 			// calculate hash over fields in canonical order
 			d := sha1.New()
@@ -363,10 +332,6 @@ func (mm *MemberMaker) MemberAndOK() (err error) {
 			d.Write(ckBytes)
 			d.Write(skBytes)
 			for i := 0; i < len(myEnds); i++ {
-				// DEBUG
-				fmt.Printf("MemberAndOK: myEnds[%d] is %s\n",
-					i, myEnds[i])
-				// END
 				d.Write([]byte(myEnds[i]))
 			}
 			hash = d.Sum(nil)
@@ -413,10 +378,6 @@ func (mm *MemberMaker) CreateAndReply() (err error) {
 
 	var response *XLRegMsg
 
-	// DEBUG
-	fmt.Println("\nCreateAndReply")
-	// END
-
 	// Send CREATE MSG ==========================================
 
 	op := XLRegMsg_Create
@@ -429,9 +390,6 @@ func (mm *MemberMaker) CreateAndReply() (err error) {
 	}
 	// SHOULD CHECK FOR TIMEOUT
 	err = mm.writeMsg(request)
-	// DEBUG
-	fmt.Printf("  CreateAndReply: after writeMsg err is %v\n", err)
-	// END
 	if err == nil {
 		// Process CREATE REPLY -------------------------------------
 		// SHOULD CHECK FOR TIMEOUT AND VERIFY THAT IT'S A CREATE REPLY
@@ -444,13 +402,6 @@ func (mm *MemberMaker) CreateAndReply() (err error) {
 			_ = op
 			if err == nil {
 				id := response.GetClusterID()
-				// DEBUG
-				if id == nil {
-					fmt.Println("  CreateAndReply: ClusterID is NIL")
-				} else {
-					fmt.Printf("  CreateAndReply: ClusterID is %x\n", id)
-				}
-				// END
 				mm.ClusterID, err = xi.New(id)
 				if err == nil {
 					mm.ClusterAttrs = response.GetClusterAttrs()
@@ -506,10 +457,6 @@ func (mm *MemberMaker) JoinAndReply() (err error) {
 // Collect information on all cluster members
 func (mm *MemberMaker) GetAndMembers() (err error) {
 
-	// DEBUG
-	fmt.Printf("Entering GetAndMembers()\n")
-	// END
-
 	if mm.ClusterID == nil {
 		fmt.Printf("** ENTERING GetAndMembers for %s with nil clusterID! **\n",
 			mm.ClusterMember.Node.GetName())
@@ -521,10 +468,6 @@ func (mm *MemberMaker) GetAndMembers() (err error) {
 	stillToGet := xu.LowNMap(uint(mm.ClusterSize))
 	for count := 0; count < MAX_GET && stillToGet.Any(); count++ {
 
-		// DEBUG
-		fmt.Printf("  GET count %d; stillToGet 0x%x\n", count, stillToGet.Bits)
-		// END
-
 		var response *XLRegMsg
 
 		for i := uint32(0); i < uint32(mm.ClusterSize); i++ {
@@ -533,10 +476,6 @@ func (mm *MemberMaker) GetAndMembers() (err error) {
 				stillToGet = stillToGet.Clear(uint(i))
 			}
 		}
-		// DEBUG
-		fmt.Printf("  after checking cluster members, stillToGet 0x%x\n",
-			stillToGet.Bits)
-		// END
 
 		// Send GET MSG =========================================
 		op := XLRegMsg_GetCluster
@@ -564,10 +503,6 @@ func (mm *MemberMaker) GetAndMembers() (err error) {
 			id := response.GetClusterID()
 			_ = id // XXX ignore for now
 			which := xu.NewBitMap64(response.GetWhich())
-			// DEBUG
-			fmt.Printf("response contains tokens 0x%x (a bit map)\n",
-				which.Bits)
-			// END
 			tokens := response.GetTokens() // a slice
 			if which.Any() {
 				offset := 0
@@ -578,11 +513,6 @@ func (mm *MemberMaker) GetAndMembers() (err error) {
 						offset++
 						mm.Members[i], err = NewMemberInfoFromToken(
 							token)
-						// DEBUG
-						fmt.Printf("  set %d-th peer from token; err = %v\n",
-							i, err)
-						// END
-
 						if err == nil {
 							// XXX UNDESIRABLE CAST
 							stillToGet = stillToGet.Clear(uint(i))
@@ -590,10 +520,6 @@ func (mm *MemberMaker) GetAndMembers() (err error) {
 					}
 				}
 			}
-			// DEBUG
-			fmt.Printf("  after checking response, stillToGet 0x%x\n",
-				stillToGet.Bits)
-			// END
 			if stillToGet.None() {
 				break
 			}
@@ -607,10 +533,6 @@ func (mm *MemberMaker) GetAndMembers() (err error) {
 
 			mi := mm.Members[i]
 			if mi == nil {
-				// DEBUG
-				msg := fmt.Sprintf("cluster member %d is nil", i)
-				fmt.Println(msg)
-				// END
 				continue
 			}
 			id := mi.Peer.GetNodeID()
@@ -623,10 +545,6 @@ func (mm *MemberMaker) GetAndMembers() (err error) {
 				break
 			}
 		}
-		// DEBUG
-	} else {
-		fmt.Printf("mm.GetAndMembers: error '%s'\n", err.Error())
-		// END
 	}
 
 	return

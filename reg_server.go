@@ -9,7 +9,6 @@ import (
 )
 
 type RegServer struct {
-	acc       xt.AcceptorI // volatile, not serialized
 	Testing   bool         // serialized
 	Verbosity int          // serialized
 	DoneCh    chan (bool)
@@ -22,9 +21,7 @@ func NewRegServer(reg *Registry, testing bool, verbosity int) (
 	if reg == nil {
 		err = NilRegistry
 	} else {
-		acc := reg.GetAcceptor(0) // by convention
 		rs = &RegServer{
-			acc:       acc,
 			Testing:   testing,
 			Verbosity: verbosity,
 			Registry:  *reg,
@@ -35,12 +32,13 @@ func NewRegServer(reg *Registry, testing bool, verbosity int) (
 }
 
 func (rs *RegServer) Close() {
-	if rs.acc != nil {
-		rs.acc.Close()
+	acc := rs.GetAcceptor()
+	if acc != nil {
+		acc.Close()
 	}
 }
 func (rs *RegServer) GetAcceptor() xt.AcceptorI {
-	return rs.acc
+	return rs.Registry.GetAcceptor(0)
 }
 
 // Starts the server running in a goroutine.  Does not block.
@@ -52,7 +50,7 @@ func (rs *RegServer) Run() (err error) {
 
 			// As each client connects its connection is passed to a
 			// handler running in a separate goroutine.
-			cnx, err := rs.acc.Accept()
+			cnx, err := rs.GetAcceptor().Accept()
 			if err != nil {
 				// SHOULD NOT CONTINUE IF 'use of closed network connection";
 				// this yields an infinite loop if the listening socket has

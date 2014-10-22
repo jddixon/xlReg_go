@@ -2,6 +2,11 @@ xlReg_go/CHANGES
 -----------------------------------------------------------------------------
 The version number and date in this file must be kept in sync with version.go
 -----------------------------------------------------------------------------
+v1.5.0
+    2014-10-22
+        * ClientInfo distinguished from MemberInfo
+        * various bugs dealt with; all tests succeed
+        * changes to reflect API changes in imported packages       SLOC 4284
 v1.4.0
     2014-10-16
         * major changes in API: MemberMaker takes node parameter    SLOC 3990

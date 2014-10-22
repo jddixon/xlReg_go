@@ -88,7 +88,7 @@ func (cm *ClusterMember) Strings() (ss []string) {
 		// END
 		miss := cm.Members[i].Strings()
 		for j := 0; j < len(miss); j++ {
-			ss = append(ss, fmt.Sprintf("%s%s", INDENT, miss[j]))
+			ss = append(ss, fmt.Sprintf("%s%s%s", INDENT, INDENT, miss[j]))
 		}
 	}
 	ss = append(ss, fmt.Sprintf("%s}", INDENT))
