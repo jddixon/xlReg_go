@@ -2,6 +2,13 @@ xlReg_go/CHANGES
 -----------------------------------------------------------------------------
 The version number and date in this file must be kept in sync with version.go
 -----------------------------------------------------------------------------
+v1.6.0
+    2014-10-24
+        * AdminMember renamed AdminClient
+        * MemberInfo Peer becomes pointer; ClusterMember.AddPeers()
+            adds other members to Node using AddPeer(), copying     SLOC 4301
+        * registry is now a Peer, MemberMaker.RegPeer
+        * all cluster members are also Peers to one another         SLOC 4308
 v1.5.0
     2014-10-22
         * ClientInfo distinguished from MemberInfo

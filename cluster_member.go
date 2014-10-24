@@ -32,6 +32,27 @@ type ClusterMember struct {
 	xn.Node
 }
 
+// Add the other members in the Members list to this member's Node as
+// Peers.  This function must be called after the struct is created but
+// BEFORE it is serialized.
+func (cm *ClusterMember) AddPeers() (err error) {
+	node := &cm.Node
+	if node == nil {
+		err = NilNode
+	} else {
+		for i := uint32(0); i < cm.ClusterSize; i++ {
+			if i == cm.SelfIndex {
+				continue
+			}
+			_, err = node.AddPeer(cm.Members[i].Peer)
+			if err != nil {
+				break
+			}
+		}
+	}
+	return
+}
+
 // EQUAL ////////////////////////////////////////////////////////////
 
 func (cm *ClusterMember) Equal(any interface{}) bool {

@@ -12,7 +12,7 @@ import (
 
 var _ = fmt.Print
 
-// In the current implementation, AdminMember's purpose is to register
+// In the current implementation, AdminClient's purpose is to register
 // clusters, so it sets up a session with the registry, (calls SessionSetup),
 // identifies itself with a Client/ClientOK sequence, uses Create/CreateReply
 // to register the cluster, and then ends with Bye/Ack.  It then returns
@@ -22,19 +22,19 @@ var _ = fmt.Print
 // neither saves nor restores its Node; keys and such are generated for
 // each instance.
 
-type AdminMember struct {
-	// In this implementation, AdminMember is a one-shot, launched
+type AdminClient struct {
+	// In this implementation, AdminClient is a one-shot, launched
 	// to create a single cluster
 
 	MemberMaker
 }
 
-func NewAdminMember(
+func NewAdminClient(
 	serverName string, serverID *xi.NodeID, serverEnd xt.EndPointI,
 	serverCK, serverSK *rsa.PublicKey,
 	clusterName string, clusterAttrs uint64,
 	size, epCount uint32, e []xt.EndPointI) (
-	ac *AdminMember, err error) {
+	ac *AdminClient, err error) {
 
 	nodeID, err := xi.New(nil)
 	// DEBUG
@@ -51,7 +51,7 @@ func NewAdminMember(
 
 			if err == nil {
 				// Run() fills in clusterID
-				ac = &AdminMember{
+				ac = &AdminClient{
 					MemberMaker: *cn,
 				}
 			}
@@ -63,7 +63,7 @@ func NewAdminMember(
 // Start the client running in separate goroutine, so that this function
 // is non-blocking.
 
-func (ac *AdminMember) Run() {
+func (ac *AdminClient) Run() {
 
 	mm := &ac.MemberMaker
 
@@ -96,7 +96,7 @@ func (ac *AdminMember) Run() {
 			cnx.Close()
 		}
 		// DEBUG
-		fmt.Printf("AdminMember.Run() : exiting; err %v\n", err)
+		fmt.Printf("AdminClient.Run() : exiting; err %v\n", err)
 		fmt.Printf("  ClusterID %x\n", mm.ClusterID.Value())
 		// END
 		mm.DoneCh <- err

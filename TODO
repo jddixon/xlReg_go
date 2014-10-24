@@ -1,12 +1,24 @@
 xlReg_go/TODO
 
+2014-18-24 (-22, edited)						                        * DONE
+    * consider adding the registry as peer to 						    * DONE
+        - AdminClient, 						                            * DONE
+        - SoloMember,						                            * DONE
+        - UserMember						                            * DONE
+
+2014-10-24 
+    * modify MemberInfo to contain POINTER to Peer                      * DONE
+    * write test to verify that (a) all other members have been added
+        to Node as Peers but (b) the 'self' member is not so added.
+
+2014-10-24 (-16, edited)
+    * cluster members should be added to Node.peers[] using AddPeer()   * DONE
+        (which makes a copy)                                            * DONE
+        - this is done BEFORE serializing the node                      * NOTED
+
 2014-10-22 (-21, edited)
     * need xlTransport function to strip off address prefixes like
         "TcpEndPoint: "; this caused problems in memberNode.go
-
-2014-18-22 
-    * consider adding the registry as peer to AdminMember, SoloMember,
-        UserMember
 
 2014-10-18
     * two test errors remain                                            * FIXED
@@ -18,10 +30,6 @@ xlReg_go/TODO
         consequent requirement that the nodeID is set                   * DONE
 
     * GOAL: MemberInfo should be merged with or become Peer             * DONE
-    * Then cluster members should be added to Node.peers[]
-        - this is done BEFORE serializing the node
-        - and then ClusterMember.Members is redundant except for the
-            attrs field, which is currently unused
 
     * Calls to MkdirAll(lfs) should be replaced by                      * DONE
         xf.CheckLFS(lfs, perm)                                          * DONE
@@ -43,7 +51,7 @@ xlReg_go/TODO
                 the call to xlReg		                                * DONE
                 - this can only be done after the MemberAndOK()		    * DONE
                     call, which picks up the nodeID from the registry	* DONE
-                    * called by AdminMember, SoloMember, and UserMember	* DONE
+                    * called by AdminClient, SoloMember, and UserMember	* DONE
     * FIX: clusterMember serialization: indentation of memberInfo{}     * DONE 
         within members{} is wrong                                       * DONE
     * to reduce confusion, rename MemberNode MemberMaker                * DONE
@@ -52,7 +60,7 @@ xlReg_go/TODO
         GetEndPoint(n) or GetAcceptor(n)
     * SoloMember should NOT persist a ClusterMember and in fact
         it just calls PersistNode()
-    * AdminMember is completely ephemeral; it does not persist anything * TRUE
+    * AdminClient is completely ephemeral; it does not persist anything * TRUE
     * UserMember also doesn't persist anything; its mission is to 
         collect MemberInfo.  Callers can persist the information, but
         the endPoints will necessarily be WRONG, as discussed above.

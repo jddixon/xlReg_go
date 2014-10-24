@@ -20,9 +20,7 @@ var _ = fmt.Print
 
 type MemberInfo struct {
 	Attrs uint64 //  bit flags are defined in const.go
-	//MyEnds      []string // serialized EndPointI
-	//xn.BaseNode          // name and ID must be unique within the cluster
-	Peer xn.Peer
+	Peer *xn.Peer
 }
 
 //func NewMemberInfo(name string, id *xi.NodeID,
@@ -44,7 +42,7 @@ func NewMemberInfo(attrs uint64, peer *xn.Peer) (
 
 	mi = &MemberInfo{
 		Attrs: attrs,
-		Peer:  *peer,
+		Peer:  peer,
 	}
 	return
 }
@@ -91,7 +89,7 @@ func NewMemberInfoFromToken(token *XLRegMsg_Token) (
 						if err == nil {
 							m = &MemberInfo{
 								Attrs: attrs,
-								Peer:  *peer,
+								Peer:  peer,
 							}
 						}
 					}
@@ -233,7 +231,7 @@ func ParseMemberInfoFromStrings(ss []string) (
 			BaseNode: *bn,
 		}
 		mi = &MemberInfo{
-			Peer: *peerPart,
+			Peer: peerPart,
 		}
 		// expect and consume a closing brace
 		rest, err = xn.CollectConnectors(peerPart, rest)

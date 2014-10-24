@@ -6,7 +6,7 @@ package reg
 // BEING MODIFIED to follow the new approach, whereby
 // 1.  we create an ephemeral registry using NewEphServer()
 // 2.  we generate a random cluster name and size
-// 3.  run an AdminMember to register the cluster with the registry (which
+// 3.  run an AdminClient to register the cluster with the registry (which
 //       gives us a cluster ID), and then
 // 4.  create the appropriate number K of UserMembers
 // 5.  do test run in which the K clients exchange details through the registry
@@ -78,12 +78,12 @@ func (s *XLSuite) TestEphServer(c *C) {
 	clusterAttrs := uint64(rng.Int63())
 	K := uint32(2 + rng.Intn(6)) // so the size is 2 .. 7
 
-	// 3. create an AdminMember, use it to get the clusterID
+	// 3. create an AdminClient, use it to get the clusterID
 	// DEBUG
 	fmt.Printf("\nADMIN\n")
 	// END
 
-	an, err := NewAdminMember(serverName, serverID, serverEnd,
+	an, err := NewAdminClient(serverName, serverID, serverEnd,
 		serverCK, serverSK, clusterName, clusterAttrs, K, uint32(1), nil)
 	c.Assert(err, IsNil)
 

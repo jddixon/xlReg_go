@@ -140,7 +140,7 @@ func (s *XLSuite) makeAMemberInfo(c *C, rng *xr.PRNG) *MemberInfo {
 	c.Assert(err, IsNil)
 	return &MemberInfo{
 		Attrs: attrs,
-		Peer:  *peer,
+		Peer:  peer,
 	}
 } // GEEP
 

@@ -51,11 +51,13 @@ type MemberMaker struct {
 	AesCnxHandler
 
 	// RegCred info: registry credentials -----------------
-	RegName string
-	RegID   *xi.NodeID
-	RegCK   *rsa.PublicKey
-	RegSK   *rsa.PublicKey
-	RegEnd  xt.EndPointI
+	//RegName string
+	//RegID   *xi.NodeID
+	//RegCK   *rsa.PublicKey
+	//RegSK   *rsa.PublicKey
+	//RegEnd  xt.EndPointI
+
+	RegPeer *xn.Peer
 
 	// serverVersion xu.DecimalVersion		// missing
 
@@ -145,6 +147,7 @@ func NewMemberMaker(
 	var (
 		cm      *ClusterMember
 		isAdmin = (attrs & ATTR_ADMIN) != 0
+		regPeer *xn.Peer
 	)
 	// sanity checks on parameter list
 	if node == nil {
@@ -189,6 +192,19 @@ func NewMemberMaker(
 	}
 
 	if err == nil {
+		var ctor xt.ConnectorI
+		var ctors []xt.ConnectorI
+		ctor, err = xt.NewTcpConnector(regEnd)
+		if err == nil {
+			ctors = append(ctors, ctor)
+			regPeer, err = xn.NewPeer(regName, regID, regCK, regSK,
+				nil, ctors)
+			if err == nil {
+				_, err = node.AddPeer(regPeer)
+			}
+		}
+	}
+	if err == nil {
 		cnxHandler := &AesCnxHandler{State: MEMBER_START}
 		cm = &ClusterMember{
 			// Attrs gets negotiated
@@ -204,11 +220,14 @@ func NewMemberMaker(
 		mm = &MemberMaker{
 			ProposedAttrs: attrs,
 			DoneCh:        make(chan error, 1),
-			RegName:       regName,
-			RegID:         regID,
-			RegEnd:        regEnd,
-			RegCK:         regCK,
-			RegSK:         regSK,
+			// BECOMING SUPERFLUOUS ---
+			//RegName:       regName,
+			//RegID:         regID,
+			//RegEnd:        regEnd,
+			//RegCK:         regCK,
+			//RegSK:         regSK,
+			// END BECOMING -----------
+			RegPeer:		regPeer,
 			AesCnxHandler: *cnxHandler,
 			ClusterMember: *cm,
 		}
@@ -238,7 +257,7 @@ func (mm *MemberMaker) writeMsg(m *XLRegMsg) (err error) {
 
 // RUN CODE =========================================================
 
-// Subclasses (UserMember, AdminMember, etc) use sequences of calls to
+// Subclasses (UserMember, AdminClient, etc) use sequences of calls to
 // these these functions to accomplish their purposes.
 
 func (mm *MemberMaker) SessionSetup(proposedVersion uint32) (
@@ -248,7 +267,8 @@ func (mm *MemberMaker) SessionSetup(proposedVersion uint32) (
 		ciphertext2, iv2, key2, salt2         []byte
 	)
 	// Set up connection to server. -----------------------------
-	ctor, err := xt.NewTcpConnector(mm.RegEnd)
+	//ctor, err := xt.NewTcpConnector(mm.RegEnd)
+	ctor := mm.RegPeer.GetConnector(0)
 	if err == nil {
 		var conn xt.ConnectionI
 		conn, err = ctor.Connect(nil)
@@ -259,8 +279,9 @@ func (mm *MemberMaker) SessionSetup(proposedVersion uint32) (
 	// Send HELLO -----------------------------------------------
 	if err == nil {
 		mm.Cnx = cnx
+		ck := mm.RegPeer.GetCommsPublicKey()
 		ciphertext1, iv1, key1, salt1,
-			err = xa.ClientEncodeHello(proposedVersion, mm.RegCK)
+			err = xa.ClientEncodeHello(proposedVersion, ck)
 	}
 	if err == nil {
 		err = mm.WriteData(ciphertext1)
