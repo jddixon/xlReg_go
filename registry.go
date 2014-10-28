@@ -42,7 +42,6 @@ type Registry struct {
 }
 
 func NewRegistry(clusters []*RegCluster,
-	// node *xn.Node, ckPriv, skPriv *rsa.PrivateKey,
 	rn *RegNode,
 	opt *RegOptions) (
 	reg *Registry, err error) {
@@ -195,7 +194,7 @@ func (reg *Registry) AddCluster(cluster *RegCluster) (index int, err error) {
 	return
 }
 
-// This function generates a good-quality random NodeID (a 32-byte
+// This function generates a good-quality random NodeID (a 20-byte
 // value) that is not already known to the registry and then adds
 // the new NodeID to the registry's Bloom filter.
 func (reg *Registry) InsertUniqueNodeID() (nodeID *xi.NodeID, err error) {

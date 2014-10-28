@@ -13,7 +13,6 @@ const (
 	MIN_CLUSTER_SIZE = uint32(2)
 
 	SHA1_LEN = 20 // length in bytes of binary hash
-	SHA3_LEN = 32
 )
 
 // client attrs bits, also used for member attrs

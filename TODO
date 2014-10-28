@@ -1,17 +1,33 @@
 xlReg_go/TODO
 
-2014-18-24 (-22, edited)						                        * DONE
+2014-10-24
+    * Registry must update RegMembersByID
+        - possibly what we need is a single ByID map, and then an
+            IsMember() or IsCluster() bool field
+    * consider drop idFilter, which seems to be misused, replacing it 
+        with HAMT?
+        - con: idFilter can be a memory-mapped file, which would seem
+            to have real advantages
+            * must be certain that deserialization restores 
+                ClusterByID, RegMembersByID XXX it cannot XXX
+            * must test the memory-mapped filters 
+
+    * modify eph_server.go as required to allow us to examine registry
+        contents
+    * then modify eph_server_test.go as required to verify that the
+        cluster generated is correctly represented in the registry
+
+2014-10-24 (-22, edited)						                        * DONE
     * consider adding the registry as peer to 						    * DONE
         - AdminClient, 						                            * DONE
         - SoloMember,						                            * DONE
         - UserMember						                            * DONE
-
 2014-10-24 
     * modify MemberInfo to contain POINTER to Peer                      * DONE
     * write test to verify that (a) all other members have been added
         to Node as Peers but (b) the 'self' member is not so added.
 
-2014-10-24 (-16, edited)
+2014-10-24 (-16, edited)                                                * DONE
     * cluster members should be added to Node.peers[] using AddPeer()   * DONE
         (which makes a copy)                                            * DONE
         - this is done BEFORE serializing the node                      * NOTED
@@ -20,22 +36,6 @@ xlReg_go/TODO
     * need xlTransport function to strip off address prefixes like
         "TcpEndPoint: "; this caused problems in memberNode.go
 
-2014-10-18
-    * two test errors remain                                            * FIXED
-2014-10-17
-    * distinguish ClientInfo (as seen by the registry) from MemberInfo  * DONE
-        (as seen by the registry clients)                               * DONE
-2014-10-16
-    * change NewMemberMaker() to take node as an argument, with a       * DONE
-        consequent requirement that the nodeID is set                   * DONE
-
-    * GOAL: MemberInfo should be merged with or become Peer             * DONE
-
-    * Calls to MkdirAll(lfs) should be replaced by                      * DONE
-        xf.CheckLFS(lfs, perm)                                          * DONE
-        - this requires a change to the CheckLFS() interface            * DONE
-    * URGENT: reg.ContainsID() is failing (eg eph_server_test.go        * FALSE
-
 2014-10-15
     * FIX: epCount at end of clusterMember serialization is wrong
     * in the definition of ClusterMember struct (line 26 or so) it 
@@ -43,19 +43,6 @@ xlReg_go/TODO
         count of endpoints passed to xn.New(), but this is nowhere 
         enforced
 
-    * FIX: endPoint ports in clusterMember serialization are wrong		* DONE
-        - the clusterMember's ports are correct but the port 		    * DONE
-            numbers in MemberInfo are wrong, because port numbers		* DONE
-            are reported to the registry before they have been bound	* DONE
-            * fix is to initialize clusterMember xlNode *before* 		* DONE
-                the call to xlReg		                                * DONE
-                - this can only be done after the MemberAndOK()		    * DONE
-                    call, which picks up the nodeID from the registry	* DONE
-                    * called by AdminClient, SoloMember, and UserMember	* DONE
-    * FIX: clusterMember serialization: indentation of memberInfo{}     * DONE 
-        within members{} is wrong                                       * DONE
-    * to reduce confusion, rename MemberNode MemberMaker                * DONE
-    
     * verify that references to cluster member endPoints use
         GetEndPoint(n) or GetAcceptor(n)
     * SoloMember should NOT persist a ClusterMember and in fact
@@ -65,43 +52,11 @@ xlReg_go/TODO
         collect MemberInfo.  Callers can persist the information, but
         the endPoints will necessarily be WRONG, as discussed above.
 
-2014-10-14
-    * memberNode.go: 
-        - split MemberNode into container (MemberMaker) and the bits
-            that get serialized (ClusterMember + what?)
-            * if what? is not an empty set, add its bits to             * DONE
-                ClusterMember                                           * DONE
-        - notice overlap with existing function PersistNode()
-        - and PersistClusterMember(), which is nowhere used             * FALSE
-    * xlReg_go version then becomes v1.3 or 2.0                         * TRUE
-
-2014-10-07
-    * FIX: README.md currently is more or less a duplicate of           * DONE
-        ghpDoc/index.md (drops last para), but this is silly, because   * DONE
-        the text references other files in ghpDoc/ using relative       * DONE
-        paths.  Fix by simply dropping the link(s).                     * DONE
-
 2014-10-07 (-07-25, edited)
-    * install current version 1.2.0 on EC2/portland), port 56789              
-    * confirm 'go test' succeeds on EC2                                 * DONE
-    * regenerate /var/app/xlReg/.xlattice and regCred.dat               * DONE
-    * regenerate xlreg_* documentation, which includes regCred.dat      * DONE
     * need to automatically edit private IP address, 192.168.240.4
         in this case, to the public IP address, 54.187.133.62
         - sed
     * need test here which runs against portland:56789
-
-2014-10-06
-    * /var/app/xlReg/regCred.dat is 0640, should be 0644                * FIXED
-    * replace xi.IDMap with HAMT                                        * DONE
-        - this means we need a way to specify w and t                   * DONE
-            * default to 6                                              * DONE
-
-2014-10-05
-    * change DEFAULT_PORT to 56789                                      * DONE
-        - if testing defaults to TEST_DEFAULT_PORT, 45678               * DONE
-        - go build && go install                                        * DONE
-    * add port 56789 to EC2 security groups in the four regions         * DONE
 
 2014-09-16
     * MemberNode.{endPoints,lfs,name} appear to be wholly redundant;

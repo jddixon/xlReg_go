@@ -27,7 +27,7 @@ const (
 )
 
 func (s *XLSuite) makeAnID(c *C, rng *xr.PRNG) (id []byte) {
-	id = make([]byte, SHA3_LEN)
+	id = make([]byte, SHA1_LEN)
 	rng.NextBytes(id)
 	return
 }
