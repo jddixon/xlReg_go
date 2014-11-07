@@ -14,6 +14,7 @@ import (
 	xi "github.com/jddixon/xlNodeID_go"
 	xn "github.com/jddixon/xlNode_go"
 	xo "github.com/jddixon/xlOverlay_go"
+	xm "github.com/jddixon/xlUtil_go/math"
 	"strconv"
 	"strings"
 	"sync"
@@ -28,8 +29,8 @@ const (
 )
 
 type RegCluster struct {
-	Name          string // must be unique
-	ID            []byte // must be unique
+	Name          string // must be globally unique, unique within the registry
+	ID            []byte // must be globally unique
 	Attrs         uint64 // a field of bit flags
 	maxSize       uint32 // a maximum; must be > 0
 	epCount       uint32 // a positive integer, for now is 1 or 2
@@ -55,7 +56,8 @@ func NewRegCluster(name string, id *xi.NodeID, attrs uint64,
 		//err = ClusterMustHaveTwo
 		err = ClusterMustHaveMember
 	} else {
-		m, err = ha.NewHAMT(DEFAULT_W, DEFAULT_W)
+		t := xm.NextExp2(uint(maxSize))
+		m, err = ha.NewHAMT(DEFAULT_W, t)
 	}
 	if err == nil {
 		rc = &RegCluster{
@@ -93,26 +95,39 @@ func (rc *RegCluster) AddMember(member *ClientInfo) (err error) {
 	rc.mu.RUnlock() // <------------------------------------
 
 	if ok {
-		// XXX surely something more complicated is called for!
-
+		// DEBUG
 		fmt.Printf("AddMember: ATTEMPT TO ADD EXISTING MEMBER %s\n", name)
-		return
+		// END
+		err = ClusterMemberNameInUse
 	}
-	// XXX CHECK FOR ENTRY IN HAMT
-
-	// XXX STUB
-
-	rc.mu.Lock()             // <------------------------------------
-	index := len(rc.Members) // DEBUG
-	_ = index                // we might want to use this
-	rc.Members = append(rc.Members, member)
-	rc.MembersByName[name] = member
-	bKey, err := ha.NewBytesKey(member.GetNodeID().Value())
 	if err == nil {
-		err = rc.MembersByID.Insert(bKey, member)
+		var (
+			entry interface{}
+			bKey  ha.BytesKey
+		)
+		// check for entry in HAMT
+		rc.mu.RLock() // <---------------------------------
+		bKey, err = ha.NewBytesKey(rc.ID)
+		entry, err = rc.MembersByID.Find(bKey)
+		rc.mu.RUnlock() // <-------------------------------
+		if err == nil {
+			if entry != nil {
+				err = ClusterMemberIDInUse
+			}
+		}
+		if err == nil {
+			rc.mu.Lock()             // <------------------
+			index := len(rc.Members) // DEBUG
+			_ = index                // we might want to use this
+			rc.Members = append(rc.Members, member)
+			rc.MembersByName[name] = member
+			bKey, err = ha.NewBytesKey(member.GetNodeID().Value())
+			if err == nil {
+				err = rc.MembersByID.Insert(bKey, member)
+			}
+			rc.mu.Unlock() // <----------------------------
+		}
 	}
-	rc.mu.Unlock() // <------------------------------------
-
 	return
 }
 
@@ -124,9 +139,9 @@ func (rc *RegCluster) MaxSize() uint32 {
 }
 func (rc *RegCluster) Size() uint32 {
 	var curSize uint32
-	rc.mu.RLock() // <------------------------------------
+	rc.mu.RLock() // <-------------------------------------
 	curSize = uint32(len(rc.Members))
-	rc.mu.RUnlock() // <------------------------------------
+	rc.mu.RUnlock() // <-----------------------------------
 	return curSize
 }
 

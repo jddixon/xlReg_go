@@ -113,7 +113,7 @@ func (s *XLSuite) TestEphServer(c *C) {
 
 	found, err = reg.ContainsID(anID)
 	c.Assert(err, IsNil)
-	c.Check(found, Equals, true) 
+	c.Check(found, Equals, true)
 
 	found, err = reg.ContainsID(an.ClusterID)
 	c.Assert(err, IsNil)

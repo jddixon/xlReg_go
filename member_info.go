@@ -20,7 +20,7 @@ var _ = fmt.Print
 
 type MemberInfo struct {
 	Attrs uint64 //  bit flags are defined in const.go
-	Peer *xn.Peer
+	Peer  *xn.Peer
 }
 
 //func NewMemberInfo(name string, id *xi.NodeID,

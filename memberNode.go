@@ -227,7 +227,7 @@ func NewMemberMaker(
 			//RegCK:         regCK,
 			//RegSK:         regSK,
 			// END BECOMING -----------
-			RegPeer:		regPeer,
+			RegPeer:       regPeer,
 			AesCnxHandler: *cnxHandler,
 			ClusterMember: *cm,
 		}

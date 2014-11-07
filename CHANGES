@@ -2,6 +2,14 @@ xlReg_go/CHANGES
 -----------------------------------------------------------------------------
 The version number and date in this file must be kept in sync with version.go
 -----------------------------------------------------------------------------
+
+v1.6.2
+    2014-11-06
+        * RegCluster root table size t is now next power of 2 
+        * RegCluster.MembersByID checked before adding member       SLOC 4342
+v1.6.1
+    2014-11-04
+        * switch to 20 byte content keys
 v1.6.0
     2014-10-24
         * AdminMember renamed AdminClient

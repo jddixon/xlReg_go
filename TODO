@@ -1,5 +1,10 @@
 xlReg_go/TODO
 
+2014-11-06
+    * modify xlReg_go so there are 2^t slots in the cluster root HAMT   * DONE
+        table and w defaults to hamt_go.MAX_W, where t is               * DONE
+        NextPow2(ClusterSize)                                           * DONE
+
 2014-10-24
     * Registry must update RegMembersByID
         - possibly what we need is a single ByID map, and then an

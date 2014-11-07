@@ -153,6 +153,20 @@ func (reg *Registry) IDCount() (count uint) {
 // XXX RegMembersByID is not being updated!  This is the redundant and so
 // possibly inconsistent index of members of registry clusters
 
+// Add a cluster member to the RegMembersByID index unless it is already
+// present.
+func (reg *Registry) indexClusterMember(cluster *RegCluster, cm *ClusterMember) (
+	index int, err error) {
+
+	if cluster == nil {
+		err = NilCluster
+	} else if cm == nil {
+		err = NilClusterMember
+	} else {
+
+	}
+	return
+}
 func (reg *Registry) AddCluster(cluster *RegCluster) (index int, err error) {
 
 	var bKey, cKey ha.BytesKey

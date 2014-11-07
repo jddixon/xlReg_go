@@ -9,8 +9,8 @@ import (
 )
 
 type RegServer struct {
-	Testing   bool         // serialized
-	Verbosity int          // serialized
+	Testing   bool // serialized
+	Verbosity int  // serialized
 	DoneCh    chan (bool)
 	Registry
 }
