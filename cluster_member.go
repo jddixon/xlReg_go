@@ -18,9 +18,7 @@ type ClusterMember struct {
 	ClusterName  string
 	ClusterAttrs uint64
 	ClusterID    *xi.NodeID
-	ClusterSize  uint32        // this is a FIXED size, aka MaxSize, including self
-	SelfIndex    uint32        // which member we are in the Members slice
-	Members      []*MemberInfo // information on (other) cluster members
+	ClusterSize  uint32 // this is a FIXED size, aka MaxSize, including self
 
 	// EPCount is the number of endPoints dedicated to use for cluster-
 	// related purposes.  By convention endPoints[0] is used for
@@ -28,6 +26,9 @@ type ClusterMember struct {
 	// should they exist. The first EPCount endPoints are passed
 	// to other cluster members via the registry.
 	EPCount uint32
+
+	SelfIndex uint32        // which member we are in the Members slice
+	Members   []*MemberInfo // information on (other) cluster members
 
 	xn.Node
 }

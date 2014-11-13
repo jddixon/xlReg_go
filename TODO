@@ -1,10 +1,17 @@
 xlReg_go/TODO
 
+2014-11-12
+    * 
+2014-11-10
+    * drop notion of registry-level RegMembersByID because node can 
+        use different IP addresses in different roles
+        - alternatively require that any host using the registry use
+            role-specific NodeID
+
 2014-11-06
     * modify xlReg_go so there are 2^t slots in the cluster root HAMT   * DONE
         table and w defaults to hamt_go.MAX_W, where t is               * DONE
-        NextPow2(ClusterSize)                                           * DONE
-
+        NextExp2(ClusterSize)                                           * DONE
 2014-10-24
     * Registry must update RegMembersByID
         - possibly what we need is a single ByID map, and then an
@@ -16,7 +23,6 @@ xlReg_go/TODO
             * must be certain that deserialization restores 
                 ClusterByID, RegMembersByID XXX it cannot XXX
             * must test the memory-mapped filters 
-
     * modify eph_server.go as required to allow us to examine registry
         contents
     * then modify eph_server_test.go as required to verify that the
@@ -105,7 +111,7 @@ xlReg_go/TODO
     * website needs new reg_cred before this is deployed
 
 2014-02-24
-    * write testData_test.go exercising data in test_dir as model for
+    * write testData_test.go exercizing data in test_dir as model for
         xlreg_*
         - 001 regCred tests                                             * DONE
         - 002 hello/reply tests                                         * DONE

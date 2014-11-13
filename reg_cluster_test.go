@@ -19,7 +19,7 @@ func (s *XLSuite) TestClusterMaker(c *C) {
 	// Generate a random cluster
 	epCount := uint32(1 + rng.Intn(3)) // so from 1 to 3
 	maxSize := uint32(2 + rng.Intn(6)) // so from 2 to 7
-	cl := s.makeACluster(c, rng, epCount, maxSize)
+	cl := s.makeARegCluster(c, rng, epCount, maxSize)
 
 	c.Assert(cl.MaxSize(), Equals, maxSize)
 	c.Assert(cl.Size(), Equals, maxSize) //
@@ -80,7 +80,7 @@ func (s *XLSuite) TestClusterSerialization(c *C) {
 	// Generate a random cluster
 	epCount := uint32(1 + rng.Intn(3)) // so from 1 to 3
 	size := uint32(2 + rng.Intn(6))    // so from 2 to 7
-	cl := s.makeACluster(c, rng, epCount, size)
+	cl := s.makeARegCluster(c, rng, epCount, size)
 
 	// Serialize it
 	serialized := cl.String()

@@ -146,8 +146,9 @@ func (s *XLSuite) makeAMemberInfo(c *C, rng *xr.PRNG) *MemberInfo {
 
 // Make a RegCluster for test purposes.  Cluster member names are guaranteed
 // to be unique but the name of the cluster itself may not be.
-
-func (s *XLSuite) makeACluster(c *C, rng *xr.PRNG, epCount, size uint32) (
+//
+// THIS IS THE REGISTRY'S VIEW OF A CLUSTER
+func (s *XLSuite) makeARegCluster(c *C, rng *xr.PRNG, epCount, size uint32) (
 	rc *RegCluster) {
 
 	var err error

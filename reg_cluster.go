@@ -56,7 +56,7 @@ func NewRegCluster(name string, id *xi.NodeID, attrs uint64,
 		//err = ClusterMustHaveTwo
 		err = ClusterMustHaveMember
 	} else {
-		t := xm.NextExp2(uint(maxSize))
+		t := uint(xm.NextExp2_32(maxSize))
 		m, err = ha.NewHAMT(DEFAULT_W, t)
 	}
 	if err == nil {

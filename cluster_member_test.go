@@ -6,15 +6,10 @@ import (
 	"fmt"
 	xr "github.com/jddixon/rnglib_go"
 	//xi "github.com/jddixon/xlNodeID_go"
-	xn "github.com/jddixon/xlNode_go"
-	xt "github.com/jddixon/xlTransport_go"
+	//xn "github.com/jddixon/xlNode_go"
+	//xt "github.com/jddixon/xlTransport_go"
 	. "gopkg.in/check.v1"
 )
-
-// XXX THIS IS CONFUSED.  A RegCluster is something that appears on
-// the server side.  It contains a set of ClientInfo objects.  This
-// test was written when ClientInfo was the same as MemberInfo.  The
-// problem is that ClientInfo objects have no serialization routines.
 
 func (s *XLSuite) TestClusterMemberSerialization(c *C) {
 	if VERBOSITY > 0 {
@@ -23,47 +18,79 @@ func (s *XLSuite) TestClusterMemberSerialization(c *C) {
 	rng := xr.MakeSimpleRNG()
 	var err error
 
-	// Generate a random cluster
-	epCount := uint32(1 + rng.Intn(3)) // so from 1 to 3
+	// Generate a random test cluster
+	name := rng.NextFileName(8)
+	nodeID := s.makeANodeID(c, rng)
+	attrs := uint64(rng.Int63())
 	size := uint32(2 + rng.Intn(6))    // so from 2 to 7
-	cl := s.makeACluster(c, rng, epCount, size)
+	epCount := uint32(1 + rng.Intn(3)) // so from 1 to 3
 
-	cl0EpCount := uint32(len(cl.Members[0].MyEnds))
-	c.Assert(cl0EpCount, Equals, epCount) // XXX FAILS: 0, 1
+	tc, err := NewTestCluster(name, nodeID, attrs, size, epCount)
+	c.Assert(err, IsNil)
+	c.Assert(tc, NotNil)
 
-	// We are going to overwrite cluster member zero's attributes
-	// with those of the new cluster member.
+	// populate the test cluster ////////////////////////////////////
 
-	// Make Node copy.
+	// add members ////////////////////////////////////////
 	namesInUse := make(map[string]bool)
-	myNode, myCkPriv, mySkPriv := s.makeHostAndKeys(c, rng, namesInUse)
-	for i := uint32(0); i < epCount; i++ {
-		var (
-			ep  xt.EndPointI
-			ndx int
-		)
-		ep, err = xt.NewTcpEndPoint(cl.Members[0].MyEnds[i])
+	for i := uint32(0); i < size; i++ {
+		node, ckPriv, skPriv := s.makeHostAndKeys(c, rng, namesInUse)
+		_, _ = ckPriv, skPriv
+		attrs := uint64(rng.Int63())
+		var member *ClusterMember
+		member, err = tc.AddToCluster(node, attrs)
 		c.Assert(err, IsNil)
-		ndx, err = myNode.AddEndPoint(ep)
-		c.Assert(err, IsNil)
-		c.Assert(uint32(ndx), Equals, i)
+		c.Assert(member, NotNil)
+		c.Assert(member.SelfIndex, Equals, i)
+
+		// WORKING HERE
 	}
-	c.Assert(uint32(myNode.SizeEndPoints()), Equals, epCount)
+	// add MemberInfo to each cluster member //////////////
+	// XXX STUB XXX
 
-	myAttrs := cl.Members[0].Attrs
+	// verify indexes (ClMembersByName, ClMembersByID /////
+	// XXX STUB XXX
 
-	var myCtors []xt.ConnectorI
-	for i := uint32(0); i < epCount; i++ {
-		var ctor xt.ConnectorI
-		ctor, err = xt.NewTcpConnector(myNode.GetEndPoint(int(i)))
-		c.Assert(err, IsNil)
-		myCtors = append(myCtors, ctor)
-	}
-	meAsPeer, err := xn.NewPeer(myNode.GetName(), myNode.GetNodeID(),
-		&myCkPriv.PublicKey, &mySkPriv.PublicKey, nil, myCtors)
+	// verify that each member's MemberInfo array is correct
+	// XXX STUB XXX
 
-	// XXX NEEDS FIXING FROM HERE
-	_, _ = myAttrs, meAsPeer
+	// XXX NEEDS FIXING OR JUST JUNK FROM HERE XXX //////////////////
+
+	//cl0EpCount := uint32(len(cl.Members[0].MyEnds))
+	//c.Assert(cl0EpCount, Equals, epCount)
+
+	//// We are going to overwrite cluster member zero's attributes
+	//// with those of the new cluster member.
+
+	//// Make Node copy.
+	//namesInUse := make(map[string]bool)
+	//myNode, myCkPriv, mySkPriv := s.makeHostAndKeys(c, rng, namesInUse)
+	//for i := uint32(0); i < epCount; i++ {
+	//	var (
+	//		ep  xt.EndPointI
+	//		ndx int
+	//	)
+	//	ep, err = xt.NewTcpEndPoint(cl.Members[0].MyEnds[i])
+	//	c.Assert(err, IsNil)
+	//	ndx, err = myNode.AddEndPoint(ep)
+	//	c.Assert(err, IsNil)
+	//	c.Assert(uint32(ndx), Equals, i)
+	//}
+	//c.Assert(uint32(myNode.SizeEndPoints()), Equals, epCount)
+
+	//myAttrs := cl.Members[0].Attrs
+
+	//var myCtors []xt.ConnectorI
+	//for i := uint32(0); i < epCount; i++ {
+	//	var ctor xt.ConnectorI
+	//	ctor, err = xt.NewTcpConnector(myNode.GetEndPoint(int(i)))
+	//	c.Assert(err, IsNil)
+	//	myCtors = append(myCtors, ctor)
+	//}
+	//meAsPeer, err := xn.NewPeer(myNode.GetName(), myNode.GetNodeID(),
+	//	&myCkPriv.PublicKey, &mySkPriv.PublicKey, nil, myCtors)
+
+	//_, _ = myAttrs, meAsPeer
 
 	//myMemberInfo, err := NewMemberInfo(myAttrs, meAsPeer)
 	//c.Assert(err, IsNil)
