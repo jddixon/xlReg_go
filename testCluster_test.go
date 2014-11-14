@@ -25,7 +25,7 @@ import (
 var _ = fmt.Print
 
 type TestCluster struct {
-	Name            string // must be globally unique, unique within the registry
+	Name            string // must be unique within the registry
 	ID              []byte // must be globally unique
 	Attrs           uint64 // a field of bit flags
 	Size            uint32 // a maximum; must be > 0

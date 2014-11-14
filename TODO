@@ -1,11 +1,15 @@
 xlReg_go/TODO
 
-2014-11-13
-    * testCluster_test.go
-        - add EPCount endPoints to each node
-        - defer closing each member's acceptors
+2014-11-14 (-13, edited)
+    * cluster_member_test.go
+        - add EPCount endPoints to each node                            * DONE
+        - defer closing each member's acceptors                         * DONE
         - verify that all members' acceptors are live
-        - run all members ?
+        - add peers to each ClusterMember
+            * add connectors to peers
+        - serialize a randomly selected ClusterMember
+        - deserialize 
+        - verify equality
 
 2014-11-12
     * testCluster_test.go needs quite a bit more work

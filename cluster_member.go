@@ -16,8 +16,8 @@ var (
 type ClusterMember struct {
 	Attrs        uint64 // negotiated with/decreed by reg server
 	ClusterName  string
-	ClusterAttrs uint64
 	ClusterID    *xi.NodeID
+	ClusterAttrs uint64
 	ClusterSize  uint32 // this is a FIXED size, aka MaxSize, including self
 
 	// EPCount is the number of endPoints dedicated to use for cluster-
@@ -97,11 +97,14 @@ func (cm *ClusterMember) Strings() (ss []string) {
 		ss = append(ss, INDENT+ns[i])
 	}
 	ss = append(ss, fmt.Sprintf("%sattrs: %d", INDENT, cm.Attrs))
+
 	ss = append(ss, fmt.Sprintf("%sclusterName: %s", INDENT, cm.ClusterName))
-	ss = append(ss, fmt.Sprintf("%sclusterAttrs: %d", INDENT, cm.ClusterAttrs))
 	ss = append(ss, fmt.Sprintf("%sclusterID: %s", INDENT,
 		hex.EncodeToString(cm.ClusterID.Value())))
+	ss = append(ss, fmt.Sprintf("%sclusterAttrs: %d", INDENT, cm.ClusterAttrs))
 	ss = append(ss, fmt.Sprintf("%sclusterSize: %d", INDENT, cm.ClusterSize))
+	ss = append(ss, fmt.Sprintf("%sepCount: %d", INDENT, cm.EPCount))
+
 	ss = append(ss, fmt.Sprintf("%sselfIndex: %d", INDENT, cm.SelfIndex))
 	ss = append(ss, fmt.Sprintf("%smembers {", INDENT))
 	for i := 0; i < len(cm.Members); i++ {
@@ -114,7 +117,6 @@ func (cm *ClusterMember) Strings() (ss []string) {
 		}
 	}
 	ss = append(ss, fmt.Sprintf("%s}", INDENT))
-	ss = append(ss, fmt.Sprintf("%sepCount: %d", INDENT, cm.EPCount))
 	ss = append(ss, "}")
 	return
 }
@@ -175,20 +177,6 @@ func ParseClusterMemberFromStrings(ss []string) (
 	if err == nil {
 		line = xn.NextNBLine(&rest)
 		parts := strings.Split(line, ": ")
-		if len(parts) == 2 && parts[0] == "clusterAttrs" {
-			var n int
-			raw := strings.TrimSpace(parts[1])
-			n, err = strconv.Atoi(raw)
-			if err == nil {
-				clusterAttrs = uint64(n)
-			}
-		} else {
-			err = IllFormedClusterMember
-		}
-	}
-	if err == nil {
-		line = xn.NextNBLine(&rest)
-		parts := strings.Split(line, ": ")
 		if len(parts) == 2 && parts[0] == "clusterID" {
 			var h []byte
 			raw := strings.TrimSpace(parts[1])
@@ -203,12 +191,40 @@ func ParseClusterMemberFromStrings(ss []string) (
 	if err == nil {
 		line = xn.NextNBLine(&rest)
 		parts := strings.Split(line, ": ")
+		if len(parts) == 2 && parts[0] == "clusterAttrs" {
+			var n int
+			raw := strings.TrimSpace(parts[1])
+			n, err = strconv.Atoi(raw)
+			if err == nil {
+				clusterAttrs = uint64(n)
+			}
+		} else {
+			err = IllFormedClusterMember
+		}
+	}
+	if err == nil {
+		line = xn.NextNBLine(&rest)
+		parts := strings.Split(line, ": ")
 		if len(parts) == 2 && parts[0] == "clusterSize" {
 			var n int
 			raw := strings.TrimSpace(parts[1])
 			n, err = strconv.Atoi(raw)
 			if err == nil {
 				clusterSize = uint32(n)
+			}
+		} else {
+			err = IllFormedClusterMember
+		}
+	}
+	if err == nil {
+		line = xn.NextNBLine(&rest)
+		parts := strings.Split(line, ": ")
+		if len(parts) == 2 && parts[0] == "epCount" {
+			var n int
+			raw := strings.TrimSpace(parts[1])
+			n, err = strconv.Atoi(raw)
+			if err == nil {
+				epCount = uint32(n)
 			}
 		} else {
 			err = IllFormedClusterMember
@@ -247,20 +263,6 @@ func ParseClusterMemberFromStrings(ss []string) (
 			line = xn.NextNBLine(&rest)
 			if line != "}" {
 				err = IllFormedClusterMember
-			}
-		} else {
-			err = IllFormedClusterMember
-		}
-	}
-	if err == nil {
-		line = xn.NextNBLine(&rest)
-		parts := strings.Split(line, ": ")
-		if len(parts) == 2 && parts[0] == "epCount" {
-			var n int
-			raw := strings.TrimSpace(parts[1])
-			n, err = strconv.Atoi(raw)
-			if err == nil {
-				epCount = uint32(n)
 			}
 		} else {
 			err = IllFormedClusterMember

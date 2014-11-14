@@ -3,9 +3,12 @@ xlReg_go/CHANGES
 The version number and date in this file must be kept in sync with version.go
 -----------------------------------------------------------------------------
 
+v1.6.4
+    2014-11-14
+        * improvements to cluster_member_test.go                    SLOC 4715
 v1.6.3
     2014-11-13
-        * added TestCluster                                         SLCO 4645
+        * added TestCluster                                         SLOC 4645
     2014-11-10
         * RegCluster root table size t determined by NextExp2_32()
 
