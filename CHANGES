@@ -4,6 +4,8 @@ The version number and date in this file must be kept in sync with version.go
 -----------------------------------------------------------------------------
 
 v1.6.3
+    2014-11-13
+        * added TestCluster                                         SLCO 4645
     2014-11-10
         * RegCluster root table size t determined by NextExp2_32()
 

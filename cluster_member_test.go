@@ -3,10 +3,12 @@ package reg
 // xlReg_go/cluster_member_test.go
 
 import (
+	"crypto/rsa"
 	"fmt"
+	xh "github.com/jddixon/hamt_go"
 	xr "github.com/jddixon/rnglib_go"
 	//xi "github.com/jddixon/xlNodeID_go"
-	//xn "github.com/jddixon/xlNode_go"
+	xn "github.com/jddixon/xlNode_go"
 	//xt "github.com/jddixon/xlTransport_go"
 	. "gopkg.in/check.v1"
 )
@@ -16,7 +18,13 @@ func (s *XLSuite) TestClusterMemberSerialization(c *C) {
 		fmt.Println("\nTEST_CLUSTER_MEMBER_SERIALIZATION")
 	}
 	rng := xr.MakeSimpleRNG()
-	var err error
+	var (
+		err              error
+		members          []*ClusterMember
+		ckPrivs, skPrivs []*rsa.PrivateKey
+	)
+
+	// XXX DEFER CLOSING EACH MEMBER'S ACCEPTORS, UNLESS NIL
 
 	// Generate a random test cluster
 	name := rng.NextFileName(8)
@@ -33,27 +41,60 @@ func (s *XLSuite) TestClusterMemberSerialization(c *C) {
 
 	// add members ////////////////////////////////////////
 	namesInUse := make(map[string]bool)
+
 	for i := uint32(0); i < size; i++ {
 		node, ckPriv, skPriv := s.makeHostAndKeys(c, rng, namesInUse)
-		_, _ = ckPriv, skPriv
+		// ADD epCount END POINTS TO EACH NODE
+		// XXX STUB
+		ckPrivs = append(ckPrivs, ckPriv)
+		skPrivs = append(skPrivs, skPriv)
 		attrs := uint64(rng.Int63())
 		var member *ClusterMember
 		member, err = tc.AddToCluster(node, attrs)
 		c.Assert(err, IsNil)
 		c.Assert(member, NotNil)
 		c.Assert(member.SelfIndex, Equals, i)
-
-		// WORKING HERE
+		members = append(members, member)
 	}
 	// add MemberInfo to each cluster member //////////////
-	// XXX STUB XXX
-
-	// verify indexes (ClMembersByName, ClMembersByID /////
-	// XXX STUB XXX
-
+	var memberInfos []*MemberInfo
+	for i := uint32(0); i < size; i++ {
+		var peer *xn.Peer
+		peer, err = xn.NewPeer(members[i].GetName(), members[i].GetNodeID(),
+			&ckPrivs[i].PublicKey, &skPrivs[i].PublicKey,
+			nil, nil) // overlays, connectors
+		c.Assert(err, IsNil)
+		c.Assert(peer, NotNil)
+		attrs := uint64(rng.Int63())
+		var mi *MemberInfo
+		mi, err = NewMemberInfo(attrs, peer)
+		c.Assert(err, IsNil)
+		c.Assert(mi, NotNil)
+		memberInfos = append(memberInfos, mi)
+	}
+	for i := uint32(0); i < size; i++ {
+		members[i].Members = memberInfos
+	}
 	// verify that each member's MemberInfo array is correct
 	// XXX STUB XXX
 
+	// verify indexes (ClMembersByName, ClMembersByID /////
+	for i := uint32(0); i < size; i++ {
+		name := members[i].GetName()
+		nodeID := members[i].GetNodeID()
+		var bKey xh.BytesKey
+		bKey, err = xh.NewBytesKey(nodeID.Value())
+		c.Assert(err, IsNil)
+		c.Assert(bKey, NotNil)
+		memberByName := tc.ClMembersByName[name]
+		c.Assert(memberByName.GetName(), Equals, name)
+		byID, err := tc.ClMembersByID.Find(bKey)
+		c.Assert(err, IsNil)
+		c.Assert(byID, NotNil)
+		memberByID, ok := byID.(*ClusterMember)
+		c.Assert(ok, Equals, true)
+		c.Assert(memberByID.GetName(), Equals, name)
+	}
 	// XXX NEEDS FIXING OR JUST JUNK FROM HERE XXX //////////////////
 
 	//cl0EpCount := uint32(len(cl.Members[0].MyEnds))
@@ -61,7 +102,6 @@ func (s *XLSuite) TestClusterMemberSerialization(c *C) {
 
 	//// We are going to overwrite cluster member zero's attributes
 	//// with those of the new cluster member.
-
 	//// Make Node copy.
 	//namesInUse := make(map[string]bool)
 	//myNode, myCkPriv, mySkPriv := s.makeHostAndKeys(c, rng, namesInUse)

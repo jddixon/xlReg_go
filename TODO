@@ -1,7 +1,15 @@
 xlReg_go/TODO
 
+2014-11-13
+    * testCluster_test.go
+        - add EPCount endPoints to each node
+        - defer closing each member's acceptors
+        - verify that all members' acceptors are live
+        - run all members ?
+
 2014-11-12
-    * 
+    * testCluster_test.go needs quite a bit more work
+
 2014-11-10
     * drop notion of registry-level RegMembersByID because node can 
         use different IP addresses in different roles
