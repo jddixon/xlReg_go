@@ -11,7 +11,23 @@ import (
 	xn "github.com/jddixon/xlNode_go"
 	xt "github.com/jddixon/xlTransport_go"
 	. "gopkg.in/check.v1"
+	"time"
 )
+
+func (s *XLSuite) closeAcceptors(c *C, members []*ClusterMember) {
+	if members != nil {
+		for i := 0; i < len(members); i++ {
+			node := members[i].Node
+			count := node.SizeAcceptors()
+			for j := 0; j < count; j++ {
+				acc := node.GetAcceptor(j)
+				if acc != nil {
+					acc.Close()
+				}
+			}
+		}
+	}
+}
 
 // This test creates a test cluster using NewTestCluster() but does
 // NOT use the xlReg registry.
@@ -28,20 +44,7 @@ func (s *XLSuite) TestClusterMemberSerialization(c *C) {
 	)
 
 	// defer closing each member's acceptors, unless nil
-	defer func() {
-		if members != nil {
-			for i := 0; i < len(members); i++ {
-				node := members[i].Node
-				count := node.SizeAcceptors()
-				for j := 0; j < count; j++ {
-					acc := node.GetAcceptor(j)
-					if acc != nil {
-						acc.Close()
-					}
-				}
-			}
-		}
-	}()
+	defer s.closeAcceptors(c, members)
 
 	// Generate a random test cluster
 	name := rng.NextFileName(8)
@@ -75,6 +78,10 @@ func (s *XLSuite) TestClusterMemberSerialization(c *C) {
 			ndx, err = node.AddEndPoint(ep)
 			c.Assert(err, IsNil)
 			c.Assert(ndx, Equals, int(j))
+			// DEBUG ------------------------------------------------
+			acc := node.GetAcceptor(int(j))
+			fmt.Printf("node %d, acceptor %d: %s\n", i, j, acc.String())
+			// END --------------------------------------------------
 		}
 		c.Assert(node.SizeEndPoints(), Equals, int(epCount))
 
@@ -89,10 +96,27 @@ func (s *XLSuite) TestClusterMemberSerialization(c *C) {
 	// add MemberInfo to each cluster member //////////////
 	var memberInfos []*MemberInfo
 	for i := uint32(0); i < size; i++ {
-		var peer *xn.Peer
+		var (
+			peer       *xn.Peer
+			connectors []xt.ConnectorI
+		)
+		for j := uint32(0); j < epCount; j++ {
+			var (
+				ctor xt.ConnectorI
+				ep   xt.EndPointI
+			)
+			ep = members[i].GetEndPoint(int(j))
+			// DEBUG ------------------------------------------------
+			fmt.Printf("node %d, endPoint %d: %s\n", i, j, ep.String())
+			// END --------------------------------------------------
+			ctor, err = xt.NewTcpConnector(ep)
+			c.Assert(err, IsNil)
+			c.Assert(ctor, NotNil)
+			connectors = append(connectors, ctor)
+		}
 		peer, err = xn.NewPeer(members[i].GetName(), members[i].GetNodeID(),
 			&ckPrivs[i].PublicKey, &skPrivs[i].PublicKey,
-			nil, nil) // overlays, connectors
+			nil, connectors) // overlays, connectors
 		c.Assert(err, IsNil)
 		c.Assert(peer, NotNil)
 		attrs := uint64(rng.Int63())
@@ -107,12 +131,17 @@ func (s *XLSuite) TestClusterMemberSerialization(c *C) {
 	}
 
 	// add peers to each ClusterMember Node ///////////////
-
-	// XXX STUB
-
-	// add connectors to peers
-
-	// XXX STUB
+	for i := uint32(0); i < size; i++ {
+		member := members[i]
+		if i == member.SelfIndex {
+			// I can't be my own peer
+			continue
+		} else {
+			mi := memberInfos[i]
+			_, err = member.AddPeer(mi.Peer)
+			c.Assert(err, IsNil)
+		}
+	}
 
 	// verify indexes (ClMembersByName, ClMembersByID /////
 	for i := uint32(0); i < size; i++ {
@@ -134,35 +163,32 @@ func (s *XLSuite) TestClusterMemberSerialization(c *C) {
 		c.Assert(ok, Equals, true)
 		c.Assert(members[i].Equal(memberByID), Equals, true)
 	}
-	// XXX NEEDS FIXING FROM HERE XXX ///////////////////////////////
 
-	//var myCtors []xt.ConnectorI
-	//for i := uint32(0); i < epCount; i++ {
-	//	var ctor xt.ConnectorI
-	//	ctor, err = xt.NewTcpConnector(myNode.GetEndPoint(int(i)))
-	//	c.Assert(err, IsNil)
-	//	myCtors = append(myCtors, ctor)
-	//}
+	// select a member randomly
+	cmNdx := rng.Intn(int(size))
+	cm := members[cmNdx]
 
-	//cm := XXX RANDOMLY SELECTED MEMBER
+	// simplest test of Equal()
+	c.Assert(cm.Equal(cm), Equals, true)
 
-	//// simplest test of Equal()
-	//c.Assert(cm.Equal(cm), Equals, true)
+	// Serialize it
+	serialized := cm.String()
 
-	//// Serialize it
-	//serialized := cm.String()
+	// close all acceptors (otherwise we get 'port in use' error)
+	s.closeAcceptors(c, members)
+	time.Sleep(50 * time.Millisecond)
 
-	//// Reverse the serialization
-	//deserialized, rest, err := ParseClusterMember(serialized)
-	//c.Assert(err, IsNil)
-	//c.Assert(deserialized, Not(IsNil))
-	//c.Assert(len(rest), Equals, 0)
+	// Reverse the serialization
+	deserialized, rest, err := ParseClusterMember(serialized)
+	c.Assert(err, IsNil)
+	c.Assert(deserialized, Not(IsNil))
+	c.Assert(len(rest), Equals, 0)
 
-	//// Verify that the deserialized ClusterMember is identical to the original
-	//// First version:
-	//c.Assert(deserialized.Equal(cm), Equals, true)
+	// Verify that the deserialized ClusterMember is identical to the original
+	// First version:
+	c.Assert(deserialized.Equal(cm), Equals, true)
 
-	//// Second version of identity test:
-	//serialized2 := deserialized.String()
-	//c.Assert(serialized2, Equals, serialized)
+	// Second version of identity test:
+	serialized2 := deserialized.String()
+	c.Assert(serialized2, Equals, serialized)
 }
