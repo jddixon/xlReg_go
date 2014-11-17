@@ -1,6 +1,6 @@
 package reg
 
-// xlReg_go/testCluster_test.go
+// xlReg_go/testCluster.go
 
 // This file contains functions and structures used to create
 // and manage and manage clusters of ClusterMembers.
@@ -29,7 +29,7 @@ type TestCluster struct {
 	ID              []byte // must be globally unique
 	Attrs           uint64 // a field of bit flags
 	Size            uint32 // a maximum; must be > 0
-	EPCount         uint32 // a positive integer, for now is 1 or 2
+	EPCount         uint32 // a positive integer, for now usually 1 or 2
 	ClMembers       []*ClusterMember
 	ClMembersByName map[string]*ClusterMember
 	ClMembersByID   ha.HAMT
@@ -84,7 +84,7 @@ func (tc *TestCluster) GetSize() uint32 {
 	curSize = uint32(len(tc.ClMembers))
 	tc.mu.RUnlock() // <-----------------------------------
 	return curSize
-} // GEEP
+}
 
 // UTILITY FUNCTIONS ////////////////////////////////////////////////
 
@@ -158,6 +158,21 @@ func (tc *TestCluster) AddMember(member *ClusterMember) (err error) {
 	return
 }
 
+func (tc *TestCluster) CloseAcceptors() {
+	members :=  tc.ClMembers		//  []*ClusterMember) 
+	if members != nil {
+		for i := 0; i < len(members); i++ {
+			node := members[i].Node
+			count := node.SizeAcceptors()
+			for j := 0; j < count; j++ {
+				acc := node.GetAcceptor(j)
+				if acc != nil {
+					acc.Close()
+				}
+			}
+		}
+	}
+}
 // EQUAL ////////////////////////////////////////////////////////////
 func (tc *TestCluster) Equal(any interface{}) bool {
 

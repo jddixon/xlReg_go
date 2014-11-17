@@ -7,55 +7,28 @@ import (
 	"fmt"
 	xh "github.com/jddixon/hamt_go"
 	xr "github.com/jddixon/rnglib_go"
-	//xi "github.com/jddixon/xlNodeID_go"
+	xi "github.com/jddixon/xlNodeID_go"
 	xn "github.com/jddixon/xlNode_go"
 	xt "github.com/jddixon/xlTransport_go"
 	. "gopkg.in/check.v1"
 	"time"
 )
 
-func (s *XLSuite) closeAcceptors(c *C, members []*ClusterMember) {
-	if members != nil {
-		for i := 0; i < len(members); i++ {
-			node := members[i].Node
-			count := node.SizeAcceptors()
-			for j := 0; j < count; j++ {
-				acc := node.GetAcceptor(j)
-				if acc != nil {
-					acc.Close()
-				}
-			}
-		}
-	}
-}
+// Create a test cluster using NewTestCluster() without using the 
+// xlReg registry.
+func (s *XLSuite) makeTestCluster(c *C, rng *xr.PRNG, name string, 
+	nodeID *xi.NodeID, attrs uint64, size, epCount uint32) (tc *TestCluster) {
 
-// This test creates a test cluster using NewTestCluster() but does
-// NOT use the xlReg registry.
-//
-func (s *XLSuite) TestClusterMemberSerialization(c *C) {
-	if VERBOSITY > 0 {
-		fmt.Println("\nTEST_CLUSTER_MEMBER_SERIALIZATION")
-	}
-	rng := xr.MakeSimpleRNG()
 	var (
-		err              error
 		members          []*ClusterMember
 		ckPrivs, skPrivs []*rsa.PrivateKey
 	)
-
-	// defer closing each member's acceptors, unless nil
-	defer s.closeAcceptors(c, members)
-
-	// Generate a random test cluster
-	name := rng.NextFileName(8)
-	nodeID := s.makeANodeID(c, rng)
-	attrs := uint64(rng.Int63())
-	size := uint32(2 + rng.Intn(6))    // so from 2 to 7
-	epCount := uint32(1 + rng.Intn(3)) // so from 1 to 3
-
+	
 	tc, err := NewTestCluster(name, nodeID, attrs, size, epCount)
 	c.Assert(err, IsNil)
 	c.Assert(tc, NotNil)
+	// defer closing each member's acceptors, unless nil
+	defer tc.CloseAcceptors()
 
 	// populate the test cluster ////////////////////////////////////
 
@@ -163,10 +136,26 @@ func (s *XLSuite) TestClusterMemberSerialization(c *C) {
 		c.Assert(ok, Equals, true)
 		c.Assert(members[i].Equal(memberByID), Equals, true)
 	}
+	return
+}
+func (s *XLSuite) TestClusterMemberSerialization(c *C) {
+	if VERBOSITY > 0 {
+		fmt.Println("\nTEST_CLUSTER_MEMBER_SERIALIZATION")
+	}
+	rng := xr.MakeSimpleRNG()
+
+	// Generate a random test cluster
+	name := rng.NextFileName(8)
+	nodeID := s.makeANodeID(c, rng)
+	attrs := uint64(rng.Int63())
+	size := uint32(2 + rng.Intn(6))    // so from 2 to 7
+	epCount := uint32(1 + rng.Intn(3)) // so from 1 to 3
+
+	tc := s.makeTestCluster(c, rng, name, nodeID, attrs, size, epCount)
 
 	// select a member randomly
 	cmNdx := rng.Intn(int(size))
-	cm := members[cmNdx]
+	cm := tc.ClMembers[cmNdx]
 
 	// simplest test of Equal()
 	c.Assert(cm.Equal(cm), Equals, true)
@@ -175,7 +164,7 @@ func (s *XLSuite) TestClusterMemberSerialization(c *C) {
 	serialized := cm.String()
 
 	// close all acceptors (otherwise we get 'port in use' error)
-	s.closeAcceptors(c, members)
+	tc.CloseAcceptors()
 	time.Sleep(50 * time.Millisecond)
 
 	// Reverse the serialization

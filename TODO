@@ -1,18 +1,26 @@
 xlReg_go/TODO
 
+2014-11-15
+    DONE WITH NAME CHANGES:
+    * extract code for creating and populating a test cluster from      * DONE
+        TestClusterMemberSerialization as                               * DONE
+            s.makeATestCluster(c *C, rng *xr.PRNG) *TestCluster         * DONE
+    * add this and s.closeAcceptors(c *C, members[]*ClusterMember)      * DONE
+        to testCluster_test.go                                          * DONE
+
 2014-11-14 (-13, edited)
     * cluster_member_test.go
         - add EPCount endPoints to each node                            * DONE
         - defer closing each member's acceptors                         * DONE
-        - verify that all members' acceptors are live
-        - add peers to each ClusterMember
-            * add connectors to peers
-        - serialize a randomly selected ClusterMember
-        - deserialize 
-        - verify equality
+        - verify that all members' acceptors are live                   * DONE
+        - add peers to each ClusterMember                               * DONE
+            * add connectors to peers                                   * DONE
+        - serialize a randomly selected ClusterMember					* DONE
+        - deserialize 						                            * DONE
+        - verify equality						                        * DONE
 
 2014-11-12
-    * testCluster_test.go needs quite a bit more work
+    * testCluster_test.go needs quite a bit more work                   * YEP
 
 2014-11-10
     * drop notion of registry-level RegMembersByID because node can 
