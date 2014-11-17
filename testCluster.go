@@ -3,13 +3,13 @@ package reg
 // xlReg_go/testCluster.go
 
 // This file contains functions and structures used to create
-// and manage and manage clusters of ClusterMembers.
-//
-// THESE FUNCTIONS AND STRUCTURES ARE FOR USE ONLY IN TESTING.
+// and manage and manage clusters of ClusterMembers.  As member attributes
+// (nodeIDs, keys, etc) are set by a random number generator and ports are
+// on localhost (127.0.0.1) , these functions are structures are primarily 
+// for use in testing.
 
 import (
 	"bytes"
-	//"crypto/rsa"
 	"encoding/hex"
 	"fmt"
 	ha "github.com/jddixon/hamt_go"
@@ -245,7 +245,7 @@ func (tc *TestCluster) Equal(any interface{}) bool {
 
 func (tc *TestCluster) Strings() (ss []string) {
 
-	ss = []string{"regCluster {"}
+	ss = []string{"testCluster {"}
 
 	ss = append(ss, fmt.Sprintf("    Attrs: 0x%016x", tc.Attrs))
 	ss = append(ss, "    Name: "+tc.Name)
@@ -285,7 +285,7 @@ func ParseTestClusterFromStrings(ss []string) (
 	rest = ss
 
 	line := xn.NextNBLine(&rest) // the line is trimmed
-	if line != "regCluster {" {
+	if line != "testCluster {" {
 		fmt.Println("MISSING regCluster {")
 		err = IllFormedCluster
 	} else {

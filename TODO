@@ -1,5 +1,9 @@
 xlReg_go/TODO
 
+2014-11-16
+    * add real testCluster_test.go, verify that serialization and
+        deserialization work
+
 2014-11-15
     DONE WITH NAME CHANGES:
     * extract code for creating and populating a test cluster from      * DONE

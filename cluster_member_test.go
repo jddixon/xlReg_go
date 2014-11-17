@@ -165,6 +165,8 @@ func (s *XLSuite) TestClusterMemberSerialization(c *C) {
 
 	// close all acceptors (otherwise we get 'port in use' error)
 	tc.CloseAcceptors()
+	// allow time for things to settle; this might very rarely cause
+	// us to lose a port
 	time.Sleep(50 * time.Millisecond)
 
 	// Reverse the serialization
