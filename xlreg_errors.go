@@ -1,20 +1,31 @@
 package reg
 
-//xlReg_go/xlreg_errors.go
+// xlReg_go/xlreg_errors.go
 
 import (
 	e "errors"
 )
 
 var (
+	BadAttrsLine                   = e.New("badly formed attrs line")
 	BadVersion                     = e.New("badly formated VERSION")
 	CantFindClusterByID            = e.New("cannot find cluster with this ID")
 	CantFindClusterByName          = e.New("cannot find cluster with this name")
+	ClusterMemberIDInUse           = e.New("cluster member id already in use")
+	ClusterMembersMustHaveEndPoint = e.New("cluster members must have at least one endPoint")
+	ClusterMemberNameInUse         = e.New("cluster member name already in use")
+	ClusterMustHaveMember          = e.New("cluster must have a member!")
+	ClusterMustHaveTwo             = e.New("cluster must have at least two members")
 	IDAlreadyInUse                 = e.New("ID already in use")
+	IllFormedCluster               = e.New("ill-formed cluster serialization")
+	IllFormedClusterMember         = e.New("ill-formed cluster member serialization")
 	IllFormedRegCred               = e.New("ill-formed regCred serialization")
+	MemberMustHaveEndPoint         = e.New("member must have at least one endPoint")
 	MissingClosingBrace            = e.New("missing closing brace")
 	MissingClusterNameOrID         = e.New("missing cluster name or ID")
 	MissingEndPointsSection        = e.New("missing endPoints section")
+	MissingMembersList             = e.New("missing members list")
+	MissingNode                    = e.New("missing node parameter")
 	MissingPrivateKey              = e.New("missing private key line")
 	MissingRegNodeLine             = e.New("missing regNode line")
 	MissingServerInfo              = e.New("missing server info")
@@ -26,24 +37,8 @@ var (
 	NilRegistry                    = e.New("nil registry argument")
 	NilRegNode                     = e.New("nil RegNode argument")
 	NilToken                       = e.New("nil XLRegMsg_Token argument")
-	MissingNode                    = e.New("missing node parameter")
 	RcvdInvalidMsgForState         = e.New("invalid msg type for current state")
-	TagOutOfRange                  = e.New("message tag of of range")
+	TagOutOfRange                  = e.New("message tag out of range")
 	UnexpectedMsgType              = e.New("unexpected message type")
-	UnknownMember                  = e.New("member unknown, not in registry")
-	
-	// XXX BEGIN DROP CANDIDATES
-	BadAttrsLine                   = e.New("badly formed attrs line")
-	ClusterMembersMustHaveEndPoint = e.New("cluster members must have at least one endPoint")
-	ClusterMemberIDInUse           = e.New("cluster member id already in use")
-	ClusterMemberNameInUse         = e.New("cluster member name already in use")
-	ClusterMustHaveMember          = e.New("cluster must have a member!")
-	ClusterMustHaveTwo             = e.New("cluster must have at least two members")
-	IllFormedCluster               = e.New("ill-formed cluster serialization")
-	IllFormedClusterMember         = e.New("ill-formed cluster member serialization")
-	MemberMustHaveEndPoint         = e.New("member must have at least one endPoint")
-	MissingMembersList             = e.New("missing members list")
 	WrongNumberOfBytesInAttrs      = e.New("wrong number of bytes in attrs")
-	// XXX END DROP CANDIDATES
-	
 )

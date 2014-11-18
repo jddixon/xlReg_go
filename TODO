@@ -1,5 +1,10 @@
 xlReg_go/TODO
 
+2014-11-18
+    * look for unused error codes                                       * DONE
+    * verify consistency of xlreg_errors.go, xlreg_error_str.dat,       * DONE
+        xlreg_error_str.go                                              * DONE
+
 2014-11-17
     * split xlCluster_go from xlReg_Go                                  * DONE
     * gocheck_test.go makeAMemberInfo() belongs in xlCluster_go

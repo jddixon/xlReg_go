@@ -31,7 +31,7 @@ var XLREG_ERRORS = []string{
 	"nil XLRegMsg_Token argument",
 	"no node and no keys to build one",
 	"invalid msg type for current state",
-	"message tag of of range",
+	"message tag out of range",
 	"unexpected message type",
 	"client unknown, not in registry",
 	"wrong number of bytes in attrs",
