@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	xr "github.com/jddixon/rnglib_go"
+	xcl "github.com/jddixon/xlCluster_go"
 	xi "github.com/jddixon/xlNodeID_go"
 	xn "github.com/jddixon/xlNode_go"
 	xt "github.com/jddixon/xlTransport_go"
@@ -128,7 +129,7 @@ func (s *XLSuite) makeAClientInfo(c *C, rng *xr.PRNG, epCount uint32) *ClientInf
 // Make a cluster member as seen by registry clients.
 // Using functions must check to ensure members have unique names
 
-func (s *XLSuite) makeAMemberInfo(c *C, rng *xr.PRNG) *MemberInfo {
+func (s *XLSuite) makeAMemberInfo(c *C, rng *xr.PRNG) *xcl.MemberInfo {
 	attrs := uint64(rng.Int63())
 	peer, err := xn.NewPeer(
 		rng.NextFileName(8),
@@ -138,7 +139,7 @@ func (s *XLSuite) makeAMemberInfo(c *C, rng *xr.PRNG) *MemberInfo {
 		nil, // overlays
 		nil) // XXX CONNECTORS
 	c.Assert(err, IsNil)
-	return &MemberInfo{
+	return &xcl.MemberInfo{
 		Attrs: attrs,
 		Peer:  peer,
 	}

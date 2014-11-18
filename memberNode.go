@@ -12,6 +12,7 @@ import (
 	"crypto/sha1"
 	"encoding/binary"
 	"fmt"
+	xcl "github.com/jddixon/xlCluster_go"
 	xc "github.com/jddixon/xlCrypto_go"
 	xi "github.com/jddixon/xlNodeID_go"
 	xn "github.com/jddixon/xlNode_go"
@@ -62,7 +63,7 @@ type MemberMaker struct {
 	// serverVersion xu.DecimalVersion		// missing
 
 	regProtoVersion uint32 // protocol version used to talk to registry
-	ClusterMember
+	xcl.ClusterMember
 }
 
 // Returns a copy of the node's comms private RSA key
@@ -145,7 +146,7 @@ func NewMemberMaker(
 	mm *MemberMaker, err error) {
 
 	var (
-		cm      *ClusterMember
+		cm      *xcl.ClusterMember
 		isAdmin = (attrs & ATTR_ADMIN) != 0
 		regPeer *xn.Peer
 	)
@@ -206,7 +207,7 @@ func NewMemberMaker(
 	}
 	if err == nil {
 		cnxHandler := &AesCnxHandler{State: MEMBER_START}
-		cm = &ClusterMember{
+		cm = &xcl.ClusterMember{
 			// Attrs gets negotiated
 			ClusterName:  clusterName,
 			ClusterAttrs: clusterAttrs,
@@ -214,7 +215,7 @@ func NewMemberMaker(
 			ClusterSize:  size,
 			EPCount:      epCount,
 			// Members added on the fly
-			Members: make([]*MemberInfo, size),
+			Members: make([]*xcl.MemberInfo, size),
 			Node:    *node,
 		}
 		mm = &MemberMaker{
@@ -462,7 +463,7 @@ func (mm *MemberMaker) JoinAndReply() (err error) {
 
 			if mm.ClusterSize != clusterSizeNow {
 				mm.ClusterSize = clusterSizeNow
-				mm.Members = make([]*MemberInfo, mm.ClusterSize)
+				mm.Members = make([]*xcl.MemberInfo, mm.ClusterSize)
 			}
 			mm.EPCount = epCount
 			// This allows members knowing only the cluster name to
@@ -484,7 +485,7 @@ func (mm *MemberMaker) GetAndMembers() (err error) {
 	}
 	const MAX_GET = 32 // 2014-01-31: was 16
 	if mm.Members == nil {
-		mm.Members = make([]*MemberInfo, mm.ClusterSize)
+		mm.Members = make([]*xcl.MemberInfo, mm.ClusterSize)
 	}
 	stillToGet := xu.LowNMap(uint(mm.ClusterSize))
 	for count := 0; count < MAX_GET && stillToGet.Any(); count++ {

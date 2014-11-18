@@ -1,5 +1,9 @@
 xlReg_go/TODO
 
+2014-11-17
+    * split xlCluster_go from xlReg_Go                                  * DONE
+    * gocheck_test.go makeAMemberInfo() belongs in xlCluster_go
+
 2014-11-16
     * add real testCluster_test.go, verify that serialization and
         deserialization work

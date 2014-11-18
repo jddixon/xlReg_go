@@ -8,6 +8,7 @@ package reg
 import (
 	"fmt"
 	ha "github.com/jddixon/hamt_go"
+	xcl "github.com/jddixon/xlCluster_go"
 	xf "github.com/jddixon/xlCrypto_go/filters"
 	xi "github.com/jddixon/xlNodeID_go"
 	xt "github.com/jddixon/xlTransport_go"
@@ -155,7 +156,7 @@ func (reg *Registry) IDCount() (count uint) {
 
 // Add a cluster member to the RegMembersByID index unless it is already
 // present.
-func (reg *Registry) indexClusterMember(cluster *RegCluster, cm *ClusterMember) (
+func (reg *Registry) indexClusterMember(cluster *RegCluster, cm *xcl.ClusterMember) (
 	index int, err error) {
 
 	if cluster == nil {
