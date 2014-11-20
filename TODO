@@ -5,6 +5,10 @@ xlReg_go/TODO
     * verify consistency of xlreg_errors.go, xlreg_error_str.dat,       * DONE
         xlreg_error_str.go                                              * DONE
 
+    * sed script to generate xlreg_error_{const,names,str}.dat from
+        xlreg_errors.go
+        - sed script gets added to Makefile
+
 2014-11-17
     * split xlCluster_go from xlReg_Go                                  * DONE
     * gocheck_test.go makeAMemberInfo() belongs in xlCluster_go

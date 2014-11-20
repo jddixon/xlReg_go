@@ -9,9 +9,9 @@ import (
 	. "gopkg.in/check.v1"
 )
 
-func (s *XLSuite) TestClusterMaker(c *C) {
+func (s *XLSuite) TestRegClusterMaker(c *C) {
 	if VERBOSITY > 0 {
-		fmt.Println("\nTEST_CLUSTER_MAKER")
+		fmt.Println("\nTEST_REG_CLUSTER_MAKER")
 	}
 	var err error
 	rng := xr.MakeSimpleRNG()
@@ -71,9 +71,9 @@ func (s *XLSuite) TestClusterMaker(c *C) {
 	}
 	c.Assert(maxSize, Equals, count)
 }
-func (s *XLSuite) TestClusterSerialization(c *C) {
+func (s *XLSuite) TestRegClusterSerialization(c *C) {
 	if VERBOSITY > 0 {
-		fmt.Println("\nTEST_CLUSTER_SERIALIZATION")
+		fmt.Println("\nTEST_REG_CLUSTER_SERIALIZATION")
 	}
 	rng := xr.MakeSimpleRNG()
 
