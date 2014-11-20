@@ -14,8 +14,8 @@ xlReg_go/TODO
     * gocheck_test.go makeAMemberInfo() belongs in xlCluster_go
 
 2014-11-16
-    * add real testCluster_test.go, verify that serialization and
-        deserialization work
+    * add real testCluster_test.go, verify that serialization and       * SKIP
+        deserialization work THIS GETS DONE UNDER xlCluster.go          * SKIP
 
 2014-11-15
     DONE WITH NAME CHANGES:

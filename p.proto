@@ -57,7 +57,7 @@ message XLRegMsg {
 
     optional bytes  ClusterID       = 13;       
     optional string ClusterName     = 14; 
-    optional uint32 ClusterSize     = 15;
+    optional uint32 ClusterMaxSize  = 15;
     optional uint64 ClusterAttrs    = 16; 
     optional uint32 EndPointCount   = 17;   // each member must have
 

@@ -103,7 +103,7 @@ type XLRegMsg struct {
 	MemberSpecs      *XLRegMsg_Token   `protobuf:"bytes,11,opt" json:"MemberSpecs,omitempty"`
 	ClusterID        []byte            `protobuf:"bytes,13,opt" json:"ClusterID,omitempty"`
 	ClusterName      *string           `protobuf:"bytes,14,opt" json:"ClusterName,omitempty"`
-	ClusterSize      *uint32           `protobuf:"varint,15,opt" json:"ClusterSize,omitempty"`
+	ClusterMaxSize   *uint32           `protobuf:"varint,15,opt" json:"ClusterMaxSize,omitempty"`
 	ClusterAttrs     *uint64           `protobuf:"varint,16,opt" json:"ClusterAttrs,omitempty"`
 	EndPointCount    *uint32           `protobuf:"varint,17,opt" json:"EndPointCount,omitempty"`
 	Which            *uint64           `protobuf:"varint,20,opt" json:"Which,omitempty"`
@@ -201,9 +201,9 @@ func (m *XLRegMsg) GetClusterName() string {
 	return ""
 }
 
-func (m *XLRegMsg) GetClusterSize() uint32 {
-	if m != nil && m.ClusterSize != nil {
-		return *m.ClusterSize
+func (m *XLRegMsg) GetClusterMaxSize() uint32 {
+	if m != nil && m.ClusterMaxSize != nil {
+		return *m.ClusterMaxSize
 	}
 	return 0
 }

@@ -48,16 +48,7 @@ type MemberMaker struct {
 	DoneCh          chan error
 	ProposedAttrs   uint64
 	ProposedVersion uint32 // proposed by member
-
 	AesCnxHandler
-
-	// RegCred info: registry credentials -----------------
-	//RegName string
-	//RegID   *xi.NodeID
-	//RegCK   *rsa.PublicKey
-	//RegSK   *rsa.PublicKey
-	//RegEnd  xt.EndPointI
-
 	RegPeer *xn.Peer
 
 	// serverVersion xu.DecimalVersion		// missing
@@ -209,11 +200,11 @@ func NewMemberMaker(
 		cnxHandler := &AesCnxHandler{State: MEMBER_START}
 		cm = &xcl.ClusterMember{
 			// Attrs gets negotiated
-			ClusterName:  clusterName,
-			ClusterAttrs: clusterAttrs,
-			ClusterID:    clusterID,
-			ClusterSize:  size,
-			EPCount:      epCount,
+			ClusterName:    clusterName,
+			ClusterAttrs:   clusterAttrs,
+			ClusterID:      clusterID,
+			ClusterMaxSize: size,
+			EPCount:        epCount,
 			// Members added on the fly
 			Members: make([]*xcl.MemberInfo, size),
 			Node:    *node,
@@ -221,13 +212,6 @@ func NewMemberMaker(
 		mm = &MemberMaker{
 			ProposedAttrs: attrs,
 			DoneCh:        make(chan error, 1),
-			// BECOMING SUPERFLUOUS ---
-			//RegName:       regName,
-			//RegID:         regID,
-			//RegEnd:        regEnd,
-			//RegCK:         regCK,
-			//RegSK:         regSK,
-			// END BECOMING -----------
 			RegPeer:       regPeer,
 			AesCnxHandler: *cnxHandler,
 			ClusterMember: *cm,
@@ -404,11 +388,11 @@ func (mm *MemberMaker) CreateAndReply() (err error) {
 
 	op := XLRegMsg_Create
 	request := &XLRegMsg{
-		Op:            &op,
-		ClusterName:   &mm.ClusterName,
-		ClusterAttrs:  &mm.ClusterAttrs,
-		ClusterSize:   &mm.ClusterSize,
-		EndPointCount: &mm.EPCount,
+		Op:             &op,
+		ClusterName:    &mm.ClusterName,
+		ClusterAttrs:   &mm.ClusterAttrs,
+		ClusterMaxSize: &mm.ClusterMaxSize,
+		EndPointCount:  &mm.EPCount,
 	}
 	// SHOULD CHECK FOR TIMEOUT
 	err = mm.writeMsg(request)
@@ -427,7 +411,7 @@ func (mm *MemberMaker) CreateAndReply() (err error) {
 				mm.ClusterID, err = xi.New(id)
 				if err == nil {
 					mm.ClusterAttrs = response.GetClusterAttrs()
-					mm.ClusterSize = response.GetClusterSize()
+					mm.ClusterMaxSize = response.GetClusterMaxSize()
 				}
 			}
 		}
@@ -459,11 +443,11 @@ func (mm *MemberMaker) JoinAndReply() (err error) {
 
 		epCount := response.GetEndPointCount()
 		if err == nil {
-			clusterSizeNow := response.GetClusterSize()
+			clusterMaxSizeNow := response.GetClusterMaxSize()
 
-			if mm.ClusterSize != clusterSizeNow {
-				mm.ClusterSize = clusterSizeNow
-				mm.Members = make([]*xcl.MemberInfo, mm.ClusterSize)
+			if mm.ClusterMaxSize != clusterMaxSizeNow {
+				mm.ClusterMaxSize = clusterMaxSizeNow
+				mm.Members = make([]*xcl.MemberInfo, mm.ClusterMaxSize)
 			}
 			mm.EPCount = epCount
 			// This allows members knowing only the cluster name to
@@ -485,14 +469,14 @@ func (mm *MemberMaker) GetAndMembers() (err error) {
 	}
 	const MAX_GET = 32 // 2014-01-31: was 16
 	if mm.Members == nil {
-		mm.Members = make([]*xcl.MemberInfo, mm.ClusterSize)
+		mm.Members = make([]*xcl.MemberInfo, mm.ClusterMaxSize)
 	}
-	stillToGet := xu.LowNMap(uint(mm.ClusterSize))
+	stillToGet := xu.LowNMap(uint(mm.ClusterMaxSize))
 	for count := 0; count < MAX_GET && stillToGet.Any(); count++ {
 
 		var response *XLRegMsg
 
-		for i := uint32(0); i < uint32(mm.ClusterSize); i++ {
+		for i := uint32(0); i < uint32(mm.ClusterMaxSize); i++ {
 			if mm.Members[i] != nil {
 				// XXX UNDESIRABLE CAST
 				stillToGet = stillToGet.Clear(uint(i))
@@ -528,7 +512,7 @@ func (mm *MemberMaker) GetAndMembers() (err error) {
 			tokens := response.GetTokens() // a slice
 			if which.Any() {
 				offset := 0
-				for i := uint32(0); i < uint32(mm.ClusterSize); i++ {
+				for i := uint32(0); i < uint32(mm.ClusterMaxSize); i++ {
 					// XXX UNDESIRABLE CAST
 					if which.Test(uint(i)) {
 						token := tokens[offset]
@@ -551,7 +535,7 @@ func (mm *MemberMaker) GetAndMembers() (err error) {
 	if err == nil {
 		selfID := mm.GetNodeID().Value()
 
-		for i := uint32(0); i < uint32(mm.ClusterSize); i++ {
+		for i := uint32(0); i < uint32(mm.ClusterMaxSize); i++ {
 
 			mi := mm.Members[i]
 			if mi == nil {
