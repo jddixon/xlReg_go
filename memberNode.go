@@ -73,7 +73,6 @@ func (mm *MemberMaker) PersistNode() (err error) {
 
 	var (
 		config string
-		//node   *xn.Node
 	)
 
 	// XXX check attrs, etc
@@ -99,10 +98,7 @@ func (mm *MemberMaker) PersistNode() (err error) {
 // to the conventional place in the file system.
 func (mn *MemberMaker) PersistClusterMember() (err error) {
 
-	var (
-		config string
-		// node   *xn.Node
-	)
+	var config string
 
 	// XXX check attrs, etc
 
@@ -116,7 +112,6 @@ func (mn *MemberMaker) PersistClusterMember() (err error) {
 	}
 
 	if err == nil {
-		// mn.Node = *node
 		config = mn.ClusterMember.String()
 		if err == nil {
 			err = ioutil.WriteFile(pathToCfgFile, []byte(config), 0600)
@@ -151,6 +146,9 @@ func NewMemberMaker(
 			err = MissingServerInfo
 		}
 		if err == nil {
+			// DEBUG
+			fmt.Printf("NemMemberMaker: regEnd is %s\n", regEnd.String())
+			// END
 			if (attrs & ATTR_SOLO) == uint64(0) {
 				if clusterName == "" {
 					err = MissingClusterNameOrID
@@ -251,46 +249,47 @@ func (mm *MemberMaker) SessionSetup(proposedVersion uint32) (
 		ciphertext1, iv1, key1, salt1, salt1c []byte
 		ciphertext2, iv2, key2, salt2         []byte
 	)
-	// Set up connection to server. -----------------------------
-	//ctor, err := xt.NewTcpConnector(mm.RegEnd)
+	// Set up connection to server. ---------------------------------
 	ctor := mm.RegPeer.GetConnector(0)
+	// DEBUG
+	fmt.Printf("SessionSetup: ctor is %s\n", ctor.String())
+	// END
+	var conn xt.ConnectionI
+	conn, err = ctor.Connect(nil)
 	if err == nil {
-		var conn xt.ConnectionI
-		conn, err = ctor.Connect(nil)
-		if err == nil {
-			cnx = conn.(*xt.TcpConnection)
-		}
-	}
-	// Send HELLO -----------------------------------------------
-	if err == nil {
+		cnx = conn.(*xt.TcpConnection)
+		// DEBUG
+		fmt.Printf("              cnx is %s\n", cnx.String())
+		// END
+		// Send HELLO -----------------------------------------------
 		mm.Cnx = cnx
 		ck := mm.RegPeer.GetCommsPublicKey()
 		ciphertext1, iv1, key1, salt1,
 			err = xa.ClientEncodeHello(proposedVersion, ck)
-	}
-	if err == nil {
-		err = mm.WriteData(ciphertext1)
-	}
-	// Process HELLO REPLY --------------------------------------
-	if err == nil {
-		ciphertext2, err = mm.ReadData()
-	}
-	if err == nil {
-		iv2, key2, salt2, salt1c, decidedVersion,
-			err = xa.ClientDecodeHelloReply(ciphertext2, iv1, key1)
-		_ = salt1c // XXX
-	}
-	// Set up AES engines ---------------------------------------
-	if err == nil {
-		mm.salt1 = salt1
-		mm.iv2 = iv2
-		mm.key2 = key2
-		mm.salt2 = salt2
-		mm.regProtoVersion = decidedVersion
-		mm.engine, err = aes.NewCipher(key2)
 		if err == nil {
-			mm.encrypter = cipher.NewCBCEncrypter(mm.engine, iv2)
-			mm.decrypter = cipher.NewCBCDecrypter(mm.engine, iv2)
+			err = mm.WriteData(ciphertext1)
+			// Process HELLO REPLY ----------------------------------
+			if err == nil {
+				ciphertext2, err = mm.ReadData()
+				if err == nil {
+					iv2, key2, salt2, salt1c, decidedVersion,
+						err = xa.ClientDecodeHelloReply(ciphertext2, iv1, key1)
+					_ = salt1c // XXX
+					// Set up AES engines ---------------------------
+					if err == nil {
+						mm.salt1 = salt1
+						mm.iv2 = iv2
+						mm.key2 = key2
+						mm.salt2 = salt2
+						mm.regProtoVersion = decidedVersion
+						mm.engine, err = aes.NewCipher(key2)
+						if err == nil {
+							mm.encrypter = cipher.NewCBCEncrypter(mm.engine, iv2)
+							mm.decrypter = cipher.NewCBCDecrypter(mm.engine, iv2)
+						}
+					}
+				}
+			}
 		}
 	}
 	return

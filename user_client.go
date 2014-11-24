@@ -56,7 +56,7 @@ func NewUserMember(
 				epCount, e)
 
 			if err == nil {
-				// Run() fills in clusterID
+				// Start() fills in clusterID
 				ac = &UserMember{
 					MemberMaker: *mn,
 				}
@@ -70,48 +70,55 @@ func NewUserMember(
 // Start the member running in separate goroutine, so that this function
 // is non-blocking.
 
-func (uc *UserMember) Run() {
+func (uc *UserMember) Start() {
+
+	var err error
 
 	mn := &uc.MemberMaker
-
-	go func() {
-		var (
-			err      error
-			version1 uint32
-		)
-		cnx, version2, err := mn.SessionSetup(version1)
-		if cnx != nil {
-			defer cnx.Close()
-		}
-		_ = version2 // not yet used
-		if err == nil {
-			err = mn.MemberAndOK()
-		}
-		// XXX MODIFY TO USE CLUSTER_ID PASSED TO UserMember
-		// 2013-10-12 this is a join by cluster name
-		if err == nil {
-			err = mn.JoinAndReply()
-		}
-		if err == nil {
-			err = mn.GetAndMembers()
-		}
-		// DEBUG ====================================================
-		var nilMembers []int
-		for i := 0; i < len(uc.Members); i++ {
-			if uc.Members[i] == nil {
-				nilMembers = append(nilMembers, i)
+	err = mn.Run() // runs the node, opening acceptors
+	if err == nil {
+		go func() {
+			var (
+				cnx      *xt.TcpConnection
+				version1 uint32
+				version2 uint32
+			)
+			cnx, version2, err = mn.SessionSetup(version1)
+			if cnx != nil {
+				defer cnx.Close()
 			}
-		}
-		if len(nilMembers) > 0 {
-			fmt.Printf("UserMember.Run() after Get finds nil members: %v\n",
-				nilMembers)
-		}
-		// END ======================================================
+			_ = version2 // not yet used
+			if err == nil {
+				err = mn.MemberAndOK()
+			}
+			// XXX MODIFY TO USE CLUSTER_ID PASSED TO UserMember
+			// 2013-10-12 this is a join by cluster name
+			if err == nil {
+				err = mn.JoinAndReply()
+			}
+			if err == nil {
+				err = mn.GetAndMembers()
+			}
+			// DEBUG ====================================================
+			var nilMembers []int
+			for i := 0; i < len(uc.Members); i++ {
+				if uc.Members[i] == nil {
+					nilMembers = append(nilMembers, i)
+				}
+			}
+			if len(nilMembers) > 0 {
+				fmt.Printf("UserMember.Start() after Get finds nil members: %v\n",
+					nilMembers)
+			}
+			// END ======================================================
 
-		if err == nil {
-			err = mn.ByeAndAck()
-		}
+			if err == nil {
+				err = mn.ByeAndAck()
+			}
 
+			mn.DoneCh <- err
+		}()
+	} else {
 		mn.DoneCh <- err
-	}()
+	}
 }

@@ -55,30 +55,41 @@ func NewEphServer() (ms *EphServer, err error) {
 		eps := []xt.EndPointI{ep}
 		if err == nil {
 			node, err = xn.New(name, id, lfs, ckPriv, skPriv, nil, eps, nil)
-		}
-		if err == nil {
-			rn, err = NewRegNode(node, ckPriv, skPriv)
-		}
-		if err == nil {
-			// a registry with no clusters and no logger
-			opt := &RegOptions{
-				EndPoint:  ep, // not used
-				Ephemeral: true,
-				Lfs:       lfs, // redundant (is in node's BaseNode)
-				Logger:    nil,
-				K:         DEFAULT_K,
-				M:         DEFAULT_M,
+			if err == nil {
+				err = node.Run() // so acceptors are now live
+				if err == nil {
+					rn, err = NewRegNode(node, ckPriv, skPriv)
+					if err == nil {
+						// DEBUG
+						if rn == nil {
+							fmt.Println("regNode is NIL!\n")
+						} else {
+							fmt.Printf("eph server listening on %s\n",
+								rn.GetAcceptor(0).String())
+						}
+						// END
+						// a registry with no clusters and no logger
+						opt := &RegOptions{
+							EndPoint:  ep, // not used
+							Ephemeral: true,
+							Lfs:       lfs, // redundant (is in node's BaseNode)
+							Logger:    nil,
+							K:         DEFAULT_K,
+							M:         DEFAULT_M,
+						}
+						reg, err = NewRegistry(nil, rn, opt)
+						if err == nil {
+							server, err = NewRegServer(reg, true, 1)
+							if err == nil {
+								ms = &EphServer{
+									acc:    rn.GetAcceptor(0),
+									Server: server,
+								}
+							}
+						}
+					}
+				}
 			}
-			reg, err = NewRegistry(nil, rn, opt)
-		}
-	}
-	if err == nil {
-		server, err = NewRegServer(reg, true, 1)
-	}
-	if err == nil {
-		ms = &EphServer{
-			acc:    rn.GetAcceptor(0),
-			Server: server,
 		}
 	}
 	return
@@ -86,9 +97,9 @@ func NewEphServer() (ms *EphServer, err error) {
 
 // Start the ephemeral server running in a separate goroutine.
 
-func (ms *EphServer) Run() (err error) {
+func (ms *EphServer) Start() (err error) {
 
-	err = ms.Server.Run()
+	err = ms.Server.Start()
 	return
 }
 

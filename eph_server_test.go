@@ -46,9 +46,14 @@ func (s *XLSuite) TestEphServer(c *C) {
 	c.Assert(serverEnd, NotNil)
 
 	// start the ephemeral server -------------------------
-	err = es.Run()
+	err = es.Start()
 	c.Assert(err, IsNil)
 	defer es.Close() // stop the server by closing its acceptor
+
+	// DEBUG
+	fmt.Printf("TestEphServer: server acc %s\n", server.GetAcceptor().String())
+	fmt.Printf("               serverEnd %s\n", server.GetEndPoint(0).String())
+	// END
 
 	// verify Bloom filter is running
 	reg := es.Server.Registry
@@ -80,20 +85,21 @@ func (s *XLSuite) TestEphServer(c *C) {
 
 	// 3. create an AdminClient, use it to get the clusterID
 	// DEBUG
-	fmt.Printf("\nADMIN\n")
+	fmt.Printf("\neph_server_test: creating ADMIN client\n")
 	// END
 
 	an, err := NewAdminClient(serverName, serverID, serverEnd,
 		serverCK, serverSK, clusterName, clusterAttrs, K, uint32(1), nil)
 	c.Assert(err, IsNil)
 
-	an.Run()
-	<-an.DoneCh
+	an.Start()
+	err = <-an.DoneCh
+	c.Assert(err, IsNil)
 
 	anID := an.ClusterMember.Node.GetNodeID()
 
 	// DEBUG
-	fmt.Println("\nADMIN MEMBER GETS:")
+	fmt.Println("\nADMIN CLIENT GETS:")
 	fmt.Printf("  regID     %s\n", regID.String())
 	fmt.Printf("  anID      %s\n", anID.String())
 	if an.ClusterID == nil {
@@ -159,7 +165,7 @@ func (s *XLSuite) TestEphServer(c *C) {
 
 	// 5. initialize the K members, each in a separate goroutine ----
 	for i := uint32(0); i < K; i++ {
-		uc[i].Run()
+		uc[i].Start()
 	}
 
 	// wait until all members are initialized -----------------------
@@ -190,7 +196,7 @@ func (s *XLSuite) TestEphServer(c *C) {
 		for j := uint32(0); j < epCount; j++ {
 			nodeEP := cm.GetEndPoint(int(j)).String()
 			nodeAcc := cm.GetAcceptor(int(j)).String()
-			c.Assert(strings.HasSuffix(nodeEP, ".0"), Equals, false)
+			c.Assert(strings.HasSuffix(nodeEP, ":0"), Equals, false)
 			c.Assert(strings.HasSuffix(nodeAcc, nodeEP), Equals, true)
 			// DEBUG
 			fmt.Printf("node %d: endPoint %d is %s\n",

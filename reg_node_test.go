@@ -25,21 +25,24 @@ func (s *XLSuite) TestRegNodeSerialization(c *C) {
 	namesInUse := make(map[string]bool)
 	node, ckPriv, skPriv := s.makeHostAndKeys(c, rng, namesInUse)
 
-	// This assigns an endPoint in 127.0.0.1 to the node; it
-	// also starts the corresponding acceptor listening.
+	// This assigns an endPoint in 127.0.0.1 to the node.
 	s.makeALocalEndPoint(c, node)
-
-	// We now have a node with 0 peers and a live acceptor.
-
+	c.Assert(node.SizeEndPoints(), Equals, 1)
+	err := node.Run()
+	c.Assert(err, IsNil)
+	c.Assert(node.SizeAcceptors(), Equals, 1)
 	regNode, err := NewRegNode(node, ckPriv, skPriv)
+	c.Assert(err, IsNil)
 
 	serialized := regNode.String()
 
 	// We can't deserialize the node - it contains a live acceptor
 	// at the same endPoint.
-	for i := 0; i < regNode.SizeAcceptors(); i++ {
-		regNode.GetAcceptor(i).Close()
-	}
+	//for i := 0; i < regNode.SizeAcceptors(); i++ {
+	//	regNode.GetAcceptor(i).Close()
+	//}
+	err = regNode.Close()
+	c.Assert(err, IsNil)
 
 	// the Node version of this fails if sleep is say 10ms
 	time.Sleep(70 * time.Millisecond)

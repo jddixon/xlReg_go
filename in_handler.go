@@ -117,7 +117,7 @@ func op2tag(op XLRegMsg_Tag) int {
 // The hello message contains an AES Key+IV, a salt, and a requested
 // protocol version. The salt must be at least eight bytes long.
 
-func (h *InHandler) Run() (err error) {
+func (h *InHandler) Start() (err error) {
 
 	defer func() {
 		if h.Cnx != nil {
@@ -184,7 +184,7 @@ func (h *InHandler) Run() (err error) {
 			// XXX log any error
 			if err != nil {
 				h.reg.Logger.Printf(
-					"InHandler.Run: EncodePadEncrypt returns %v\n", err)
+					"InHandler.Start: EncodePadEncrypt returns %v\n", err)
 			}
 
 			// put the ciphertext on the wire
@@ -194,7 +194,7 @@ func (h *InHandler) Run() (err error) {
 				// XXX log any error
 				if err != nil {
 					h.reg.Logger.Printf(
-						"InHandler.Run: WriteData returns %v\n", err)
+						"InHandler.Start: WriteData returns %v\n", err)
 				}
 			}
 

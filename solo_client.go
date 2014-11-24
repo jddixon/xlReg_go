@@ -43,7 +43,7 @@ func NewSoloMember(node *xn.Node,
 		uint32(len(e)), e)
 
 	if err == nil {
-		// Run() fills in clusterID
+		// Start() fills in clusterID
 		sc = &SoloMember{
 			MemberMaker: *cn,
 		}
@@ -54,7 +54,7 @@ func NewSoloMember(node *xn.Node,
 // Start the client running in separate goroutine, so that this function
 // is non-blocking.
 
-func (sc *SoloMember) Run() {
+func (sc *SoloMember) Start() {
 
 	cn := &sc.MemberMaker
 

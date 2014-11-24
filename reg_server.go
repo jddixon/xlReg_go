@@ -3,10 +3,13 @@ package reg
 // xlReg_go/reg_server.go
 
 import (
+	"fmt"
 	xt "github.com/jddixon/xlTransport_go"
 	"io"
 	"net"
 )
+
+var _ = fmt.Printf
 
 type RegServer struct {
 	Testing   bool // serialized
@@ -42,51 +45,62 @@ func (rs *RegServer) GetAcceptor() xt.AcceptorI {
 }
 
 // Starts the server running in a goroutine.  Does not block.
-func (rs *RegServer) Run() (err error) {
+func (rs *RegServer) Start() (err error) {
 
-	go func() {
-		for {
-			logger := rs.Registry.Logger
+	err = rs.Run() // opens RegNode's acceptor
+	// DEBUG
+	acc := rs.GetAcceptor()
+	if acc == nil {
+		fmt.Printf("RegServer.Start: acceptor is NIL\n")
+	} else {
+		fmt.Printf("RegServer.Start(): acceptor is %s\n", acc.String())
+	}
+	// END
+	if err == nil {
+		go func() {
+			for {
+				logger := rs.Registry.Logger
 
-			// As each client connects its connection is passed to a
-			// handler running in a separate goroutine.
-			cnx, err := rs.GetAcceptor().Accept()
-			if err != nil {
-				// SHOULD NOT CONTINUE IF 'use of closed network connection";
-				// this yields an infinite loop if the listening socket has
-				// been closed to shut down the server.
-				netOpError, ok := err.(*net.OpError)
-				if ok && netOpError.Err.Error() == "use of closed network connection" {
-					err = nil
-				} else {
-					logger.Printf(
-						"fatal I/O error %v, shutting down the server\n",
-						err)
-				}
-				break
-			}
-			go func() {
-				var (
-					h *InHandler
-				)
-				h, err = NewInHandler(&rs.Registry, cnx)
-				if err == nil {
-					err = h.Run()
-				}
+				// As each client connects its connection is passed to a
+				// handler running in a separate goroutine.
+				cnx, err := rs.GetAcceptor().Accept()
 				if err != nil {
-					if err != io.EOF {
+					// SHOULD NOT CONTINUE IF 'use of closed network connection";
+					// this yields an infinite loop if the listening socket has
+					// been closed to shut down the server.
+					netOpError, ok := err.(*net.OpError)
+					if ok && netOpError.Err.Error() == "use of closed network connection" {
+						err = nil
+					} else {
 						logger.Printf(
-							"I/O error %v, closing client connection\n", err)
+							"fatal I/O error %v, shutting down the server\n",
+							err)
 					}
-					cnx := h.Cnx
-					if cnx != nil {
-						cnx.Close()
-					}
+					break
 				}
-			}()
-		}
-		rs.DoneCh <- true
-	}()
+				go func() {
+					var (
+						h *InHandler
+					)
+					h, err = NewInHandler(&rs.Registry, cnx)
+					if err == nil {
+						err = h.Start()
+					}
+					if err != nil {
+						if err != io.EOF {
+							logger.Printf(
+								"I/O error %v, closing client connection\n", err)
+						}
+						cnx := h.Cnx
+						if cnx != nil {
+							cnx.Close()
+						}
+					}
+				}()
+			}
+			rs.DoneCh <- true
+		}()
+	}
 	return
 }
 

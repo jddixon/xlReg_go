@@ -26,7 +26,9 @@ type RegNode struct {
 	xn.Node                   // name, id, ck, sk, etc, etc
 }
 
-//
+/**
+ * Returns AcceptorNotLive if the node does not have an open acceptor.
+ */
 func NewRegNode(node *xn.Node, commsKey, sigKey *rsa.PrivateKey) (
 	q *RegNode, err error) {
 
@@ -34,27 +36,25 @@ func NewRegNode(node *xn.Node, commsKey, sigKey *rsa.PrivateKey) (
 
 	if node == nil {
 		err = NilNode
-	}
-	// We would prefer that the node's name be xlReg and that its
-	// LFS default to /var/app/xlReg.
-
-	if err == nil {
+		// We would prefer that the node's name be xlReg and that its
+		// LFS default to /var/app/xlReg.
+	} else {
 		acc = node.GetAcceptor(0)
 		if acc == nil {
 			err = xm.AcceptorNotLive
 		}
-	}
-	if err == nil {
-		stopCh := make(chan bool, 1)
-		stoppedCh := make(chan bool, 1)
+		if err == nil {
+			stopCh := make(chan bool, 1)
+			stoppedCh := make(chan bool, 1)
 
-		q = &RegNode{
-			Acc:       acc,
-			StopCh:    stopCh,
-			StoppedCh: stoppedCh,
-			ckPriv:    commsKey,
-			skPriv:    sigKey,
-			Node:      *node,
+			q = &RegNode{
+				Acc:       acc,
+				StopCh:    stopCh,
+				StoppedCh: stoppedCh,
+				ckPriv:    commsKey,
+				skPriv:    sigKey,
+				Node:      *node,
+			}
 		}
 	}
 	return
@@ -92,6 +92,9 @@ func ParseRegNode(s string) (rn *RegNode, rest []string, err error) {
 	return ParseRegNodeFromStrings(ss)
 }
 
+/**
+ * Parse a serialized RegNode, returning one with an open acceptor.
+ */
 func ParseRegNodeFromStrings(ss []string) (
 	rn *RegNode, rest []string, err error) {
 
@@ -114,24 +117,28 @@ func ParseRegNodeFromStrings(ss []string) (
 			} else {
 				err = MissingPrivateKey
 			}
-		}
-		if err == nil {
-			line = xn.NextNBLine(&rest)
-			parts := strings.Split(line, ": ")
-			if parts[0] == "skPriv" && parts[1] == "-----BEGIN -----" {
-				skPriv, err = xn.ExpectRSAPrivateKey(&rest)
-			} else {
-				err = MissingPrivateKey
+			if err == nil {
+				line = xn.NextNBLine(&rest)
+				parts := strings.Split(line, ": ")
+				if parts[0] == "skPriv" && parts[1] == "-----BEGIN -----" {
+					skPriv, err = xn.ExpectRSAPrivateKey(&rest)
+				} else {
+					err = MissingPrivateKey
+				}
+				if err == nil {
+					line = xn.NextNBLine(&rest)
+					if line != "}" {
+						err = MissingClosingBrace
+					}
+					if err == nil {
+						// Try to open the acceptor.
+						err = node.Run()
+						if err == nil {
+							rn, err = NewRegNode(node, ckPriv, skPriv)
+						}
+					}
+				}
 			}
-		}
-		if err == nil {
-			line = xn.NextNBLine(&rest)
-			if line != "}" {
-				err = MissingClosingBrace
-			}
-		}
-		if err == nil {
-			rn, err = NewRegNode(node, ckPriv, skPriv)
 		}
 	}
 	return

@@ -3,6 +3,10 @@ xlReg_go/CHANGES
 The version number and date in this file must be kept in sync with version.go
 -----------------------------------------------------------------------------
 
+v1.7.0
+    2014-11-24
+        * improved handling of open/close acceptors
+        * fix various bugs                                          SLOC 3957
 v1.6.5
     2014-11-18
         * split out xlCluster_go as separarate project

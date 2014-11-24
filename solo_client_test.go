@@ -37,7 +37,7 @@ func (s *XLSuite) TestSoloMember(c *C) {
 	c.Assert(serverEnd, NotNil)
 
 	// start the mock server ------------------------------
-	err = es.Run()
+	err = es.Start()
 	c.Assert(err, IsNil)
 
 	// 2. create the solo client ------------------------------------
@@ -68,7 +68,7 @@ func (s *XLSuite) TestSoloMember(c *C) {
 	c.Assert(sc, NotNil)
 
 	// 3. run the client
-	sc.Run()
+	sc.Start()
 	err = <-sc.DoneCh
 
 	// 4.  verify that the client LFS exists and is correct ---------

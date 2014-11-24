@@ -38,22 +38,22 @@ func NewAdminClient(
 
 	nodeID, err := xi.New(nil)
 	// DEBUG
-	fmt.Printf("  admin ID %x\n", nodeID.Value())
+	fmt.Printf("    admin ID %x\n", nodeID.Value())
 	// END
 	if err == nil {
 		node, err := xn.NewNew("admin", nodeID, "") // name, id, lfs
 		if err == nil {
-
 			cn, err := NewMemberMaker(node,
 				ATTR_ADMIN|ATTR_SOLO|ATTR_EPHEMERAL,
 				serverName, serverID, serverEnd, serverCK, serverSK,
 				clusterName, clusterAttrs, nil, size, epCount, e)
 
 			if err == nil {
-				// Run() fills in clusterID
+				// Start() fills in clusterID
 				ac = &AdminClient{
 					MemberMaker: *cn,
 				}
+				// we do NOT invoke node.Run() on adminClients
 			}
 		}
 	}
@@ -62,8 +62,12 @@ func NewAdminClient(
 
 // Start the client running in separate goroutine, so that this function
 // is non-blocking.
+//
+// XXX If the xlReg server is not running, this gets an error:
+//   dial tcp 127.0.0.1:0: connection refused
+// and then a panic because the nodeID is nil
 
-func (ac *AdminClient) Run() {
+func (ac *AdminClient) Start() {
 
 	mm := &ac.MemberMaker
 
@@ -96,8 +100,12 @@ func (ac *AdminClient) Run() {
 			cnx.Close()
 		}
 		// DEBUG
-		fmt.Printf("AdminClient.Run() : exiting; err %v\n", err)
-		fmt.Printf("  ClusterID %x\n", mm.ClusterID.Value())
+		fmt.Printf("AdminClient.Start() : exiting; err %v\n", err)
+		if mm.ClusterID == nil {
+			fmt.Printf("    NIL mm.ClusterID\n")
+		} else {
+			fmt.Printf("  ClusterID %x\n", mm.ClusterID.Value())
+		}
 		// END
 		mm.DoneCh <- err
 	}()
