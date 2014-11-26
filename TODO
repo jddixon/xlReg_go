@@ -1,5 +1,25 @@
 xlReg_go/TODO
 
+2004-11-26
+    * copy paxos_go/pktComms as xlReg_go/pktComms                       * DONE
+        - later delete this subdir from paxos_go
+
+2004-11-25
+    * move paxos_go/pktComms/bootstrap.go into this package             * DONE
+
+    * on the current host, given (a) regCred.dat describing the xlReg
+        server, (b) the details of the prospective cluster member, 
+        and (c) the cluster name and/or ID, the Bootstrapper contacts
+        the xlReg server, joins the cluster, and saves the node 
+        configuration in LFS/.xlattice/config.
+
+    * create command xlRegJoinAndSave which invokes 
+        NewBootstrapper(), saving the configuration as described
+
+    * create Python script xgJoinAndSave with the same functionality
+    * create Python script xgList which lists (initially) clusters and
+        optionally clusterMembers
+
 2014-11-24
     * need to further improve handling of node acceptors, possibly
         renaming Node.Run() to Node.OpenAcc() and Node.Close() to
