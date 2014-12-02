@@ -77,9 +77,9 @@ func (s *XLSuite) TestSoloMember(c *C) {
 	c.Assert(found, Equals, true)
 
 	// 5.  shut down the client -------------------------------------
-	sc.Close() // should close any acceptors
+	sc.CloseAcc() // should close any acceptors
 
-	// 6.  stop the server by closing its acceptor ------------------
-	es.Close()
+	// 6.  stop the server, closing its acceptor --------------------
+	es.Stop()
 
 }

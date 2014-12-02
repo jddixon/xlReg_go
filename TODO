@@ -2,7 +2,7 @@ xlReg_go/TODO
 
 2004-11-26
     * copy paxos_go/pktComms as xlReg_go/pktComms                       * DONE
-        - later delete this subdir from paxos_go
+        - later delete this subdir from paxos_go                        * DONE
 
 2004-11-25
     * move paxos_go/pktComms/bootstrap.go into this package             * DONE

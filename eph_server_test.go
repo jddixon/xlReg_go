@@ -48,7 +48,7 @@ func (s *XLSuite) TestEphServer(c *C) {
 	// start the ephemeral server -------------------------
 	err = es.Start()
 	c.Assert(err, IsNil)
-	defer es.Close() // stop the server by closing its acceptor
+	defer es.Stop() // stop the server, closing its acceptor
 
 	// DEBUG
 	fmt.Printf("TestEphServer: server acc %s\n", server.GetAcceptor().String())

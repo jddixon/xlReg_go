@@ -53,7 +53,7 @@ func NewAdminClient(
 				ac = &AdminClient{
 					MemberMaker: *cn,
 				}
-				// we do NOT invoke node.Run() on adminClients
+				// we do NOT invoke node.OpenAcc() on adminClients
 			}
 		}
 	}

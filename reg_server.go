@@ -34,7 +34,7 @@ func NewRegServer(reg *Registry, testing bool, verbosity int) (
 	return
 }
 
-func (rs *RegServer) Close() {
+func (rs *RegServer) Stop() {
 	acc := rs.GetAcceptor()
 	if acc != nil {
 		acc.Close()
@@ -47,7 +47,7 @@ func (rs *RegServer) GetAcceptor() xt.AcceptorI {
 // Starts the server running in a goroutine.  Does not block.
 func (rs *RegServer) Start() (err error) {
 
-	err = rs.Run() // opens RegNode's acceptor
+	err = rs.OpenAcc() // opens RegNode's acceptor
 	// DEBUG
 	acc := rs.GetAcceptor()
 	if acc == nil {

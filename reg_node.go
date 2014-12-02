@@ -132,7 +132,7 @@ func ParseRegNodeFromStrings(ss []string) (
 					}
 					if err == nil {
 						// Try to open the acceptor.
-						err = node.Run()
+						err = node.OpenAcc()
 						if err == nil {
 							rn, err = NewRegNode(node, ckPriv, skPriv)
 						}

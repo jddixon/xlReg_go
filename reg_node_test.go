@@ -28,7 +28,7 @@ func (s *XLSuite) TestRegNodeSerialization(c *C) {
 	// This assigns an endPoint in 127.0.0.1 to the node.
 	s.makeALocalEndPoint(c, node)
 	c.Assert(node.SizeEndPoints(), Equals, 1)
-	err := node.Run()
+	err := node.OpenAcc()
 	c.Assert(err, IsNil)
 	c.Assert(node.SizeAcceptors(), Equals, 1)
 	regNode, err := NewRegNode(node, ckPriv, skPriv)
@@ -41,7 +41,7 @@ func (s *XLSuite) TestRegNodeSerialization(c *C) {
 	//for i := 0; i < regNode.SizeAcceptors(); i++ {
 	//	regNode.GetAcceptor(i).Close()
 	//}
-	err = regNode.Close()
+	err = regNode.CloseAcc()
 	c.Assert(err, IsNil)
 
 	// the Node version of this fails if sleep is say 10ms

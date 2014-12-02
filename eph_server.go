@@ -56,7 +56,7 @@ func NewEphServer() (ms *EphServer, err error) {
 		if err == nil {
 			node, err = xn.New(name, id, lfs, ckPriv, skPriv, nil, eps, nil)
 			if err == nil {
-				err = node.Run() // so acceptors are now live
+				err = node.OpenAcc() // so acceptors are now live
 				if err == nil {
 					rn, err = NewRegNode(node, ckPriv, skPriv)
 					if err == nil {
@@ -107,6 +107,6 @@ func (ms *EphServer) GetAcceptor() (acc xt.AcceptorI) {
 	return ms.acc
 }
 
-func (ms *EphServer) Close() {
-	ms.Server.Close()
+func (ms *EphServer) Stop() {
+	ms.Server.Stop()
 }

@@ -3,6 +3,12 @@ xlReg_go/CHANGES
 The version number and date in this file must be kept in sync with version.go
 -----------------------------------------------------------------------------
 
+v1.8.0
+    2014-12-02
+        * rename Eph/RegServer.Close() to Stop()                    SLOC 4044
+v1.7.1
+    2014-11-26
+        * added bootstrap.go from paxos_go/pktComms                 SLOC 4044
 v1.7.0
     2014-11-24
         * improved handling of open/close acceptors

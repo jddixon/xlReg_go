@@ -9,6 +9,6 @@ package reg
 // with each part being one or two digits.  It is converted
 // into a uint32 in in_handler.go init()
 const (
-	VERSION      = "1.7.0"
-	VERSION_DATE = "2014-11-24"
+	VERSION      = "1.8.0"
+	VERSION_DATE = "2014-12-02"
 )

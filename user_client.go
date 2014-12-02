@@ -75,7 +75,7 @@ func (uc *UserMember) Start() {
 	var err error
 
 	mn := &uc.MemberMaker
-	err = mn.Run() // runs the node, opening acceptors
+	err = mn.OpenAcc() // runs the node, opening acceptors
 	if err == nil {
 		go func() {
 			var (
