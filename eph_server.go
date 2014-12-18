@@ -11,6 +11,7 @@ import (
 	xi "github.com/jddixon/xlNodeID_go"
 	xn "github.com/jddixon/xlNode_go"
 	xt "github.com/jddixon/xlTransport_go"
+	xu "github.com/jddixon/xlUtil_go"
 )
 
 var _ = fmt.Print
@@ -39,7 +40,7 @@ func NewEphServer() (ms *EphServer, err error) {
 
 	rng := xr.MakeSimpleRNG()
 	name := rng.NextFileName(16)
-	idBuf := make([]byte, SHA1_LEN)
+	idBuf := make([]byte, xu.SHA1_BIN_LEN)
 	rng.NextBytes(idBuf)
 	lfs := "tmp/" + hex.EncodeToString(idBuf)
 	id, err := xi.New(nil)

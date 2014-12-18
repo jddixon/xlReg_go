@@ -10,6 +10,7 @@ import (
 	xi "github.com/jddixon/xlNodeID_go"
 	xn "github.com/jddixon/xlNode_go"
 	xt "github.com/jddixon/xlTransport_go"
+	xu "github.com/jddixon/xlUtil_go"
 	. "gopkg.in/check.v1"
 	"strings"
 	"testing"
@@ -28,7 +29,7 @@ const (
 )
 
 func (s *XLSuite) makeAnID(c *C, rng *xr.PRNG) (id []byte) {
-	id = make([]byte, SHA1_LEN)
+	id = make([]byte, xu.SHA1_BIN_LEN)
 	rng.NextBytes(id)
 	return
 }

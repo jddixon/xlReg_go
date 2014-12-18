@@ -15,8 +15,6 @@ const (
 
 	MAX_CLUSTER_SIZE = uint32(64) // inclusive
 	MIN_CLUSTER_SIZE = uint32(2)
-
-	SHA1_LEN = 20 // length in bytes of binary hash
 )
 
 // client attrs bits, also used for member attrs
