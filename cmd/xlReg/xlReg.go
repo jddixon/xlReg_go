@@ -1,6 +1,6 @@
 package main
 
-// xlReg_go/cmd/xlReg/xlReg.co
+// xlReg_go/cmd/xlReg/xlReg.go
 
 import (
 	"crypto/rand"
@@ -220,25 +220,40 @@ func setup(opt *reg.RegOptions) (rs *reg.RegServer, err error) {
 				if err == nil {
 					skPriv, err = rsa.GenerateKey(rand.Reader, 2048)
 				}
-			}
-			if err == nil {
-				node, err = xn.New("xlReg", nodeID, opt.Lfs, ckPriv, skPriv,
-					nil, e, nil)
-			}
-			if err == nil {
-				// DEBUG
-				fmt.Printf("node successfully created\n")
-				// END
-				rn, err = reg.NewRegNode(node, ckPriv, skPriv)
-			}
-			if err == nil {
-				// DEBUG
-				fmt.Printf("regNode successfully created\n")
-				// END
-				err = xf.MkdirsToFile(pathToConfigFile, 0700)
 				if err == nil {
-					err = ioutil.WriteFile(pathToConfigFile,
-						[]byte(rn.String()), 0400)
+					node, err = xn.New("xlReg", nodeID, opt.Lfs, ckPriv, skPriv,
+						nil, e, nil)
+					if err == nil {
+						node.OpenAcc() // XXX needs a complementary close
+						if err == nil {
+							// DEBUG
+							fmt.Printf("XLattice node successfully created\n")
+							fmt.Printf("  listening on %s\n", ep.String())
+							// END
+							rn, err = reg.NewRegNode(node, ckPriv, skPriv)
+							if err == nil {
+								// DEBUG
+								fmt.Printf("regNode successfully created\n")
+								// END
+								err = xf.MkdirsToFile(pathToConfigFile, 0700)
+								if err == nil {
+									err = ioutil.WriteFile(pathToConfigFile,
+										[]byte(rn.String()), 0400)
+									// DEBUG
+								} else {
+									fmt.Printf("error writing config file: %v\n",
+										err.Error())
+								}
+								// END --------------
+
+								// DEBUG
+							} else {
+								fmt.Printf("error creating regNode: %v\n",
+									err.Error())
+								// END
+							}
+						}
+					}
 				}
 			}
 		}
@@ -246,7 +261,7 @@ func setup(opt *reg.RegOptions) (rs *reg.RegServer, err error) {
 	if err == nil {
 		var r *reg.Registry
 		r, err = reg.NewRegistry(nil, // nil = clusters so far
-			rn, opt)
+			rn, opt) // regNode, options
 		if err == nil {
 			logger.Printf("Registry name: %s\n", rn.GetName())
 			logger.Printf("         ID:   %s\n", rn.GetNodeID().String())
@@ -266,7 +281,7 @@ func setup(opt *reg.RegOptions) (rs *reg.RegServer, err error) {
 }
 func serve(rs *reg.RegServer) (err error) {
 
-	err = rs.Run() // non-blocking
+	err = rs.Start() // non-blocking
 	if err == nil {
 		<-rs.DoneCh
 	}

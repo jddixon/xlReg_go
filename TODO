@@ -1,6 +1,10 @@
 xlReg_go/TODO
 
-2004-11-26
+2014-12-27
+    * xlReg around line 227 calls Node.OpenAcc(), CloseAcc nees to 
+        be called
+
+2014-11-26
     * copy paxos_go/pktComms as xlReg_go/pktComms                       * DONE
         - later delete this subdir from paxos_go                        * DONE
 
