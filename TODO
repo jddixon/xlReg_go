@@ -3,6 +3,8 @@ xlReg_go/TODO
 2014-12-27
     * xlReg around line 227 calls Node.OpenAcc(), CloseAcc nees to 
         be called
+    * need a tool which verifies that the regCred.dat embedded in
+        http://jddixon.github.com/xlreg_c/ is valid
 
 2014-11-26
     * copy paxos_go/pktComms as xlReg_go/pktComms                       * DONE

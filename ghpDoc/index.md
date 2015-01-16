@@ -1,4 +1,4 @@
-# xlReg_go
+<h1 class="libTop">xlReg_go</h1>
 
 The reg library for xlattice_go.
 

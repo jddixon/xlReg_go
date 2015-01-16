@@ -1,11 +1,12 @@
-# xlReg_go
+xlReg_go
+========
 
 The reg library for xlattice_go.
 
-xlReg is a tool, primarily intended for use in testing,
+[xlReg](xlReg.html) is a tool, primarily intended for use in testing,
 which facilitates the formation of clusters, groups of cooperating nodes.
 
-On registration, a cluster member
+On registration, a client (cluster member)
 is issued a globally unique NodeID, a 256-bit random value.
 Once it has an ID, the member can create and/or join clusters.  
 
@@ -24,7 +25,6 @@ the configuration data other members have registered.
 The xlReg server, its clients, and the cluster members, are all
 XLattice [nodes](https://jddixon.github.io/xlattice_go/node.html).
 
-
 ## On-line Documentation
-
-More information on the **xlReg_go** project can be found [here](https://jddixon.github.io/xlReg_go)
+More information on the **xlReg_go** project can be found 
+[here](https://jddixon.github.io/xlReg_go)
