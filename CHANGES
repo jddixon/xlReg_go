@@ -3,6 +3,9 @@ xlReg_go/CHANGES
 The version number and date in this file must be kept in sync with version.go
 -----------------------------------------------------------------------------
 
+v1.8.3
+    2015-04-09
+        * add portlangRegCred_test.go                               SLOC 4124
 v1.8.2
     2014-12-27
         * correct bug in xlReg.go (OpenAcc() not called)            SLOC 4055

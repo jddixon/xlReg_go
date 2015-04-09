@@ -1,7 +1,20 @@
 xlReg_go/TODO
 
+2015-04-08
+    * regCred.dat on remote servers must report the public IP address
+        of the server OR its fully qualified domain name
+
+    * XXX FIX PANIC: portlandRegCred_test.go, data in file junk
+
+2015-03-28
+    * xlreg.xlattice.org resolves to www.xlattice.org (= portland)      * OK
+    * nobody's listening at http://54.186.197.123:56789                 * FIXED
+        - after fix telnet 56789 still returns Connection refused
+    * need test program to verify that xlReg is running on Portland
+        and regCred.dat data is correct
+
 2014-12-27
-    * xlReg around line 227 calls Node.OpenAcc(), CloseAcc nees to 
+    * xlReg around line 227 calls Node.OpenAcc(), CloseAcc needs to 
         be called
     * need a tool which verifies that the regCred.dat embedded in
         http://jddixon.github.com/xlreg_c/ is valid

@@ -1,0 +1,12 @@
+regCred {
+    Name: xlReg
+    ID: 9cf517be9bcaaeb794a7530dd34ae873651c41b4
+    CommsPubKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDfxYMpgUX1/QH5nLN5I8gW9xewU4NFOGEOlsiFKU2R/NbmiyVOl2UyfuSFmZLauT3hJh9PsVyrHkfyiSJrd9k4Wjy3UKi3hZY7AIuHBLdbIrdOQiDTkkrfIv80ogjpMFsSivY4NTYrsPtXihi+E2iZlabv3m3PqKycjXDU/PZEAw+W6fsg1GCJTbGWtDoNQk6hbMS3UhOxL1G/WWB1V9lYXflLsv+Oym5/y1mUR4B7N2Uey1J5XQuIfXpJaM/+qNy2X1fB6575iJzvES791OszI3cvBFNReySbR/SUJqcFIZAbtj4swnoAFkyQ0zlN1Ok6Iacp5bTq8upYi3TyZcPr
+
+    SigPubKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCzouB3y/p7VdnJ66p4NLZa5Z4IyPtMryEp3URPlUC25LuzT2b/utrMvTX4fAXnuPF/v/qhQKm0LOOW+YnEk1vwN0HsEvD/9D8qYkBBIv636w4k2k+O4Lt1rQ32t22AbEHOjIZtVdfoZm9/ypd8ogchkr7yH/Na6FE0UySh0dJDf9HlYcfjYy1IkkAgGlWmCX61LJ4Wgw00QkkuztlVUnRjEW9MIohgVcFx/+gF/shtmy0rCGYpLszdMlGGaGCzXO1PK3BVLaZPKfcafUzfksif+vWqEQ0KnmjtV5it0wEa89IebAEW7cS1rvyRH2Y8/gie5CkgwHve/hgThY3KSUih
+
+    EndPoints {
+         TcpEndPoint: 54.186.197.123:56789
+    }
+    Version: 1.8.2
+}

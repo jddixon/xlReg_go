@@ -64,7 +64,11 @@ func (sc *SoloMember) Start() {
 		)
 		cnx, version2, err := cn.SessionSetup(version1)
 		_ = version2 // not yet used
-		defer cnx.Close()
+		defer func() {
+			if cnx != nil {
+				cnx.Close()
+			}
+		}()
 		if err == nil {
 			err = cn.MemberAndOK()
 			if err == nil {
