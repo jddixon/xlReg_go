@@ -25,21 +25,24 @@ func Usage() {
 }
 
 const (
-	DEFAULT_ADDR      = "127.0.0.1"
-	DEFAULT_NAME      = "xlReg"
-	DEFAULT_LFS       = "/var/app/xlReg"
-	TEST_DEFAULT_PORT = 45678 // for the registry, not clients
-	DEFAULT_PORT      = 56789 // for the registry, not clients
+	DEFAULT_ADDR        = "0.0.0.0" // listen on all interfaces
+	DEFAULT_GLOBAL_ADDR = "54.186.197.123"
+	DEFAULT_NAME        = "xlReg"
+	DEFAULT_LFS         = "/var/app/xlReg"
+	TEST_DEFAULT_PORT   = 45678 // for the registry, not clients
+	DEFAULT_PORT        = 56789 // for the registry, not clients
 )
 
 var (
 	// these need to be referenced as pointers
 	address = flag.String("a", DEFAULT_ADDR,
-		"registry IP address")
+		"registry IP address (dotted quad)")
 	clearFilter = flag.Bool("c", false,
 		"clear Bloom filer at beginning of run")
 	ephemeral = flag.Bool("e", false,
 		"server is ephemeral, does not persist data")
+	globalAddress = flag.String("g", DEFAULT_GLOBAL_ADDR,
+		"registry global IP address (dotted quad)")
 	justShow = flag.Bool("j", false,
 		"display option settings and exit")
 	k = flag.Uint("k", reg.DEFAULT_K,
@@ -87,20 +90,35 @@ func main() {
 		} else {
 			*lfs = path.Join("tmp", *lfs)
 		}
+		if *address == DEFAULT_ADDR {
+			*address = "127.0.0.1"
+		}
+		if *globalAddress == DEFAULT_GLOBAL_ADDR {
+			*globalAddress = "127.0.0.1"
+		}
 		if *port == DEFAULT_PORT || *port == 0 {
 			*port = TEST_DEFAULT_PORT
 		}
 	}
-	addrAndPort := fmt.Sprintf("%s:%d", *address, *port)
 	var backingFile string
 	if !*ephemeral {
 		backingFile = path.Join(*lfs, "idFilter.dat")
 	}
+	addrAndPort := fmt.Sprintf("%s:%d", *address, *port)
 	endPoint, err := xt.NewTcpEndPoint(addrAndPort)
 	if err != nil {
 		fmt.Printf("not a valid endPoint: %s\n", addrAndPort)
-		// XXX STUB XXX
+		Usage()
+		os.Exit(-1)
 	}
+	globalAddrAndPort := fmt.Sprintf("%s:%d", *globalAddress, *port)
+	globalEndPoint, err := xt.NewTcpEndPoint(globalAddrAndPort)
+	if err != nil {
+		fmt.Printf("not a valid endPoint: %s\n", globalAddrAndPort)
+		Usage()
+		os.Exit(-1)
+	}
+
 	// SANITY CHECKS ////////////////////////////////////////////////
 	if err == nil {
 		if *m < 2 {
@@ -118,20 +136,22 @@ func main() {
 	}
 	// DISPLAY STUFF ////////////////////////////////////////////////
 	if *verbose || *justShow {
-		fmt.Printf("address      = %v\n", *address)
-		fmt.Printf("backingFile  = %v\n", backingFile)
-		fmt.Printf("clearFilter  = %v\n", *clearFilter)
-		fmt.Printf("endPoint     = %v\n", endPoint)
-		fmt.Printf("ephemeral    = %v\n", *ephemeral)
-		fmt.Printf("justShow     = %v\n", *justShow)
-		fmt.Printf("k            = %d\n", *k)
-		fmt.Printf("lfs          = %s\n", *lfs)
-		fmt.Printf("logFile      = %s\n", *logFile)
-		fmt.Printf("m            = %d\n", *m)
-		fmt.Printf("name         = %s\n", *name)
-		fmt.Printf("port         = %d\n", *port)
-		fmt.Printf("testing      = %v\n", *testing)
-		fmt.Printf("verbose      = %v\n", *verbose)
+		fmt.Printf("address          = %v\n", *address)
+		fmt.Printf("backingFile      = %v\n", backingFile)
+		fmt.Printf("clearFilter      = %v\n", *clearFilter)
+		fmt.Printf("endPoint         = %v\n", endPoint)
+		fmt.Printf("ephemeral        = %v\n", *ephemeral)
+		fmt.Printf("globalAddress    = %v\n", *globalAddress)
+		fmt.Printf("globalEndPoint   = %v\n", *globalEndPoint)
+		fmt.Printf("justShow         = %v\n", *justShow)
+		fmt.Printf("k                = %d\n", *k)
+		fmt.Printf("lfs              = %s\n", *lfs)
+		fmt.Printf("logFile          = %s\n", *logFile)
+		fmt.Printf("m                = %d\n", *m)
+		fmt.Printf("name             = %s\n", *name)
+		fmt.Printf("port             = %d\n", *port)
+		fmt.Printf("testing          = %v\n", *testing)
+		fmt.Printf("verbose          = %v\n", *verbose)
 	}
 	if *justShow {
 		return
@@ -157,6 +177,7 @@ func main() {
 		opt.BackingFile = backingFile
 		opt.ClearFilter = *clearFilter
 		opt.Ephemeral = *ephemeral
+		opt.GlobalEndPoint = globalEndPoint
 		opt.K = uint(*k)
 		opt.Lfs = *lfs
 		opt.Logger = logger

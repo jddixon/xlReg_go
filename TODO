@@ -1,10 +1,30 @@
 xlReg_go/TODO
 
+2015-04-10
+    * FIX: registry_test.go is empty !
+    * add notion of GlobalAddress and so GlobalEndPoint for use with	* DONE
+        eg servers on the Amazon EC2 cloud, which have local addresses	* DONE
+        in private address space (192.168/16) and global addresses		* DONE
+        which are not otherwise known to the server		                * DONE
+
+2015-04-09
+    * portlandRegCred_test reports no errors but there is no evidence
+        that it succeeds: in particular there is no corresponing entry
+        in the log on Portland (=xlreg.xlattice.org) 
+    * this makes questionable the results of solo_client_test.go
+
+    * to listen on all interfaces, the server should use 0.0.0.0:56789
+    * CRITICAL ERROR: started server (xlReg) with -a 0.0.0.0 but 
+        TcpAcceptor is 127.0.0.1:56789
+    * if eph_server_test is set to run on 0.0.0.0:56789, it displays    * FIXED
+        the address as [::] and then panics in                          * FIXED
+        xlTransport_go/v4_address.go:100                                * FIXED
+
 2015-04-08
     * regCred.dat on remote servers must report the public IP address
         of the server OR its fully qualified domain name
 
-    * XXX FIX PANIC: portlandRegCred_test.go, data in file junk
+    * XXX FIX PANIC: portlandRegCred_test.go, data in file junk         * DONE
 
 2015-03-28
     * xlreg.xlattice.org resolves to www.xlattice.org (= portland)      * OK

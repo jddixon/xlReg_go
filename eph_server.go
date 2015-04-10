@@ -73,6 +73,7 @@ func NewEphServer() (ms *EphServer, err error) {
 						opt := &RegOptions{
 							EndPoint:  ep, // not used
 							Ephemeral: true,
+							GlobalEndPoint: node.GetEndPoint(0),
 							Lfs:       lfs, // redundant (is in node's BaseNode)
 							Logger:    nil,
 							K:         DEFAULT_K,

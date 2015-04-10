@@ -28,10 +28,10 @@ type Registry struct {
 	Logger  *log.Logger // volatile, not serialized
 
 	// registry data
-	m, k     uint          // serialized
-	Clusters []*RegCluster // serialized
-
-	idFilter xf.BloomSHAI
+	m, k           uint          // serialized
+	Clusters       []*RegCluster // serialized
+	GlobalEndPoint xt.EndPointI  // gets written to regCred
+	idFilter       xf.BloomSHAI
 
 	ClustersByName map[string]*RegCluster // volatile, not serialized
 	ClustersByID   ha.HAMT                // -ditto-
@@ -72,13 +72,21 @@ func NewRegistry(clusters []*RegCluster,
 		if logger == nil {
 			logger = log.New(os.Stderr, "", log.Ldate|log.Ltime)
 		}
+		testing := opt.Testing
+		// DEBUG
+		if testing {
+			logger.Printf("testing and globalEndPoint = %s\n", opt.GlobalEndPoint)
+		}
+		// END
 		reg = &Registry{
 			idFilter:       idFilter,
 			Clusters:       clusters,
+			GlobalEndPoint: opt.GlobalEndPoint, // written to regCred
 			ClustersByName: make(map[string]*RegCluster),
 			ClustersByID:   m,
-			Logger:         logger,
-			RegNode:        *rn,
+
+			Logger:  logger,
+			RegNode: *rn,
 		}
 		if clusters != nil {
 			// XXX need to populate the indexes here
@@ -86,21 +94,26 @@ func NewRegistry(clusters []*RegCluster,
 		myLFS := rn.GetLFS()
 		if myLFS != "" {
 			var ep []xt.EndPointI
-			for i := 0; i < rn.SizeEndPoints(); i++ {
-				ep = append(ep, rn.GetEndPoint(i))
+			// list of endpoints for regCred
+			//for i := 0; i < rn.SizeEndPoints(); i++ {
+			//	ep = append(ep, rn.GetEndPoint(i))
+			//}
+			// XXX err should never be nil here
+			if err == nil {
+				ep = append(ep, opt.GlobalEndPoint)
+				regCred := &RegCred{
+					Name:        rn.GetName(),
+					ID:          rn.GetNodeID(),
+					CommsPubKey: rn.GetCommsPublicKey(),
+					SigPubKey:   rn.GetSigPublicKey(),
+					EndPoints:   ep,
+					Version:     serverVersion,
+				}
+				serialized := regCred.String() // shd have terminating CRLF
+				logger.Print(serialized)
+				pathToFile := filepath.Join(myLFS, "regCred.dat")
+				err = ioutil.WriteFile(pathToFile, []byte(serialized), 0644)
 			}
-			regCred := &RegCred{
-				Name:        rn.GetName(),
-				ID:          rn.GetNodeID(),
-				CommsPubKey: rn.GetCommsPublicKey(),
-				SigPubKey:   rn.GetSigPublicKey(),
-				EndPoints:   ep,
-				Version:     serverVersion,
-			}
-			serialized := regCred.String() // shd have terminating CRLF
-			logger.Print(serialized)
-			pathToFile := filepath.Join(myLFS, "regCred.dat")
-			err = ioutil.WriteFile(pathToFile, []byte(serialized), 0644)
 		}
 	}
 	if err == nil {

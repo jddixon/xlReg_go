@@ -15,7 +15,6 @@ import (
 	"path"
 )
 
-
 func (s *XLSuite) TestPortlandRegCred(c *C) {
 	if VERBOSITY > 0 {
 		fmt.Println("\nTEST_PORTLAND_REG_CRED")
@@ -28,7 +27,7 @@ func (s *XLSuite) TestPortlandRegCred(c *C) {
 	c.Assert(err, IsNil)
 	rc, err := ParseRegCred(string(rcData))
 	c.Assert(err, IsNil)
-	c.Assert(rc,  NotNil)
+	c.Assert(rc, NotNil)
 
 	// DEBUG
 	fmt.Println("portlandRegCred_test PORTLAND - A PUZZLE")
@@ -59,21 +58,21 @@ func (s *XLSuite) TestPortlandRegCred(c *C) {
 
 	// DEBUG
 	fmt.Printf("Portland client is at %v; lfs is %s\n",
-		e, lfs)	
+		e, lfs)
 	// END
 
 	// set up its relationship to the server ------------------------
 	serverName := rc.Name
-	serverID   := rc.ID
-	serverEnd  := rc.EndPoints
+	serverID := rc.ID
+	serverEnd := rc.EndPoints
 	c.Assert(serverEnd, NotNil)
 	c.Assert(len(serverEnd) > 0, Equals, true)
 	c.Assert(serverEnd[0], NotNil)
 	// XXX TOO RIGID
 	c.Assert(serverEnd[0].String(), Equals, "TcpEndPoint: 54.186.197.123:56789")
 	// END
-	serverCK   := rc.CommsPubKey
-	serverSK   := rc.SigPubKey
+	serverCK := rc.CommsPubKey
+	serverSK := rc.SigPubKey
 
 	sc, err := NewSoloMember(node, serverName, serverID, serverEnd[0],
 		serverCK, serverSK, e)
@@ -82,7 +81,7 @@ func (s *XLSuite) TestPortlandRegCred(c *C) {
 
 	// DEBUG
 	fmt.Println("SoloMember CREATED")
-	
+
 	// END
 
 	// 3. run the client
