@@ -1,5 +1,27 @@
 xlReg_go/TODO
 
+2015-04-17 (edited from -16)
+    * change code to agree with current xlProtocol/aes_cnx/helloAndReply 
+        specifically to remove iv1 and iv2 from various data structures
+        and argument lists; IVs should be generated locally as needed
+        - in_handler.handleHello
+        - MemberNode.SessionSetup
+2015-04-15
+    * xlReg on Portland needs to log all accesses
+    * xlReg needs to have a default timeout on all sessions
+        - and all timeouts need to be logged
+    * if -v option set, all interactions with the outside world 
+        must be logged
+
+2015-04-11
+    * gh-pages site needs link to plain-text version of regCred.dat 
+        for portland = xlreg.xlattice.org
+        - so can update regCred.dat without updating index.html
+
+2015-04-11 (edited from 2014-12-27)
+    * need a tool which verifies that the regCred.dat embedded in
+        http://jddixon.github.io/xlreg_c/ is valid
+
 2015-04-10
     * FIX: registry_test.go is empty !
     * add notion of GlobalAddress and so GlobalEndPoint for use with	* DONE
@@ -8,42 +30,39 @@ xlReg_go/TODO
         which are not otherwise known to the server		                * DONE
 
 2015-04-09
-    * portlandRegCred_test reports no errors but there is no evidence
-        that it succeeds: in particular there is no corresponing entry
-        in the log on Portland (=xlreg.xlattice.org) 
-    * this makes questionable the results of solo_client_test.go
+    * portlandRegCred_test reports no errors but there is no evidence   * OK
+        that it succeeds: in particular there is no corresponing entry  * OK
+        in the log on Portland (=xlreg.xlattice.org)                    * OK
+    * this makes questionable the results of solo_client_test.go        * FALSE
 
-    * to listen on all interfaces, the server should use 0.0.0.0:56789
-    * CRITICAL ERROR: started server (xlReg) with -a 0.0.0.0 but 
-        TcpAcceptor is 127.0.0.1:56789
+    * to listen on all interfaces, the server should use 0.0.0.0:56789  * DONE
+    * CRITICAL ERROR: started server (xlReg) with -a 0.0.0.0 but        * FIXED
+        TcpAcceptor is 127.0.0.1:56789                                  * FIXED
     * if eph_server_test is set to run on 0.0.0.0:56789, it displays    * FIXED
         the address as [::] and then panics in                          * FIXED
         xlTransport_go/v4_address.go:100                                * FIXED
 
 2015-04-08
-    * regCred.dat on remote servers must report the public IP address
-        of the server OR its fully qualified domain name
-
+    * regCred.dat on remote servers must report the public IP address   * DONE
+        of the server OR its fully qualified domain name                * DONE
     * XXX FIX PANIC: portlandRegCred_test.go, data in file junk         * DONE
 
 2015-03-28
     * xlreg.xlattice.org resolves to www.xlattice.org (= portland)      * OK
     * nobody's listening at http://54.186.197.123:56789                 * FIXED
-        - after fix telnet 56789 still returns Connection refused
-    * need test program to verify that xlReg is running on Portland
-        and regCred.dat data is correct
+        - after fix telnet 56789 still returns Connection refused       * FIXED
+    * need test program to verify that xlReg is running on Portland     * FIXED
+        and regCred.dat data is correct                                 * FIXED
 
 2014-12-27
-    * xlReg around line 227 calls Node.OpenAcc(), CloseAcc needs to 
+    * xlReg around line 248 calls Node.OpenAcc(), CloseAcc needs to 
         be called
-    * need a tool which verifies that the regCred.dat embedded in
-        http://jddixon.github.com/xlreg_c/ is valid
 
 2014-11-26
     * copy paxos_go/pktComms as xlReg_go/pktComms                       * DONE
         - later delete this subdir from paxos_go                        * DONE
 
-2004-11-25
+2014-11-25
     * move paxos_go/pktComms/bootstrap.go into this package             * DONE
 
     * on the current host, given (a) regCred.dat describing the xlReg

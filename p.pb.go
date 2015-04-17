@@ -13,7 +13,7 @@ It has these top-level messages:
 */
 package reg
 
-import proto "code.google.com/p/goprotobuf/proto"
+import proto "github.com/golang/protobuf/proto"
 import math "math"
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -92,7 +92,6 @@ func (x *XLRegMsg_Tag) UnmarshalJSON(data []byte) error {
 
 type XLRegMsg struct {
 	Op               *XLRegMsg_Tag     `protobuf:"varint,1,opt,enum=reg.XLRegMsg_Tag" json:"Op,omitempty"`
-	AesIV            []byte            `protobuf:"bytes,2,opt" json:"AesIV,omitempty"`
 	AesKey           []byte            `protobuf:"bytes,3,opt" json:"AesKey,omitempty"`
 	Salt1            []byte            `protobuf:"bytes,4,opt" json:"Salt1,omitempty"`
 	Salt2            []byte            `protobuf:"bytes,5,opt" json:"Salt2,omitempty"`
@@ -122,13 +121,6 @@ func (m *XLRegMsg) GetOp() XLRegMsg_Tag {
 		return *m.Op
 	}
 	return XLRegMsg_RegCredRequest
-}
-
-func (m *XLRegMsg) GetAesIV() []byte {
-	if m != nil {
-		return m.AesIV
-	}
-	return nil
 }
 
 func (m *XLRegMsg) GetAesKey() []byte {

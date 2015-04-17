@@ -12,6 +12,7 @@ import (
 	"crypto/sha1"
 	"encoding/binary"
 	"fmt"
+	xr "github.com/jddixon/rnglib_go"
 	xcl "github.com/jddixon/xlCluster_go"
 	xc "github.com/jddixon/xlCrypto_go"
 	xi "github.com/jddixon/xlNodeID_go"
@@ -246,25 +247,25 @@ func (mm *MemberMaker) writeMsg(m *XLRegMsg) (err error) {
 func (mm *MemberMaker) SessionSetup(proposedVersion uint32) (
 	cnx *xt.TcpConnection, decidedVersion uint32, err error) {
 	var (
-		ciphertext1, iv1, key1, salt1, salt1c []byte
-		ciphertext2, iv2, key2, salt2         []byte
+		ciphertext1, key1, salt1, salt1c []byte
+		ciphertext2, key2, salt2         []byte
 	)
 	// Set up connection to server. ---------------------------------
 	ctor := mm.RegPeer.GetConnector(0)
 	// DEBUG
-	fmt.Printf("SessionSetup: ctor is %s\n", ctor.String())
+	fmt.Printf("        SessionSetup: ctor is %s\n", ctor.String())
 	// END
 	var conn xt.ConnectionI
 	conn, err = ctor.Connect(nil)
 	if err == nil {
 		cnx = conn.(*xt.TcpConnection)
 		// DEBUG
-		fmt.Printf("              cnx is %s\n", cnx.String())
+		fmt.Printf("        SessionSetup: cnx is %s\n", cnx.String())
 		// END
 		// Send HELLO -----------------------------------------------
 		mm.Cnx = cnx
 		ck := mm.RegPeer.GetCommsPublicKey()
-		ciphertext1, iv1, key1, salt1,
+		ciphertext1, key1, salt1,
 			err = xa.ClientEncodeHello(proposedVersion, ck)
 		if err == nil {
 			err = mm.WriteData(ciphertext1)
@@ -272,20 +273,23 @@ func (mm *MemberMaker) SessionSetup(proposedVersion uint32) (
 			if err == nil {
 				ciphertext2, err = mm.ReadData()
 				if err == nil {
-					iv2, key2, salt2, salt1c, decidedVersion,
-						err = xa.ClientDecodeHelloReply(ciphertext2, iv1, key1)
+					key2, salt2, salt1c, decidedVersion,
+						err = xa.ClientDecodeHelloReply(ciphertext2, key1)
 					_ = salt1c // XXX
 					// Set up AES engines ---------------------------
 					if err == nil {
 						mm.salt1 = salt1
-						mm.iv2 = iv2
 						mm.key2 = key2
 						mm.salt2 = salt2
 						mm.regProtoVersion = decidedVersion
 						mm.engine, err = aes.NewCipher(key2)
 						if err == nil {
-							mm.encrypter = cipher.NewCBCEncrypter(mm.engine, iv2)
-							mm.decrypter = cipher.NewCBCDecrypter(mm.engine, iv2)
+							// XXX should there be distinct IVs ?
+							rng := xr.MakeSystemRNG()
+							iv := make([]byte, aes.BlockSize)
+							rng.NextBytes(iv)
+							mm.encrypter = cipher.NewCBCEncrypter(mm.engine, iv)
+							mm.decrypter = cipher.NewCBCDecrypter(mm.engine, iv)
 						}
 					}
 				}
@@ -317,6 +321,9 @@ func (mm *MemberMaker) MemberAndOK() (err error) {
 	skPriv := node.GetSigPrivateKey()
 
 	// Send MEMBER MSG ==========================================
+	// DEBUF
+	fmt.Println("MemberMaker: have node info")
+	// END
 	aBytes := make([]byte, 8)
 	binary.LittleEndian.PutUint64(aBytes, mm.ProposedAttrs)
 	ckBytes, err = xc.RSAPubKeyToWire(&ckPriv.PublicKey)
@@ -343,6 +350,9 @@ func (mm *MemberMaker) MemberAndOK() (err error) {
 			// calculate digital signature
 			digSig, err = rsa.SignPKCS1v15(rand.Reader, skPriv,
 				crypto.SHA1, hash)
+			// DEBUF
+			fmt.Printf("    MM: digSig added; error = %v\n", err)
+			// END
 		}
 	}
 	if err == nil {
@@ -364,6 +374,9 @@ func (mm *MemberMaker) MemberAndOK() (err error) {
 		}
 		// SHOULD CHECK FOR TIMEOUT
 		err = mm.writeMsg(request)
+		// DEBUF
+		fmt.Printf("    MM: Member msg written; error = %v\n", err)
+		// END
 	}
 	// Process CLIENT_OK --------------------------------------------
 	// SHOULD CHECK FOR TIMEOUT
@@ -376,6 +389,9 @@ func (mm *MemberMaker) MemberAndOK() (err error) {
 
 		mm.Attrs = response.GetMemberAttrs()
 	}
+	// DEBUF
+	fmt.Printf("    MM: response received; error = %v\n", err)
+	// END
 	return
 }
 

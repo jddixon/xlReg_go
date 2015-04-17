@@ -114,7 +114,7 @@ func op2tag(op XLRegMsg_Tag) int {
 
 // Given a handler associating an open new connection with a registry,
 // process a hello message for this node, which creates a session.
-// The hello message contains an AES Key+IV, a salt, and a requested
+// The hello message contains an AES Key, a salt, and a requested
 // protocol version. The salt must be at least eight bytes long.
 
 func (h *InHandler) Start() (err error) {
@@ -125,12 +125,12 @@ func (h *InHandler) Start() (err error) {
 		}
 	}()
 
-	// This adds an AES iv2 and key2 to the handler.
+	// This adds an AES key2 to the handler.
 	err = handleHello(h)
 	if err != nil {
 		return
 	}
-	// Given iv2, key2 create encrypt and decrypt engines.
+	// Given key2 create encrypt and decrypt engines.
 	aPtr := &h.AesCnxHandler
 	err = aPtr.SetupSessionKey()
 	if err != nil {
@@ -219,29 +219,27 @@ func (h *InHandler) Start() (err error) {
 
 func handleHello(h *InHandler) (err error) {
 	var (
-		ciphertext, iv1, key1, salt1 []byte
-		version1                     uint32
+		ciphertext, key1, salt1 []byte
+		version1                uint32
 	)
 	rn := &h.reg.RegNode
 	ciphertext, err = h.ReadData()
 	if err == nil {
-		iv1, key1, salt1, version1,
+		key1, salt1, version1,
 			err = xa.ServerDecodeHello(ciphertext, rn.ckPriv)
 		_ = version1 // ignore whatever version they propose
 	}
 	if err == nil {
 		version2 := serverVersion
-		iv2, key2, salt2, ciphertextOut, err := xa.ServerEncodeHelloReply(
-			iv1, key1, salt1, uint32(version2))
+		key2, salt2, ciphertextOut, err := xa.ServerEncodeHelloReply(
+			key1, salt1, uint32(version2))
 		if err == nil {
 			err = h.WriteData(ciphertextOut)
 		}
 		if err == nil {
 			h.version = uint32(version2)
 
-			h.iv1 = iv1
 			h.key1 = key1
-			h.iv2 = iv2
 			h.key2 = key2
 			h.salt1 = salt1
 			h.salt2 = salt2

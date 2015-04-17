@@ -8,6 +8,7 @@ import (
 	xi "github.com/jddixon/xlNodeID_go"
 	xn "github.com/jddixon/xlNode_go"
 	xt "github.com/jddixon/xlTransport_go"
+	"os"
 )
 
 var _ = fmt.Print
@@ -59,6 +60,13 @@ func (sc *SoloMember) Start() {
 	cn := &sc.MemberMaker
 
 	go func() {
+		// DEBUG
+		fo, err := os.Create("junk.soloClient.log")
+		if err != nil {
+			panic(err)
+		}
+		defer fo.Close()
+		// END
 		var (
 			version1 uint32
 		)
@@ -69,18 +77,45 @@ func (sc *SoloMember) Start() {
 				cnx.Close()
 			}
 		}()
+		// DEBUG
+		if err != nil {
+			fo.WriteString(fmt.Sprintf("err fromSessionSetup is %s\n",
+				err.Error()))
+		}
+		fo.WriteString(fmt.Sprintf("lfs is %s\n", cn.GetLFS())) // DEBUG
+		// END
+
 		if err == nil {
 			err = cn.MemberAndOK()
+			// DEBUG
+			fo.WriteString("MemberAndOK done\n")
+			if err != nil {
+				fo.WriteString(fmt.Sprintf("  err was %s\n", err))
+			}
+			// END
 			if err == nil {
 				err = cn.ByeAndAck()
+				// DEBUG
+				fo.WriteString("ByeAndAck done\n")
+				if err != nil {
+					fo.WriteString(fmt.Sprintf("  err was %s\n", err))
+				}
+				// END
 				// END OF RUN =======================================
 				if err == nil {
-					// Write configuration to // the usual place in the
+					// WriteString configuration to // the usual place in the
 					// file system:   LFS/.xlattice/node.config.
 					err = cn.PersistNode()
+					// DEBUG
+					fo.WriteString("Node persisted\n")
+					if err != nil {
+						fo.WriteString(fmt.Sprintf("  err was %s\n", err))
+					}
+					// END
 				}
 			}
 		}
+		fo.Sync() // DEBUG
 		cn.DoneCh <- err
 	}()
 }

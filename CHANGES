@@ -3,6 +3,9 @@ xlReg_go/CHANGES
 The version number and date in this file must be kept in sync with version.go
 -----------------------------------------------------------------------------
 
+v1.9.0
+    2015-04-17
+        * change handling of IV to follow xlProtocol/aes_cnx        SLOC 3924
 v1.8.4
     2015-04-10
         * add -g globalAddr option, IP address to appear in 

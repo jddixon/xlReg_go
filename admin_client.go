@@ -38,7 +38,7 @@ func NewAdminClient(
 
 	nodeID, err := xi.New(nil)
 	// DEBUG
-	fmt.Printf("    admin ID %x\n", nodeID.Value())
+	fmt.Printf("NewAdminClient: admin ID %x\n", nodeID.Value())
 	// END
 	if err == nil {
 		node, err := xn.NewNew("admin", nodeID, "") // name, id, lfs
@@ -54,6 +54,9 @@ func NewAdminClient(
 					MemberMaker: *cn,
 				}
 				// we do NOT invoke node.OpenAcc() on adminClients
+				// DEBUG
+				fmt.Println("   NewAdminClient: OK exit")
+				// END
 			}
 		}
 	}
@@ -69,6 +72,10 @@ func NewAdminClient(
 
 func (ac *AdminClient) Start() {
 
+	// DEBUG
+	fmt.Printf("AdminClient.Start\n")
+	// END
+
 	mm := &ac.MemberMaker
 
 	go func() {
@@ -78,17 +85,17 @@ func (ac *AdminClient) Start() {
 		cnx, version2, err := mm.SessionSetup(version1)
 		_ = version2 // not yet used
 		// DEBUG
-		fmt.Printf("  after SessionSetup err is %v\n", err)
+		fmt.Printf("  AC.S: after SessionSetup err is %v\n", err)
 		// END
 		if err == nil {
 			err = mm.MemberAndOK()
 			// DEBUG
-			fmt.Printf("  after MemberAndOK err is %v\n", err)
+			fmt.Printf("  AC.S: after MemberAndOK err is %v\n", err)
 			// END
 			if err == nil {
 				err = mm.CreateAndReply()
 				// DEBUG
-				fmt.Printf("  after CreateAndReply err is %v\n", err)
+				fmt.Printf("  AC.S: after CreateAndReply err is %v\n", err)
 				// END
 				if err == nil {
 					err = mm.ByeAndAck()
@@ -100,7 +107,7 @@ func (ac *AdminClient) Start() {
 			cnx.Close()
 		}
 		// DEBUG
-		fmt.Printf("AdminClient.Start() : exiting; err %v\n", err)
+		fmt.Printf("    AC.S: exiting; err %v\n", err)
 		if mm.ClusterID == nil {
 			fmt.Printf("    NIL mm.ClusterID\n")
 		} else {

@@ -16,6 +16,7 @@ import (
 	"code.google.com/p/goprotobuf/proto"
 	"crypto/aes"
 	"crypto/cipher"
+	xr "github.com/jddixon/rnglib_go"
 	xc "github.com/jddixon/xlCrypto_go"
 	xt "github.com/jddixon/xlTransport_go"
 )
@@ -30,14 +31,17 @@ type AesCnxHandler struct {
 	engine                             cipher.Block
 	encrypter                          cipher.BlockMode
 	decrypter                          cipher.BlockMode
-	iv1, key1, iv2, key2, salt1, salt2 []byte
+	key1, key2, salt1, salt2 []byte
 }
 
 func (a *AesCnxHandler) SetupSessionKey() (err error) {
 	a.engine, err = aes.NewCipher(a.key2)
 	if err == nil {
-		a.encrypter = cipher.NewCBCEncrypter(a.engine, a.iv2)
-		a.decrypter = cipher.NewCBCDecrypter(a.engine, a.iv2)
+		rng := xr.MakeSystemRNG()
+		iv := make([]byte, aes.BlockSize)
+		rng.NextBytes(iv)
+		a.encrypter = cipher.NewCBCEncrypter(a.engine, iv)
+		a.decrypter = cipher.NewCBCDecrypter(a.engine, iv)
 	}
 	return
 }
