@@ -1,14 +1,13 @@
 xlReg_go/TODO
 
 2015-04-22
-    * write aes_cnx_test.go
+    * write aes_cnx_test.go                                             * DONE
         - notion of session key should be retained
         - need per-message encrypters and decrypters
             * these should not reside in the data structure
     * either rename aes_cnx.go or merge its functionality into
         xlProtocol/aes_cnx
         - both having the same name is confusion
-    * XXX we get 'incorrectly padded data' in aes_cnx_test, line 83
 
 2015-04-17 (edited from -16)
     * change code to agree with current xlProtocol/aes_cnx/helloAndReply* DONE

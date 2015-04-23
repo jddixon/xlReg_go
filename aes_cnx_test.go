@@ -12,92 +12,128 @@ import (
 	. "gopkg.in/check.v1"
 )
 
+// Make a message (or reply) of up to 16 AES blocks in size and stuff
+// it with random bytes.  Return the message with PKCS7-padded appended.
+//
+func (s *XLSuite) MakeAPaddedMsg(c *C, rng *xr.PRNG) (
+	msg []byte, msgLen int, paddedMsg []byte, paddedLen int) {
+
+	msgLen = 2 + rng.Intn(16 * aes.BlockSize - 2)
+	msg = make([]byte, msgLen)
+	rng.NextBytes(msg)
+
+    // add PKCS7 padding
+    paddedMsg, err := xc.AddPKCS7Padding(msg, aes.BlockSize)
+    c.Assert(err, IsNil)
+    paddedLen = len(paddedMsg)
+    nBlks := paddedLen / aes.BlockSize
+    c.Assert(paddedLen, Equals, nBlks * aes.BlockSize)	// per contract
+
+	return
+}
+func (s *XLSuite) encryptMsg(c *C, rng *xr.PRNG, paddedMsg []byte, engine cipher.Block) (
+	prefixedCiphertext, iv []byte) {
+
+    // chooose an IV to set up encrypter (later prefix to the padded msg)
+	iv = make([]byte, aes.BlockSize)
+	rng.NextBytes(iv)
+    
+    //   A encrypts message
+    encrypterA := cipher.NewCBCEncrypter(engine, iv)
+    ciphertext := make([]byte, len(paddedMsg))
+    encrypterA.CryptBlocks(ciphertext, paddedMsg)	// dest <- src
+    
+    prefixedCiphertext = make([]byte, len(iv))
+    copy(prefixedCiphertext, iv)	// dest <- src
+    prefixedCiphertext = append(prefixedCiphertext, ciphertext...)
+
+	return
+}
+func (s *XLSuite) decryptCiphertext(c *C, rng *xr.PRNG, 
+	abCiphertext []byte, engine cipher.Block) (unpaddedMsg , iv []byte) {
+
+	// abCiphertext is prefixed with the (plaintext) IV
+	iv = abCiphertext[0:aes.BlockSize]	
+	ciphertext := abCiphertext[aes.BlockSize:]
+	paddedLen := len(ciphertext)
+	c.Assert(ciphertext, DeepEquals, ciphertext)
+	decrypterB := cipher.NewCBCDecrypter(engine, iv)
+	plaintext := make([]byte, paddedLen)
+	decrypterB.CryptBlocks(plaintext, ciphertext)	// dest <- src
+	unpaddedMsg, err := xc.StripPKCS7Padding(plaintext, aes.BlockSize)
+	c.Assert(err, IsNil)
+	return
+}
 func (s *XLSuite) doTestAESCnx(c *C, rng *xr.PRNG) {
 
-	// SESSION SETUP ================================================
-	// set up A side of session
-	keyA := make([]byte, 2 * aes.BlockSize)
-	rng.NextBytes(keyA)
-	hA   := AesCnxHandler{key2: keyA}
+// SESSION SETUP ================================================
 
-	err := hA.SetupSessionKey()
+	// A->B half circuit ----------------------------------
+	keyAB := make([]byte, 2 * aes.BlockSize)
+	rng.NextBytes(keyAB)
+
+	// set up A side of A->B half-circuit
+	hAOut   := AesCnxHandler{key2: keyAB}
+	err := hAOut.SetupSessionKey()
 	c.Assert(err, IsNil)
-	c.Assert(hA.engine, NotNil)
+	c.Assert(hAOut.engine, NotNil)
 
-	// set up B side of session
-	keyB := make([]byte, 2 * aes.BlockSize)
-	rng.NextBytes(keyB)
-	hB   := AesCnxHandler{key2: keyB}
-
-	err = hB.SetupSessionKey()
+	// set up B side of A->B half-circuit
+	hBIn   := AesCnxHandler{key2: keyAB}
+	err = hBIn.SetupSessionKey()
 	c.Assert(err, IsNil)
-	c.Assert(hB.engine, NotNil)
+	c.Assert(hBIn.engine, NotNil)
+
+	// B->A half circuit ----------------------------------
+	keyBA := make([]byte, 2 * aes.BlockSize)
+	rng.NextBytes(keyBA)
+	
+	// set up B side of B->A half-circuit
+	hBOut   := AesCnxHandler{key2: keyBA}
+	err = hBOut.SetupSessionKey()
+	c.Assert(err, IsNil)
+	c.Assert(hBOut.engine, NotNil)
+
+	// set up A side of B->A half-circuit
+	hAIn   := AesCnxHandler{key2: keyBA}
+	err = hAIn.SetupSessionKey()
+	c.Assert(err, IsNil)
+	c.Assert(hAIn.engine, NotNil)
 
 	// for N messages initiated by A
-	N := 1
+	N := 4
 	for n := 0; n < N; n++ {
-		// A SENDS MESSAGE TO B =====================================
-		
 		// A create a random-ish message ----------------------------
-		msgASize := 2 + rng.Intn(16 * aes.BlockSize - 2) 
-		msgA := make([]byte, msgASize)
-		rng.NextBytes(msgA)
+		msg, msgSize, paddedMsg, paddedLen := s.MakeAPaddedMsg(c, rng)
 
-		// A adds PKCS7 padding
-		paddedMsg, err := xc.AddPKCS7Padding(msgA, aes.BlockSize)
-		c.Assert(err, IsNil)
-		paddedLen := len(paddedMsg)
-		// DEBUG
-		fmt.Printf("msgLen %d, padded %d\n", msgASize, paddedLen)
-		// END
-		nBlks := paddedLen / aes.BlockSize
-		c.Assert(paddedLen, Equals, nBlks * aes.BlockSize)	// per contract
+		// encrypt it, yielding abCiphertext, which is prefixed with the IV
+		abCiphertext, ivA := s.encryptMsg(c, rng, paddedMsg, hAOut.engine)
 
-		// chooose an IV to set up encrypter (later prefix to the padded msg)
-		ivA := make([]byte, aes.BlockSize)
-		rng.NextBytes(ivA)
-
-		//   A encrypts message
-		encrypterA := cipher.NewCBCEncrypter(hA.engine, ivA)
-		ciphertext := make([]byte, paddedLen)
-		encrypterA.CryptBlocks(ciphertext, paddedMsg)	// dest <- src
-
-		prefixedCiphertext := make([]byte, len(ivA))
-		copy(prefixedCiphertext, ivA)	// dest <- src
-		prefixedCiphertext = append(prefixedCiphertext, paddedMsg...)
-		// DEBUG
-		lenPrefixed := len(prefixedCiphertext)
-		// END
-		c.Assert(len(prefixedCiphertext), Equals, (nBlks + 1) * aes.BlockSize)
+		c.Assert(len(abCiphertext), Equals, paddedLen + aes.BlockSize)
 
 		//   B decrypts msg -----------------------------------------
-		ivAb := prefixedCiphertext[0:aes.BlockSize]	// extract the IV
-		c.Assert(ivAb,DeepEquals,ivA)
-		bCiphertextIn := prefixedCiphertext[aes.BlockSize:]
-		lenCipherIntoB := len(bCiphertextIn)
-		c.Assert(lenCipherIntoB/aes.BlockSize, Equals, nBlks)
-		decrypterB := cipher.NewCBCEncrypter(hB.engine, ivAb)
-		plaintext := make([]byte, lenCipherIntoB)
-		decrypterB.CryptBlocks(plaintext, bCiphertextIn)	// dest <- src
-		unpaddedMsg, err := xc.StripPKCS7Padding(plaintext, aes.BlockSize)
-		c.Assert(err, IsNil)
-		// DEBUG
-		fmt.Printf("B-side prefixed ciphertext %d bytes, plaintext %d, stripped %d\n",
-			lenPrefixed, len(plaintext), len(unpaddedMsg))
-		// END
-		c.Assert(len(unpaddedMsg), Equals, msgASize)
-		c.Assert(unpaddedMsg, Equals, msgA)
+		unpaddedMsg, ivAb := s.decryptCiphertext(
+			c, rng, abCiphertext, hBIn.engine) 
+		c.Assert(ivAb, DeepEquals, ivA)
+	
+		c.Assert(len(unpaddedMsg), Equals, msgSize)
+		c.Assert(unpaddedMsg, DeepEquals, msg)
 
-		// B SENDS REPLY TO A =======================================
+		// B create a random-ish message ----------------------------
+		reply, replySize, paddedReply, paddedLen := s.MakeAPaddedMsg(c, rng)
 
-		// B create a random-ish reply
-		replyBSize := 2 + rng.Intn(16 * aes.BlockSize - 2) 
-		replyB := make([]byte, replyBSize)
-		rng.NextBytes(replyB)
+		// encrypt it, yielding baCiphertext, which is prefixed with the IV
+		baCiphertext, ivB := s.encryptMsg(c, rng, paddedReply, hBOut.engine)
 
-		//   B encrypts reply
+		c.Assert(len(baCiphertext), Equals, paddedLen + aes.BlockSize)
 
-		//   A decrypts reply 
+		//   A decrypts reply -----------------------------------------
+		unpaddedReply, ivBb := s.decryptCiphertext(
+			c, rng, baCiphertext, hAIn.engine) 
+		c.Assert(ivBb, DeepEquals, ivB)
+	
+		c.Assert(len(unpaddedReply), Equals, replySize)
+		c.Assert(unpaddedReply, DeepEquals, reply)
 	}
 }
 
