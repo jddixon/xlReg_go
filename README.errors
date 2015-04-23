@@ -9,12 +9,12 @@ xlreg_errors.go is generated from three files:
  
 These same files are used to generate error codes for 
     xlreg_c
-    xlreg_j
+    xlreg_java
     xlreg_p
-    xlreg_r
+    xlreg_rb
 
 Error codes should also be generated for
     xlreg_cpp   // C++
-    xlreg_o     // ocaml
+    xlreg_ml    // ocaml
 but this isn't being done yet.
 

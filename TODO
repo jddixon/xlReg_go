@@ -1,11 +1,21 @@
 xlReg_go/TODO
 
+2015-04-22
+    * write aes_cnx_test.go
+        - notion of session key should be retained
+        - need per-message encrypters and decrypters
+            * these should not reside in the data structure
+    * either rename aes_cnx.go or merge its functionality into
+        xlProtocol/aes_cnx
+        - both having the same name is confusion
+    * XXX we get 'incorrectly padded data' in aes_cnx_test, line 83
+
 2015-04-17 (edited from -16)
-    * change code to agree with current xlProtocol/aes_cnx/helloAndReply 
-        specifically to remove iv1 and iv2 from various data structures
-        and argument lists; IVs should be generated locally as needed
-        - in_handler.handleHello
-        - MemberNode.SessionSetup
+    * change code to agree with current xlProtocol/aes_cnx/helloAndReply* DONE
+        specifically to remove iv1 and iv2 from various data structures * DONE
+        and argument lists; IVs should be generated locally as needed   * DONE
+        - in_handler.handleHello                                        * DONE
+        - MemberNode.SessionSetup                                       * DONE
 2015-04-15
     * xlReg on Portland needs to log all accesses
     * xlReg needs to have a default timeout on all sessions

@@ -212,16 +212,19 @@ func (h *InHandler) Start() (err error) {
 // RSA-BASED MESSAGE PAIR
 /////////////////////////////////////////////////////////////////////
 
-// The client has sent the server a one-time AES key+iv encrypted with
+// The client has sent the server a one-time AES key encrypted with
 // the server's RSA comms public key.  The server creates the real
-// session iv+key and returns them to the client encrypted with the
-// one-time key+iv.
+// session key and returns it to the client encrypted with the
+// one-time key.
 
 func handleHello(h *InHandler) (err error) {
 	var (
 		ciphertext, key1, salt1 []byte
 		version1                uint32
 	)
+	// DEBUG
+	fmt.Println("entering handleHello")
+	// END
 	rn := &h.reg.RegNode
 	ciphertext, err = h.ReadData()
 	if err == nil {
@@ -230,19 +233,24 @@ func handleHello(h *InHandler) (err error) {
 		_ = version1 // ignore whatever version they propose
 	}
 	if err == nil {
+		// DEBUG
+		fmt.Println("server has decoded hello")
+		// END
 		version2 := serverVersion
 		key2, salt2, ciphertextOut, err := xa.ServerEncodeHelloReply(
 			key1, salt1, uint32(version2))
+		_ = salt2
 		if err == nil {
+			// The server has preceded the ciphertext with the plain text IV.
 			err = h.WriteData(ciphertextOut)
 		}
 		if err == nil {
 			h.version = uint32(version2)
 
-			h.key1 = key1
+			//h.key1 = key1
 			h.key2 = key2
-			h.salt1 = salt1
-			h.salt2 = salt2
+			//h.salt1 = salt1
+			//h.salt2 = salt2
 			h.State = HELLO_RCVD
 		}
 	}
@@ -253,5 +261,10 @@ func handleHello(h *InHandler) (err error) {
 		// END
 		h.Cnx.Close()
 	}
+	// DEBUG
+	if err == nil {
+		fmt.Println("  leaving handleHello with no error")
+	}
+	// END
 	return
 }

@@ -275,12 +275,12 @@ func (mm *MemberMaker) SessionSetup(proposedVersion uint32) (
 				if err == nil {
 					key2, salt2, salt1c, decidedVersion,
 						err = xa.ClientDecodeHelloReply(ciphertext2, key1)
-					_ = salt1c // XXX
+					_,_,_ = salt1,salt2, salt1c // XXX
 					// Set up AES engines ---------------------------
 					if err == nil {
-						mm.salt1 = salt1
+						//mm.salt1 = salt1
 						mm.key2 = key2
-						mm.salt2 = salt2
+						//mm.salt2 = salt2
 						mm.regProtoVersion = decidedVersion
 						mm.engine, err = aes.NewCipher(key2)
 						if err == nil {

@@ -31,9 +31,15 @@ type AesCnxHandler struct {
 	engine                             cipher.Block
 	encrypter                          cipher.BlockMode
 	decrypter                          cipher.BlockMode
-	key1, key2, salt1, salt2 []byte
+	key2								[]byte
 }
 
+// XXX ILL-CONCEIVED.  The engine should be created here, but the
+// encrypter and decrypter are specific to a particular message,
+// and should be created either (a) with the IV when sending a 
+// message (the encrypter) or (b) after having stripped the IV from
+// a received message (the decrypter).
+//
 func (a *AesCnxHandler) SetupSessionKey() (err error) {
 	a.engine, err = aes.NewCipher(a.key2)
 	if err == nil {
@@ -54,9 +60,10 @@ func (a *AesCnxHandler) ReadData() (data []byte, err error) {
 	count, err := a.Cnx.Read(data)
 	if err == nil && count > 0 {
 		data = data[:count]
-		return
+	} else {
+		data = nil
 	}
-	return nil, err
+	return 
 }
 
 func (a *AesCnxHandler) WriteData(data []byte) (err error) {
