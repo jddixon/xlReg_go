@@ -6,7 +6,7 @@ import (
 	"bytes"
 	"crypto"
 	"crypto/aes"
-	"crypto/cipher"
+	//"crypto/cipher"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha1"
@@ -49,12 +49,13 @@ type MemberMaker struct {
 	DoneCh          chan error
 	ProposedAttrs   uint64
 	ProposedVersion uint32 // proposed by member
-	AesCnxHandler
-	RegPeer *xn.Peer
 
 	// serverVersion xu.DecimalVersion		// missing
 
 	regProtoVersion uint32 // protocol version used to talk to registry
+
+	CnxHandler
+	RegPeer *xn.Peer
 	xcl.ClusterMember
 }
 
@@ -196,7 +197,6 @@ func NewMemberMaker(
 		}
 	}
 	if err == nil {
-		cnxHandler := &AesCnxHandler{State: MEMBER_START}
 		cm = &xcl.ClusterMember{
 			// Attrs gets negotiated
 			ClusterName:    clusterName,
@@ -212,7 +212,6 @@ func NewMemberMaker(
 			ProposedAttrs: attrs,
 			DoneCh:        make(chan error, 1),
 			RegPeer:       regPeer,
-			AesCnxHandler: *cnxHandler,
 			ClusterMember: *cm,
 		}
 	}
@@ -223,7 +222,7 @@ func NewMemberMaker(
 func (mm *MemberMaker) readMsg() (m *XLRegMsg, err error) {
 	inBuf, err := mm.ReadData()
 	if err == nil && inBuf != nil {
-		m, err = DecryptUnpadDecode(inBuf, mm.decrypter)
+		m, err = mm.DecryptUnpadDecode(inBuf)
 	}
 	return
 }
@@ -232,7 +231,7 @@ func (mm *MemberMaker) readMsg() (m *XLRegMsg, err error) {
 func (mm *MemberMaker) writeMsg(m *XLRegMsg) (err error) {
 	var data []byte
 	// serialize, marshal the message
-	data, err = EncodePadEncrypt(m, mm.encrypter)
+	data, err = mm.EncodePadEncrypt(m)
 	if err == nil {
 		err = mm.WriteData(data)
 	}
@@ -262,6 +261,16 @@ func (mm *MemberMaker) SessionSetup(proposedVersion uint32) (
 		// DEBUG
 		fmt.Printf("        SessionSetup: cnx is %s\n", cnx.String())
 		// END
+		var cnxHandler *CnxHandler
+		if err == nil {
+			cnxHandler, err = NewCnxHandler(cnx, nil, nil)
+			if err == nil {
+				cnxHandler.State = MEMBER_START
+				mm.CnxHandler = *cnxHandler
+			}
+		}
+	}
+	if err == nil {
 		// Send HELLO -----------------------------------------------
 		mm.Cnx = cnx
 		ck := mm.RegPeer.GetCommsPublicKey()
@@ -275,21 +284,22 @@ func (mm *MemberMaker) SessionSetup(proposedVersion uint32) (
 				if err == nil {
 					key2, salt2, salt1c, decidedVersion,
 						err = xa.ClientDecodeHelloReply(ciphertext2, key1)
-					_,_,_ = salt1,salt2, salt1c // XXX
+					_, _, _ = salt1, salt2, salt1c // XXX
 					// Set up AES engines ---------------------------
 					if err == nil {
 						//mm.salt1 = salt1
-						mm.key2 = key2
+						mm.Key2 = key2
 						//mm.salt2 = salt2
 						mm.regProtoVersion = decidedVersion
-						mm.engine, err = aes.NewCipher(key2)
+						// mm.engine, err = aes.NewCipher(key2)
 						if err == nil {
 							// XXX should there be distinct IVs ?
+							// XXX WE ALREADY HAVE AN RNG
 							rng := xr.MakeSystemRNG()
 							iv := make([]byte, aes.BlockSize)
 							rng.NextBytes(iv)
-							mm.encrypter = cipher.NewCBCEncrypter(mm.engine, iv)
-							mm.decrypter = cipher.NewCBCDecrypter(mm.engine, iv)
+							//mm.encrypter = cipher.NewCBCEncrypter(mm.engine, iv)
+							//mm.decrypter = cipher.NewCBCDecrypter(mm.engine, iv)
 						}
 					}
 				}

@@ -1,5 +1,10 @@
 xlReg_go/README.errors
 
+2015-04-24
+    
+Use the command xlRegErrorGen to do the actions described below.
+Source code for the command is in ~/dev/py/xlreg_error_gen
+
 2014-11-18
 
 xlreg_errors.go is generated from three files:

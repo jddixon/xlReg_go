@@ -8,6 +8,7 @@ import (
 
 var (
 	BadAttrsLine                   = e.New("badly formed attrs line")
+	BadOrNilCnx                    = e.New("bad or nil connection")
 	BadVersion                     = e.New("badly formated VERSION")
 	CantFindClusterByID            = e.New("cannot find cluster with this ID")
 	CantFindClusterByName          = e.New("cannot find cluster with this name")

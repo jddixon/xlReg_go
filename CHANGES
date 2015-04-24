@@ -3,6 +3,10 @@ xlReg_go/CHANGES
 The version number and date in this file must be kept in sync with version.go
 -----------------------------------------------------------------------------
 
+v1.9.3
+    2015-04-24
+        * aes_cnx{_test}.go renamed cnxHandler{_text}.go
+        * then restructured to use xlProtocol_go/aes_cnx properly   SLOC 3943
 v1.9.2
     2015-04-23
         * working, tested aes_cnx_test.go                           SLOC 3998

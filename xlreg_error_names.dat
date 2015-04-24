@@ -1,4 +1,5 @@
 BadAttrsLine
+BadOrNilCnx
 BadVersion
 CantFindClusterByID
 CantFindClusterByName

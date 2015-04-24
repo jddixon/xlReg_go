@@ -77,7 +77,7 @@ type InHandler struct {
 	msgOut     *XLRegMsg
 	errOut     error
 
-	AesCnxHandler
+	CnxHandler
 }
 
 // Given an open new connection, create a handler for the connection,
@@ -86,6 +86,7 @@ type InHandler struct {
 func NewInHandler(reg *Registry, conn xt.ConnectionI) (
 	h *InHandler, err error) {
 
+	var cnxHandler *CnxHandler
 	if reg == nil {
 		return nil, NilRegistry
 	}
@@ -94,13 +95,15 @@ func NewInHandler(reg *Registry, conn xt.ConnectionI) (
 		err = xa.NilNode
 	} else if conn == nil {
 		err = xa.NilConnection
-	} else {
+	}
+	if err == nil {
 		cnx := conn.(*xt.TcpConnection)
+		cnxHandler, err = NewCnxHandler(cnx, nil, nil)
+	}
+	if err == nil {
 		h = &InHandler{
-			reg: reg,
-			AesCnxHandler: AesCnxHandler{
-				Cnx: cnx,
-			},
+			reg:        reg,
+			CnxHandler: *cnxHandler,
 		}
 	}
 	return
@@ -131,11 +134,11 @@ func (h *InHandler) Start() (err error) {
 		return
 	}
 	// Given key2 create encrypt and decrypt engines.
-	aPtr := &h.AesCnxHandler
-	err = aPtr.SetupSessionKey()
-	if err != nil {
-		return
-	}
+	// aPtr := &h.CnxHandler
+	// err = aPtr.SetupSessionKey()
+	// if err != nil {
+	//	return
+	//}
 	for {
 		var (
 			tag int
@@ -147,7 +150,7 @@ func (h *InHandler) Start() (err error) {
 		if err != nil {
 			return
 		}
-		h.msgIn, err = DecryptUnpadDecode(ciphertext, h.decrypter)
+		h.msgIn, err = h.DecryptUnpadDecode(ciphertext)
 		if err != nil {
 			return
 		}
@@ -179,7 +182,7 @@ func (h *InHandler) Start() (err error) {
 
 		// encode, pad, and encrypt the XLRegMsg object
 		if h.msgOut != nil {
-			ciphertext, err = EncodePadEncrypt(h.msgOut, h.encrypter)
+			ciphertext, err = h.EncodePadEncrypt(h.msgOut)
 
 			// XXX log any error
 			if err != nil {
@@ -248,7 +251,7 @@ func handleHello(h *InHandler) (err error) {
 			h.version = uint32(version2)
 
 			//h.key1 = key1
-			h.key2 = key2
+			h.Key2 = key2 // XXX REDUNDANT OR WORSE ?
 			//h.salt1 = salt1
 			//h.salt2 = salt2
 			h.State = HELLO_RCVD

@@ -1,5 +1,6 @@
 BAD_ATTRS_LINE:BadAttrsLine:badly formed attrs line
-BAD_VERSION:BadVersion:badly formated VERSION
+BAD_VERSION:BadOrNilCnx:bad or nil connection
+BAD_OR_NIL_CNX:BadVersion:badly formated VERSION
 CANT_FIND_CLUSTER_BY_ID:CantFindClusterByID:cannot find cluster with this ID
 CANT_FIND_CLUSTER_BY_NAME:CantFindClusterByName:cannot find cluster with this name
 CLUSTER_MEMBER_ID_IN_USE:ClusterMemberIDInUse:cluster member id already in use

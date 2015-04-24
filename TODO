@@ -1,13 +1,18 @@
 xlReg_go/TODO
 
-2015-04-22
+2015-04-23 (-22 edited)
     * write aes_cnx_test.go                                             * DONE
-        - notion of session key should be retained
-        - need per-message encrypters and decrypters
-            * these should not reside in the data structure
-    * either rename aes_cnx.go or merge its functionality into
-        xlProtocol/aes_cnx
-        - both having the same name is confusion
+        - notion of session key should be retained                      * YES...
+        - need per-message encrypters and decrypters                    * DONE
+            * these should not reside in the data structure             * MAYBE
+    * merge aes_cnx.go functionality into xlProtocol/aes_cnx
+        - in_handler.go already uses xlProtocol/aes_cnx as xa
+        - it also uses AesCnxHandler 
+        - memberNode.go already uses xlProtocol/aes_cnx as xa
+        - it also uses AesCnxHandler as cnxHandler
+        - which suggests renaming the file aes_cnx_handler.go 
+        - but functionality tested in aes_cnx_test.go largely or 
+            entirely belongs in xlProtocol_go/aes_cnx
 
 2015-04-17 (edited from -16)
     * change code to agree with current xlProtocol/aes_cnx/helloAndReply* DONE

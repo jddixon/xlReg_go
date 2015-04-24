@@ -17,7 +17,7 @@ import (
 )
 
 // TestTestDir executes the helloAndReply protocl manually, so to speak.
-// Its handling of IVs *does not follow current practice* in that the 
+// Its handling of IVs *does not follow current practice* in that the
 // IV is incorporated in the message.
 func (s *XLSuite) TestTestDir(c *C) {
 	if VERBOSITY > 0 {
