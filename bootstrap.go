@@ -13,7 +13,7 @@ import (
 
 var _ = fmt.Print
 
-// The bootstrap process enables the caller to join a cluster
+// The bootstrap process enables the caller to join an xlReg cluster
 // and learn information about the cluster's other members.  Once the
 // bootstrapper has learned that information, it is done.
 
@@ -26,7 +26,7 @@ var _ = fmt.Print
 // configuration.  This is conventionally written to LFS/.xlattice/config.
 // On subsequent runs the client reads its configuration file rather than
 // regenerating keys, etc.
-
+//
 type Bootstrapper struct {
 	DoneCh chan error
 	mu     sync.RWMutex // ever used ??? XXX

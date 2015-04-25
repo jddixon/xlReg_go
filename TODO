@@ -1,18 +1,34 @@
 xlReg_go/TODO
 
-2015-04-23 (-22 edited)
+2015-04-25
+    * need to review bootstrap.go 
+        - and either integrate it into this package
+        - or return it to xlCluster_go if that is appropriate
+        - it will need a bootstrap_test.go
+
+2015-04-24 (-23,22 edited)
     * write aes_cnx_test.go                                             * DONE
         - notion of session key should be retained                      * YES...
         - need per-message encrypters and decrypters                    * DONE
             * these should not reside in the data structure             * MAYBE
-    * merge aes_cnx.go functionality into xlProtocol/aes_cnx
-        - in_handler.go already uses xlProtocol/aes_cnx as xa
-        - it also uses AesCnxHandler 
-        - memberNode.go already uses xlProtocol/aes_cnx as xa
-        - it also uses AesCnxHandler as cnxHandler
-        - which suggests renaming the file aes_cnx_handler.go 
-        - but functionality tested in aes_cnx_test.go largely or 
-            entirely belongs in xlProtocol_go/aes_cnx
+    * rename aes_cnx.go cnxHandler.go                                   * DONE
+    * rework to use xa = xlProtocol_go/aes_cnx for all AES stuff        * DONE
+    * gut aes_cnx_test.go, turn remnants into cnxHandler_test.go        * DONE
+
+    * cnxHandler_test has parties A and B and three phases:
+        - A (client) uses xa.helloAndReply OAEP pass AES Key1 to B,
+            then sets up its end of a one-shot AES half-circuit
+        - B uses the other end of the half-circuit to send Key2 to A,
+            then sets up its end of the permanent circuit (using Key2)
+        - A sets up its end of the Key2 circuit
+        - then the two exchange random messages for a few iterations
+  
+    * then we rework the existing code as necessary to make the 
+        memberNode/regServer comms follow the same pattern as A and B
+        - correct memberNode.go 
+        - correct in_handler.go
+
+    * XXX xlReg passes its tests but PANICS if I run tests in upax_go
 
 2015-04-17 (edited from -16)
     * change code to agree with current xlProtocol/aes_cnx/helloAndReply* DONE

@@ -232,7 +232,7 @@ func handleHello(h *InHandler) (err error) {
 	ciphertext, err = h.ReadData()
 	if err == nil {
 		key1, salt1, version1,
-			err = xa.ServerDecodeHello(ciphertext, rn.ckPriv)
+			err = xa.ServerDecryptHello(ciphertext, rn.ckPriv)
 		_ = version1 // ignore whatever version they propose
 	}
 	if err == nil {
@@ -240,7 +240,7 @@ func handleHello(h *InHandler) (err error) {
 		fmt.Println("server has decoded hello")
 		// END
 		version2 := serverVersion
-		key2, salt2, ciphertextOut, err := xa.ServerEncodeHelloReply(
+		key2, salt2, ciphertextOut, err := xa.ServerEncryptHelloReply(
 			key1, salt1, uint32(version2))
 		_ = salt2
 		if err == nil {

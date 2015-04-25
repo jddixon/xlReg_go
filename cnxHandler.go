@@ -4,7 +4,6 @@ package reg
 
 import (
 	"code.google.com/p/goprotobuf/proto"
-	"crypto/aes"
 	"fmt"
 	xr "github.com/jddixon/rnglib_go"
 	xa "github.com/jddixon/xlProtocol_go/aes_cnx"
@@ -34,34 +33,13 @@ func NewCnxHandler(cnx *xt.TcpConnection, key []byte, rng *xr.PRNG) (
 		err = BadOrNilCnx
 	} else {
 		session, err := xa.NewAesSession(key, rng)
-		if err != nil {
+		if err == nil {
 			handler = &CnxHandler{
 				Cnx:        cnx,
 				AesSession: *session,
 			}
 		}
 	}
-	return
-}
-
-// XXX ILL-CONCEIVED.  The engine should be created here, but the
-// encrypter and decrypter are specific to a particular message,
-// and should be created either (a) with the IV when sending a
-// message (the encrypter) or (b) after having stripped the IV from
-// a received message (the decrypter).
-//
-func (a *CnxHandler) SetupSessionKey() (err error) {
-	a.Engine, err = aes.NewCipher(a.Key2)
-	//if err == nil {
-	//	rng := xr.MakeSystemRNG()
-	//	iv := make([]byte, aes.BlockSize)
-	//	rng.NextBytes(iv)
-	//	a.encrypter = cipher.NewCBCEncrypter(a.Engine, iv)
-	//	a.decrypter = cipher.NewCBCDecrypter(a.Engine, iv)
-	//}
-
-	fmt.Println("*** SetupSessionKey is OBSOLETE ***")
-
 	return
 }
 

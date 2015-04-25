@@ -275,7 +275,7 @@ func (mm *MemberMaker) SessionSetup(proposedVersion uint32) (
 		mm.Cnx = cnx
 		ck := mm.RegPeer.GetCommsPublicKey()
 		ciphertext1, key1, salt1,
-			err = xa.ClientEncodeHello(proposedVersion, ck)
+			err = xa.ClientEncryptHello(proposedVersion, ck)
 		if err == nil {
 			err = mm.WriteData(ciphertext1)
 			// Process HELLO REPLY ----------------------------------
@@ -283,7 +283,7 @@ func (mm *MemberMaker) SessionSetup(proposedVersion uint32) (
 				ciphertext2, err = mm.ReadData()
 				if err == nil {
 					key2, salt2, salt1c, decidedVersion,
-						err = xa.ClientDecodeHelloReply(ciphertext2, key1)
+						err = xa.ClientDecryptHelloReply(ciphertext2, key1)
 					_, _, _ = salt1, salt2, salt1c // XXX
 					// Set up AES engines ---------------------------
 					if err == nil {
