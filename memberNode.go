@@ -5,7 +5,7 @@ package reg
 import (
 	"bytes"
 	"crypto"
-	"crypto/aes"
+	//"crypto/aes"
 	//"crypto/cipher"
 	"crypto/rand"
 	"crypto/rsa"
@@ -246,8 +246,8 @@ func (mm *MemberMaker) writeMsg(m *XLRegMsg) (err error) {
 func (mm *MemberMaker) SessionSetup(proposedVersion uint32) (
 	cnx *xt.TcpConnection, decidedVersion uint32, err error) {
 	var (
-		ciphertext1, key1, salt1, salt1c []byte
-		ciphertext2, key2, salt2         []byte
+		ciphertext1 []byte
+		ciphertext2 []byte
 	)
 	// Set up connection to server. ---------------------------------
 	ctor := mm.RegPeer.GetConnector(0)
@@ -271,36 +271,23 @@ func (mm *MemberMaker) SessionSetup(proposedVersion uint32) (
 		}
 	}
 	if err == nil {
+		var cOneShot, cSession *xa.AesSession
 		// Send HELLO -----------------------------------------------
 		mm.Cnx = cnx
 		ck := mm.RegPeer.GetCommsPublicKey()
-		ciphertext1, key1, salt1,
-			err = xa.ClientEncryptHello(proposedVersion, ck)
+		rng := xr.MakeSystemRNG()
+		cOneShot, ciphertext1, err = xa.ClientEncryptHello(
+			proposedVersion, ck, rng)
 		if err == nil {
 			err = mm.WriteData(ciphertext1)
 			// Process HELLO REPLY ----------------------------------
 			if err == nil {
 				ciphertext2, err = mm.ReadData()
 				if err == nil {
-					key2, salt2, salt1c, decidedVersion,
-						err = xa.ClientDecryptHelloReply(ciphertext2, key1)
-					_, _, _ = salt1, salt2, salt1c // XXX
-					// Set up AES engines ---------------------------
+					cSession, decidedVersion,
+						err = xa.ClientDecryptHelloReply(cOneShot, ciphertext2)
 					if err == nil {
-						//mm.salt1 = salt1
-						mm.Key2 = key2
-						//mm.salt2 = salt2
-						mm.regProtoVersion = decidedVersion
-						// mm.engine, err = aes.NewCipher(key2)
-						if err == nil {
-							// XXX should there be distinct IVs ?
-							// XXX WE ALREADY HAVE AN RNG
-							rng := xr.MakeSystemRNG()
-							iv := make([]byte, aes.BlockSize)
-							rng.NextBytes(iv)
-							//mm.encrypter = cipher.NewCBCEncrypter(mm.engine, iv)
-							//mm.decrypter = cipher.NewCBCDecrypter(mm.engine, iv)
-						}
+						mm.AesSession = *cSession
 					}
 				}
 			}

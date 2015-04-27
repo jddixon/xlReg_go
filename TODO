@@ -1,5 +1,15 @@
 xlReg_go/TODO
 
+2015-04-26
+    * SERIOUS problem with NewInHandler and CnxHandler: the CnxHandler  * FIXED
+        embeds an AesSession, but this is created before handleHello    * FIXED
+        has negotiated keys with the client!  The embedded session      * FIXED
+        should of course be the sSession created by ServerDecryptHello  * FIXED
+    
+    * code rejigged to suit new aes_cnx API, but definitely in_handler
+        and memberNode need cleanup
+        - all use of CnxHandler should be inspected
+        
 2015-04-25
     * need to review bootstrap.go 
         - and either integrate it into this package

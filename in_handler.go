@@ -133,12 +133,6 @@ func (h *InHandler) Start() (err error) {
 	if err != nil {
 		return
 	}
-	// Given key2 create encrypt and decrypt engines.
-	// aPtr := &h.CnxHandler
-	// err = aPtr.SetupSessionKey()
-	// if err != nil {
-	//	return
-	//}
 	for {
 		var (
 			tag int
@@ -222,8 +216,9 @@ func (h *InHandler) Start() (err error) {
 
 func handleHello(h *InHandler) (err error) {
 	var (
-		ciphertext, key1, salt1 []byte
-		version1                uint32
+		sOneShot   *xa.AesSession
+		ciphertext []byte
+		version1   uint32
 	)
 	// DEBUG
 	fmt.Println("entering handleHello")
@@ -231,8 +226,8 @@ func handleHello(h *InHandler) (err error) {
 	rn := &h.reg.RegNode
 	ciphertext, err = h.ReadData()
 	if err == nil {
-		key1, salt1, version1,
-			err = xa.ServerDecryptHello(ciphertext, rn.ckPriv)
+		sOneShot, version1,
+			err = xa.ServerDecryptHello(ciphertext, rn.ckPriv, h.RNG)
 		_ = version1 // ignore whatever version they propose
 	}
 	if err == nil {
@@ -240,20 +235,16 @@ func handleHello(h *InHandler) (err error) {
 		fmt.Println("server has decoded hello")
 		// END
 		version2 := serverVersion
-		key2, salt2, ciphertextOut, err := xa.ServerEncryptHelloReply(
-			key1, salt1, uint32(version2))
-		_ = salt2
+		sSession, ciphertextOut, err := xa.ServerEncryptHelloReply(
+			sOneShot, uint32(version2))
 		if err == nil {
+			// we have our AesSession
+			h.AesSession = *sSession
 			// The server has preceded the ciphertext with the plain text IV.
 			err = h.WriteData(ciphertextOut)
 		}
 		if err == nil {
 			h.version = uint32(version2)
-
-			//h.key1 = key1
-			h.Key2 = key2 // XXX REDUNDANT OR WORSE ?
-			//h.salt1 = salt1
-			//h.salt2 = salt2
 			h.State = HELLO_RCVD
 		}
 	}

@@ -3,6 +3,9 @@ xlReg_go/CHANGES
 The version number and date in this file must be kept in sync with version.go
 -----------------------------------------------------------------------------
 
+v1.9.5
+    2015-04-26
+        * tests succeed after changes to aes_cnx API                SLOC 3924
 v1.9.4
     2015-04-25
         * changes to matching refactoring in aes_cnx                SLOC 3937
