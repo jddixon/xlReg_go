@@ -17,9 +17,3 @@ const (
 	MIN_CLUSTER_SIZE = uint32(2)
 )
 
-// client attrs bits, also used for member attrs
-const (
-	ATTR_EPHEMERAL = 1 << iota
-	ATTR_ADMIN
-	ATTR_SOLO // no related cluster, persists config to LFS
-)

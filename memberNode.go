@@ -135,7 +135,7 @@ func NewMemberMaker(
 
 	var (
 		cm      *xcl.ClusterMember
-		isAdmin = (attrs & ATTR_ADMIN) != 0
+		isAdmin = (attrs & xcl.ATTR_ADMIN) != 0
 		regPeer *xn.Peer
 	)
 	// sanity checks on parameter list
@@ -151,7 +151,7 @@ func NewMemberMaker(
 			// DEBUG
 			fmt.Printf("NemMemberMaker: regEnd is %s\n", regEnd.String())
 			// END
-			if (attrs & ATTR_SOLO) == uint64(0) {
+			if (attrs & xcl.ATTR_SOLO) == uint64(0) {
 				if clusterName == "" {
 					err = MissingClusterNameOrID
 					if err == nil && size < uint32(1) {

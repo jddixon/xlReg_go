@@ -5,6 +5,7 @@ package reg
 import (
 	"crypto/rsa"
 	"fmt"
+	xcl "github.com/jddixon/xlCluster_go"
 	xi "github.com/jddixon/xlNodeID_go"
 	xn "github.com/jddixon/xlNode_go"
 	xt "github.com/jddixon/xlTransport_go"
@@ -38,7 +39,7 @@ func NewSoloMember(node *xn.Node,
 	e []xt.EndPointI) (
 	sc *SoloMember, err error) {
 
-	cn, err := NewMemberMaker(node, ATTR_SOLO,
+	cn, err := NewMemberMaker(node, xcl.ATTR_SOLO,
 		serverName, serverID, serverEnd, serverCK, serverSK,
 		"", uint64(0), nil, 0, // no cluster
 		uint32(len(e)), e)

@@ -220,9 +220,6 @@ func handleHello(h *InHandler) (err error) {
 		ciphertext []byte
 		version1   uint32
 	)
-	// DEBUG
-	fmt.Println("entering handleHello")
-	// END
 	rn := &h.reg.RegNode
 	ciphertext, err = h.ReadData()
 	if err == nil {
@@ -231,9 +228,6 @@ func handleHello(h *InHandler) (err error) {
 		_ = version1 // ignore whatever version they propose
 	}
 	if err == nil {
-		// DEBUG
-		fmt.Println("server has decoded hello")
-		// END
 		version2 := serverVersion
 		sSession, ciphertextOut, err := xa.ServerEncryptHelloReply(
 			sOneShot, uint32(version2))
@@ -255,10 +249,5 @@ func handleHello(h *InHandler) (err error) {
 		// END
 		h.Cnx.Close()
 	}
-	// DEBUG
-	if err == nil {
-		fmt.Println("  leaving handleHello with no error")
-	}
-	// END
 	return
 }

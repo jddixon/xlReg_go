@@ -5,6 +5,7 @@ package reg
 import (
 	"crypto/rsa"
 	"fmt"
+	xcl "github.com/jddixon/xlCluster_go"
 	xi "github.com/jddixon/xlNodeID_go"
 	xn "github.com/jddixon/xlNode_go"
 	xt "github.com/jddixon/xlTransport_go"
@@ -44,7 +45,7 @@ func NewUserMember(
 	nodeID, err := xi.New(nil)
 	if err == nil {
 		if lfs == "" {
-			attrs |= ATTR_EPHEMERAL
+			attrs |= xcl.ATTR_EPHEMERAL
 		}
 		node, err := xn.New(name, nodeID, lfs, ckPriv, skPriv, nil, nil, nil)
 		if err == nil {

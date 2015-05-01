@@ -5,6 +5,7 @@ package reg
 import (
 	"crypto/rsa"
 	"fmt"
+	xcl "github.com/jddixon/xlCluster_go"
 	xi "github.com/jddixon/xlNodeID_go"
 	xn "github.com/jddixon/xlNode_go"
 	xt "github.com/jddixon/xlTransport_go"
@@ -44,7 +45,7 @@ func NewAdminClient(
 		node, err := xn.NewNew("admin", nodeID, "") // name, id, lfs
 		if err == nil {
 			cn, err := NewMemberMaker(node,
-				ATTR_ADMIN|ATTR_SOLO|ATTR_EPHEMERAL,
+				xcl.ATTR_ADMIN|xcl.ATTR_SOLO|xcl.ATTR_EPHEMERAL,
 				serverName, serverID, serverEnd, serverCK, serverSK,
 				clusterName, clusterAttrs, nil, size, epCount, e)
 

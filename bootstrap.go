@@ -5,6 +5,7 @@ package reg
 import (
 	"crypto/rsa"
 	"fmt"
+	xcl "github.com/jddixon/xlCluster_go"
 	xi "github.com/jddixon/xlNodeID_go"
 	xn "github.com/jddixon/xlNode_go"
 	xt "github.com/jddixon/xlTransport_go"
@@ -48,7 +49,7 @@ func NewBootstrapper(
 	// END
 
 	if lfs == "" {
-		attrs |= ATTR_EPHEMERAL
+		attrs |= xcl.ATTR_EPHEMERAL
 	}
 	nodeID, err := xi.New(nil) // ie, make me a NodeID
 	if err == nil {
