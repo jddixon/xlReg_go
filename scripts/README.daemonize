@@ -1,0 +1,7 @@
+daemonize can be acquired by
+    git clone https://github.com/bmc/daemonize
+and then built using the usual
+    ./configure
+    make
+    make install
+   

@@ -1,0 +1,11 @@
+# ~/ubuntu/bin/start.xlreg
+
+# See rc.local for the version of this run by root.
+
+mkdir -p /tmp/xlReg
+/usr/local/sbin/daemonize -a    \
+    -c /var/app/xlReg           \
+	-l /tmp/xlReg/lockFile	    \
+	-p /tmp/xlReg/pidFile	    \
+    /home/ubuntu/go/bin/xlReg   \
+	$@
