@@ -1,0 +1,3 @@
+pySloc -v \
+    bash:countem bash:make.template \
+    bash:scripts/rc.local bash:scripts/start.xlreg

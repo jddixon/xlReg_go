@@ -1,17 +1,26 @@
 xlReg_go/TODO
 
+2015-06-01
+    * consider conforming to:
+      http://refspecs.linuxbase.org/LSB_4.1.0/LSB-Core-generic/LSB-Core-generic/iniscrptact.html
+
+    * the server should write its PID to a well-known place, such as    * DONE
+        /tmp/xlReg/pidFile                                              * DONE
+    * improve ~/bin/start.xlreg so that it can be run either by ubuntu
+        or root
+
 2015-04-26
     * SERIOUS problem with NewInHandler and CnxHandler: the CnxHandler  * FIXED
         embeds an AesSession, but this is created before handleHello    * FIXED
         has negotiated keys with the client!  The embedded session      * FIXED
         should of course be the sSession created by ServerDecryptHello  * FIXED
-    
+
     * code rejigged to suit new aes_cnx API, but definitely in_handler
         and memberNode need cleanup
         - all use of CnxHandler should be inspected
-        
+
 2015-04-25
-    * need to review bootstrap.go 
+    * need to review bootstrap.go
         - and either integrate it into this package
         - or return it to xlCluster_go if that is appropriate
         - it will need a bootstrap_test.go
@@ -32,10 +41,10 @@ xlReg_go/TODO
             then sets up its end of the permanent circuit (using Key2)
         - A sets up its end of the Key2 circuit
         - then the two exchange random messages for a few iterations
-  
-    * then we rework the existing code as necessary to make the 
+
+    * then we rework the existing code as necessary to make the
         memberNode/regServer comms follow the same pattern as A and B
-        - correct memberNode.go 
+        - correct memberNode.go
         - correct in_handler.go
 
     * XXX xlReg passes its tests but PANICS if I run tests in upax_go
@@ -50,11 +59,11 @@ xlReg_go/TODO
     * xlReg on Portland needs to log all accesses
     * xlReg needs to have a default timeout on all sessions
         - and all timeouts need to be logged
-    * if -v option set, all interactions with the outside world 
+    * if -v option set, all interactions with the outside world
         must be logged
 
 2015-04-11
-    * gh-pages site needs link to plain-text version of regCred.dat 
+    * gh-pages site needs link to plain-text version of regCred.dat
         for portland = xlreg.xlattice.org
         - so can update regCred.dat without updating index.html
 
@@ -91,11 +100,11 @@ xlReg_go/TODO
     * xlreg.xlattice.org resolves to www.xlattice.org (= portland)      * OK
     * nobody's listening at http://54.186.197.123:56789                 * FIXED
         - after fix telnet 56789 still returns Connection refused       * FIXED
-    * need test program to verify that xlReg is running on Portland     * FIXED
-        and regCred.dat data is correct                                 * FIXED
+    * need test program to verify that xlReg is running on Portland
+        and regCred.dat data is correct
 
 2014-12-27
-    * xlReg around line 248 calls Node.OpenAcc(), CloseAcc needs to 
+    * xlReg around line 248 calls Node.OpenAcc(), CloseAcc needs to
         be called
 
 2014-11-26
@@ -106,12 +115,12 @@ xlReg_go/TODO
     * move paxos_go/pktComms/bootstrap.go into this package             * DONE
 
     * on the current host, given (a) regCred.dat describing the xlReg
-        server, (b) the details of the prospective cluster member, 
+        server, (b) the details of the prospective cluster member,
         and (c) the cluster name and/or ID, the Bootstrapper contacts
-        the xlReg server, joins the cluster, and saves the node 
+        the xlReg server, joins the cluster, and saves the node
         configuration in LFS/.xlattice/config.
 
-    * create command xlRegJoinAndSave which invokes 
+    * create command xlRegJoinAndSave which invokes
         NewBootstrapper(), saving the configuration as described
 
     * create Python script xgJoinAndSave with the same functionality
@@ -165,7 +174,7 @@ xlReg_go/TODO
 2014-11-12
     * testCluster_test.go needs quite a bit more work                   * YEP
 2014-11-10
-    * drop notion of registry-level RegMembersByID because node can 
+    * drop notion of registry-level RegMembersByID because node can
         use different IP addresses in different roles
         - alternatively require that any host using the registry use
             role-specific NodeID
@@ -177,13 +186,13 @@ xlReg_go/TODO
     * Registry must update RegMembersByID
         - possibly what we need is a single ByID map, and then an
             IsMember() or IsCluster() bool field
-    * consider drop idFilter, which seems to be misused, replacing it 
+    * consider drop idFilter, which seems to be misused, replacing it
         with HAMT?
         - con: idFilter can be a memory-mapped file, which would seem
             to have real advantages
-            * must be certain that deserialization restores 
+            * must be certain that deserialization restores
                 ClusterByID, RegMembersByID XXX it cannot XXX
-            * must test the memory-mapped filters 
+            * must test the memory-mapped filters
     * modify eph_server.go as required to allow us to examine registry
         contents
     * then modify eph_server_test.go as required to verify that the
@@ -194,7 +203,7 @@ xlReg_go/TODO
         - AdminClient, 						                            * DONE
         - SoloMember,						                            * DONE
         - UserMember						                            * DONE
-2014-10-24 
+2014-10-24
     * modify MemberInfo to contain POINTER to Peer                      * DONE
     * write test to verify that (a) all other members have been added
         to Node as Peers but (b) the 'self' member is not so added.
@@ -207,16 +216,16 @@ xlReg_go/TODO
         "TcpEndPoint: "; this caused problems in memberNode.go
 2014-10-15
     * FIX: epCount at end of clusterMember serialization is wrong
-    * in the definition of ClusterMember struct (line 26 or so) it 
-        claims that the EPCount is potentially different from the 
-        count of endpoints passed to xn.New(), but this is nowhere 
+    * in the definition of ClusterMember struct (line 26 or so) it
+        claims that the EPCount is potentially different from the
+        count of endpoints passed to xn.New(), but this is nowhere
         enforced
     * verify that references to cluster member endPoints use
         GetEndPoint(n) or GetAcceptor(n)
     * SoloMember should NOT persist a ClusterMember and in fact
         it just calls PersistNode()
     * AdminClient is completely ephemeral; it does not persist anything * TRUE
-    * UserMember also doesn't persist anything; its mission is to 
+    * UserMember also doesn't persist anything; its mission is to
         collect MemberInfo.  Callers can persist the information, but
         the endPoints will necessarily be WRONG, as discussed above.
 2014-10-07 (-07-25, edited)
@@ -235,7 +244,7 @@ xlReg_go/TODO
         not similarly exposed
         - need to at least adjust version date
     * REVIEW: ClientNode fields size, epCount were int, now uint
-    * REVIEW: ClusterMember fields SelfIndex, ClusterSize, 
+    * REVIEW: ClusterMember fields SelfIndex, ClusterSize,
         EpCount were uint32, now uint
     * REVIEW: protocol ClusterSize and EndPointCount are uint32,
         whereas struct fields are uint
@@ -258,7 +267,7 @@ xlReg_go/TODO
     * need -d/--runDetached switch to make server run detached
     * to start from rc.local need -u/--user option
     * RESOLVE: regCred.dat should include publicly accessible IP
-        address, but on EC2 cloud has to use its private (10/8 or 
+        address, but on EC2 cloud has to use its private (10/8 or
         192.178.*/24) address to get address to bind
         - if 127.0.0.1 is used, clients must be on same host
 
@@ -281,7 +290,7 @@ xlReg_go/TODO
 2014-02-20
     * need to step version number at each branch merge
     * investigate: msg_handlers.go L 169: "NO LONGER MAKES ANY SENSE"
-    * also determine why xlReg continued to load on Stockton 
+    * also determine why xlReg continued to load on Stockton
         despite having no /var/app/xlReg
 
 2014-02-03 (2013-10-09, edited)

@@ -1,0 +1,15 @@
+# This is an extract from /etc/rc.local, used to start xlReg on the server
+# using daemonize
+
+if [ ! -f /tmp/xlReg ]
+then
+    mkdir -p /tmp/xlReg
+    chown ubuntu.ubuntu /tmp/xlReg
+fi
+/usr/local/sbin/daemonize -a    \
+    -c /var/app/xlReg           \
+	-l /tmp/xlReg/lockFile	    \
+	-p /tmp/xlReg/pidFile	    \
+    -u ubuntu                   \
+    /home/ubuntu/go/bin/xlReg   \
+	$@
