@@ -160,49 +160,61 @@ func (mi *ClientInfo) String() string {
 }
 func collectClientAttrs(mi *ClientInfo, ss []string) (rest []string, err error) {
 	rest = ss
-	line := xn.NextNBLine(&rest) // trims
-	// attrs line looks like "attrs: 0xHHHH..." where H is a hex digit
-	if strings.HasPrefix(line, "attrs: 0x") {
-		var val []byte
-		var attrs uint64
-		line := line[9:]
-		val, err = hex.DecodeString(line)
-		if err == nil {
-			if len(val) != 8 {
-				err = WrongNumberOfBytesInAttrs
-			} else {
-				for i := 0; i < 8; i++ {
-					// assume little-endian ; but printf has put
-					// high order bytes first - ie, it's big-endian
-					attrs |= uint64(val[i]) << uint(8*(7-i))
+	var line string
+	line, err = xn.NextNBLine(&rest) // trims
+	if err == nil {
+		// attrs line looks like "attrs: 0xHHHH..." where H is a hex digit
+		if strings.HasPrefix(line, "attrs: 0x") {
+			var val []byte
+			var attrs uint64
+			line := line[9:]
+			val, err = hex.DecodeString(line)
+			if err == nil {
+				if len(val) != 8 {
+					err = WrongNumberOfBytesInAttrs
+				} else {
+					for i := 0; i < 8; i++ {
+						// assume little-endian ; but printf has put
+						// high order bytes first - ie, it's big-endian
+						attrs |= uint64(val[i]) << uint(8*(7-i))
+					}
+					mi.Attrs = attrs
 				}
-				mi.Attrs = attrs
 			}
+		} else {
+			err = BadAttrsLine
 		}
-	} else {
-		err = BadAttrsLine
 	}
 	return
 }
 func collectMyEnds(mi *ClientInfo, ss []string) (rest []string, err error) {
 	rest = ss
-	line := xn.NextNBLine(&rest)
-	if line == "endPoints {" {
-		for {
-			line = strings.TrimSpace(rest[0]) // peek
-			if line == "}" {
-				break
+	var line string
+	line, err = xn.NextNBLine(&rest)
+	if err == nil {
+		if line == "endPoints {" {
+			for {
+				line = strings.TrimSpace(rest[0]) // peek
+				if line == "}" {
+					break
+				}
+				line, err = xn.NextNBLine(&rest)
+				if err == nil {
+					// XXX NO CHECK THAT THIS IS A VALID ENDPOINT
+					mi.MyEnds = append(mi.MyEnds, line)
+				}
 			}
-			line = xn.NextNBLine(&rest)
-			// XXX NO CHECK THAT THIS IS A VALID ENDPOINT
-			mi.MyEnds = append(mi.MyEnds, line)
+			if err == nil {
+				line, err = xn.NextNBLine(&rest)
+				if err == nil {
+					if line != "}" {
+						err = MissingClosingBrace
+					}
+				}
+			}
+		} else {
+			err = MissingEndPointsSection
 		}
-		line = xn.NextNBLine(&rest)
-		if line != "}" {
-			err = MissingClosingBrace
-		}
-	} else {
-		err = MissingEndPointsSection
 	}
 	return
 }
@@ -224,10 +236,13 @@ func ParseClientInfoFromStrings(ss []string) (
 			rest, err = collectMyEnds(mi, rest)
 		}
 		if err == nil {
+			var line string
 			// expect and consume a closing brace
-			line := xn.NextNBLine(&rest)
-			if line != "}" {
-				err = MissingClosingBrace
+			line, err = xn.NextNBLine(&rest)
+			if err == nil {
+				if line != "}" {
+					err = MissingClosingBrace
+				}
 			}
 		}
 	}

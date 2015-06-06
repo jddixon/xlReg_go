@@ -99,42 +99,47 @@ func ParseRegNodeFromStrings(ss []string) (
 	rn *RegNode, rest []string, err error) {
 
 	var (
+		line   string
 		node   *xn.Node
 		ckPriv *rsa.PrivateKey
 		skPriv *rsa.PrivateKey
 	)
 	rest = ss
-	line := xn.NextNBLine(&rest)
-	if line != "regNode {" {
+	line, err = xn.NextNBLine(&rest)
+	if (err == nil) && (line != "regNode {") {
 		err = MissingRegNodeLine
 	} else {
 		node, rest, err = xn.ParseFromStrings(rest)
 		if err == nil {
-			line = xn.NextNBLine(&rest)
-			parts := strings.Split(line, ": ")
-			if parts[0] == "ckPriv" && parts[1] == "-----BEGIN -----" {
-				ckPriv, err = xn.ExpectRSAPrivateKey(&rest)
-			} else {
-				err = MissingPrivateKey
-			}
+			line, err = xn.NextNBLine(&rest)
 			if err == nil {
-				line = xn.NextNBLine(&rest)
 				parts := strings.Split(line, ": ")
-				if parts[0] == "skPriv" && parts[1] == "-----BEGIN -----" {
-					skPriv, err = xn.ExpectRSAPrivateKey(&rest)
+				if parts[0] == "ckPriv" && parts[1] == "-----BEGIN -----" {
+					ckPriv, err = xn.ExpectRSAPrivateKey(&rest)
 				} else {
 					err = MissingPrivateKey
 				}
 				if err == nil {
-					line = xn.NextNBLine(&rest)
-					if line != "}" {
-						err = MissingClosingBrace
-					}
+					line, err = xn.NextNBLine(&rest)
 					if err == nil {
-						// Try to open the acceptor.
-						err = node.OpenAcc()
+						parts := strings.Split(line, ": ")
+						if parts[0] == "skPriv" && parts[1] == "-----BEGIN -----" {
+							skPriv, err = xn.ExpectRSAPrivateKey(&rest)
+						} else {
+							err = MissingPrivateKey
+						}
 						if err == nil {
-							rn, err = NewRegNode(node, ckPriv, skPriv)
+							line, err = xn.NextNBLine(&rest)
+							if (err == nil) && (line != "}") {
+								err = MissingClosingBrace
+							}
+							if err == nil {
+								// Try to open the acceptor.
+								err = node.OpenAcc()
+								if err == nil {
+									rn, err = NewRegNode(node, ckPriv, skPriv)
+								}
+							}
 						}
 					}
 				}
