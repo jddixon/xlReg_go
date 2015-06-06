@@ -256,110 +256,129 @@ func ParseRegClusterFromStrings(ss []string) (
 	)
 	rest = ss
 
-	line := xn.NextNBLine(&rest) // the line is trimmed
-	if line != "regCluster {" {
-		fmt.Println("MISSING regCluster {")
-		err = IllFormedCluster
-	} else {
-		line = xn.NextNBLine(&rest)
-		if strings.HasPrefix(line, "Attrs: ") {
-			var i int64
-			i, err = strconv.ParseInt(line[7:], 0, 64)
-			if err == nil {
-				attrs = uint64(i)
-			}
-		} else {
-			fmt.Printf("BAD ATTRS in line '%s'", line)
+	var line string
+	line, err = xn.NextNBLine(&rest) // the line is trimmed
+	if err == nil {
+		if line != "regCluster {" {
+			fmt.Println("MISSING regCluster {")
 			err = IllFormedCluster
+		} else {
+			line, err = xn.NextNBLine(&rest)
+			if err == nil {
+				if strings.HasPrefix(line, "Attrs: ") {
+					var i int64
+					i, err = strconv.ParseInt(line[7:], 0, 64)
+					if err == nil {
+						attrs = uint64(i)
+					}
+				} else {
+					fmt.Printf("BAD ATTRS in line '%s'", line)
+					err = IllFormedCluster
+				}
+			}
 		}
 	}
 	if err == nil {
-		line = xn.NextNBLine(&rest)
-		if strings.HasPrefix(line, "Name: ") {
-			name = line[6:]
-		} else {
-			fmt.Printf("BAD NAME in line '%s'", line)
-			err = IllFormedCluster
+		line, err = xn.NextNBLine(&rest)
+		if err == nil {
+			if strings.HasPrefix(line, "Name: ") {
+				name = line[6:]
+			} else {
+				fmt.Printf("BAD NAME in line '%s'", line)
+				err = IllFormedCluster
+			}
 		}
 	}
 	if err == nil {
 		// collect ID
-		line = xn.NextNBLine(&rest)
-		if strings.HasPrefix(line, "ID: ") {
-			var val []byte
-			val, err = hex.DecodeString(line[4:])
-			if err == nil {
-				id, err = xi.New(val)
+		line, err = xn.NextNBLine(&rest)
+		if err == nil {
+			if strings.HasPrefix(line, "ID: ") {
+				var val []byte
+				val, err = hex.DecodeString(line[4:])
+				if err == nil {
+					id, err = xi.New(val)
+				}
+			} else {
+				fmt.Println("BAD ID")
+				err = IllFormedCluster
 			}
-		} else {
-			fmt.Println("BAD ID")
-			err = IllFormedCluster
 		}
 	}
 	if err == nil {
-		line = xn.NextNBLine(&rest)
-		if strings.HasPrefix(line, "epCount: ") {
-			var count int
-			count, err = strconv.Atoi(line[9:])
-			if err == nil {
-				epCount = uint32(count)
+		line, err = xn.NextNBLine(&rest)
+		if err == nil {
+			if strings.HasPrefix(line, "epCount: ") {
+				var count int
+				count, err = strconv.Atoi(line[9:])
+				if err == nil {
+					epCount = uint32(count)
+				}
+			} else {
+				fmt.Println("BAD END POINT COUNT")
+				err = IllFormedCluster
 			}
-		} else {
-			fmt.Println("BAD END POINT COUNT")
-			err = IllFormedCluster
 		}
 	}
 	if err == nil {
-		line = xn.NextNBLine(&rest)
-		if strings.HasPrefix(line, "maxSize: ") {
-			var size int
-			size, err = strconv.Atoi(line[9:])
-			if err == nil {
-				maxSize = uint32(size)
+		line, err = xn.NextNBLine(&rest)
+		if err == nil {
+			if strings.HasPrefix(line, "maxSize: ") {
+				var size int
+				size, err = strconv.Atoi(line[9:])
+				if err == nil {
+					maxSize = uint32(size)
+				}
+			} else {
+				fmt.Println("BAD MAX_SIZE")
+				err = IllFormedCluster
 			}
-		} else {
-			fmt.Println("BAD MAX_SIZE")
-			err = IllFormedCluster
 		}
 	}
 	if err == nil {
 		rc, err = NewRegCluster(name, id, attrs, maxSize, epCount)
 	}
 	if err == nil {
-		line = xn.NextNBLine(&rest)
-		if line == "Members {" {
-			for {
-				line = strings.TrimSpace(rest[0]) // peek
-				if line == "}" {
-					break
+		line, err = xn.NextNBLine(&rest)
+		if err == nil {
+			if line == "Members {" {
+				for {
+					line = strings.TrimSpace(rest[0]) // peek
+					if line == "}" {
+						break
+					}
+					var member *ClientInfo
+					member, rest, err = ParseClientInfoFromStrings(rest)
+					if err != nil {
+						break
+					}
+					err = rc.AddMember(member)
+					if err != nil {
+						break
+					}
 				}
-				var member *ClientInfo
-				member, rest, err = ParseClientInfoFromStrings(rest)
-				if err != nil {
-					break
-				}
-				err = rc.AddMember(member)
-				if err != nil {
-					break
-				}
+			} else {
+				err = MissingMembersList
 			}
-		} else {
-			err = MissingMembersList
 		}
 	}
 
 	// expect closing brace for Members list
 	if err == nil {
-		line = xn.NextNBLine(&rest)
-		if line != "}" {
-			err = MissingClosingBrace
+		line, err = xn.NextNBLine(&rest)
+		if err == nil {
+			if line != "}" {
+				err = MissingClosingBrace
+			}
 		}
 	}
 	// expect closing brace  for cluster
 	if err == nil {
-		line = xn.NextNBLine(&rest)
-		if line != "}" {
-			err = MissingClosingBrace
+		line, err = xn.NextNBLine(&rest)
+		if err == nil {
+			if line != "}" {
+				err = MissingClosingBrace
+			}
 		}
 	}
 

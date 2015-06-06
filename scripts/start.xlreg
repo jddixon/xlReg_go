@@ -2,10 +2,12 @@
 
 # See rc.local for the version of this run by root.
 
+echo "This script assumes that xlReg is located at /home/$USER/dev/go/bin/xlReg"
+
 mkdir -p /tmp/xlReg
 /usr/local/sbin/daemonize -a    \
     -c /var/app/xlReg           \
 	-l /tmp/xlReg/lockFile	    \
 	-p /tmp/xlReg/pidFile	    \
-    /home/ubuntu/go/bin/xlReg   \
+    /home/$USER/dev/go/bin/xlReg      \
 	$@

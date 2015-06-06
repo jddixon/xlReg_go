@@ -54,6 +54,7 @@ func (rc *RegCred) String() string {
 func ParseRegCred(s string) (rc *RegCred, err error) {
 
 	var (
+		line    string
 		parts   []string
 		name    string
 		nodeID  *xi.NodeID
@@ -62,91 +63,104 @@ func ParseRegCred(s string) (rc *RegCred, err error) {
 		version xu.DecimalVersion
 	)
 	ss := strings.Split(s, "\n")
-
-	line := xn.NextNBLine(&ss)
-	if line != "regCred {" {
+	line, err = xn.NextNBLine(&ss)
+	if (err == nil) && (line != "regCred {") {
 		err = IllFormedRegCred
 	}
 	if err == nil {
-		line := xn.NextNBLine(&ss)
-		parts = strings.Split(line, ": ")
-		if len(parts) == 2 && parts[0] == "Name" {
-			name = strings.TrimLeft(parts[1], " \t")
-		} else {
-			err = IllFormedRegCred
+		line, err = xn.NextNBLine(&ss)
+		if err == nil {
+			parts = strings.Split(line, ": ")
+			if len(parts) == 2 && parts[0] == "Name" {
+				name = strings.TrimLeft(parts[1], " \t")
+			} else {
+				err = IllFormedRegCred
+			}
 		}
 	}
 	if err == nil {
 		var id []byte
-		line := xn.NextNBLine(&ss)
-		parts = strings.Split(line, ": ")
-		if len(parts) == 2 && parts[0] == "ID" {
-			id, err = hex.DecodeString(parts[1])
-		} else {
-			err = IllFormedRegCred
+		line, err = xn.NextNBLine(&ss)
+		if err == nil {
+			parts = strings.Split(line, ": ")
+			if len(parts) == 2 && parts[0] == "ID" {
+				id, err = hex.DecodeString(parts[1])
+			} else {
+				err = IllFormedRegCred
+			}
 		}
 		if err == nil {
 			nodeID, err = xi.New(id)
 		}
 	}
 	if err == nil {
-		line := xn.NextNBLine(&ss)
-		parts = strings.Split(line, ": ")
-		if len(parts) == 2 && parts[0] == "CommsPubKey" {
-			ck, err = xc.RSAPubKeyFromDisk([]byte(parts[1]))
-		} else {
-			err = IllFormedRegCred
+		line, err = xn.NextNBLine(&ss)
+		if err == nil {
+			parts = strings.Split(line, ": ")
+			if len(parts) == 2 && parts[0] == "CommsPubKey" {
+				ck, err = xc.RSAPubKeyFromDisk([]byte(parts[1]))
+			} else {
+				err = IllFormedRegCred
+			}
 		}
 	}
 	if err == nil {
-		line := xn.NextNBLine(&ss)
-		parts = strings.Split(line, ": ")
-		if len(parts) == 2 && parts[0] == "SigPubKey" {
-			sk, err = xc.RSAPubKeyFromDisk([]byte(parts[1]))
-		} else {
-			err = IllFormedRegCred
+		line, err = xn.NextNBLine(&ss)
+		if err == nil {
+			parts = strings.Split(line, ": ")
+			if len(parts) == 2 && parts[0] == "SigPubKey" {
+				sk, err = xc.RSAPubKeyFromDisk([]byte(parts[1]))
+			} else {
+				err = IllFormedRegCred
+			}
 		}
 	}
 	if err == nil {
-		line := xn.NextNBLine(&ss)
-		// collect EndPoints section; this should be turned into a
-		// utility function
-		if line == "EndPoints {" {
-			for err == nil {
-				line = strings.TrimSpace(ss[0]) // peek
-				if line == "}" {
-					break
-				}
-				line = xn.NextNBLine(&ss)
-				line = strings.TrimSpace(line)
-				parts := strings.Split(line, ": ")
-				if len(parts) != 2 || parts[0] != "TcpEndPoint" {
-					err = IllFormedRegCred
-				} else {
-					var ep xt.EndPointI
-					ep, err = xt.NewTcpEndPoint(parts[1])
+		line, err = xn.NextNBLine(&ss)
+		if err == nil {
+			// collect EndPoints section; this should be turned into a
+			// utility function
+			if line == "EndPoints {" {
+				for err == nil {
+					line = strings.TrimSpace(ss[0]) // peek
+					if line == "}" {
+						break
+					}
+					line, err = xn.NextNBLine(&ss)
 					if err == nil {
-						e = append(e, ep)
+						line = strings.TrimSpace(line)
+						parts := strings.Split(line, ": ")
+						if len(parts) != 2 || parts[0] != "TcpEndPoint" {
+							err = IllFormedRegCred
+						} else {
+							var ep xt.EndPointI
+							ep, err = xt.NewTcpEndPoint(parts[1])
+							if err == nil {
+								e = append(e, ep)
+							}
+						}
 					}
 				}
-			}
-			if err == nil {
-				line = xn.NextNBLine(&ss)
-				if line != "}" {
-					err = MissingClosingBrace
+				if err == nil {
+					line, err = xn.NextNBLine(&ss)
+					if (err == nil) && (line != "}") {
+						err = MissingClosingBrace
+					}
 				}
+			} else {
+				err = MissingEndPointsSection
 			}
-		} else {
-			err = MissingEndPointsSection
 		}
 	}
 	if err == nil {
-		line := xn.NextNBLine(&ss)
-		parts = strings.Split(line, ": ")
-		if len(parts) == 2 && parts[0] == "Version" {
-			version, err = xu.ParseDecimalVersion(parts[1])
-		} else {
-			err = IllFormedRegCred
+		line, err = xn.NextNBLine(&ss)
+		if err == nil {
+			parts = strings.Split(line, ": ")
+			if len(parts) == 2 && parts[0] == "Version" {
+				version, err = xu.ParseDecimalVersion(parts[1])
+			} else {
+				err = IllFormedRegCred
+			}
 		}
 	}
 	if err == nil {

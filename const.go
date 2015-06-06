@@ -16,4 +16,3 @@ const (
 	MAX_CLUSTER_SIZE = uint32(64) // inclusive
 	MIN_CLUSTER_SIZE = uint32(2)
 )
-
