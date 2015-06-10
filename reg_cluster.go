@@ -11,8 +11,8 @@ import (
 	"encoding/hex"
 	"fmt"
 	ha "github.com/jddixon/hamt_go"
+	xc "github.com/jddixon/xlCrypto_go"
 	xi "github.com/jddixon/xlNodeID_go"
-	xn "github.com/jddixon/xlNode_go"
 	xo "github.com/jddixon/xlOverlay_go"
 	xm "github.com/jddixon/xlUtil_go/math"
 	"strconv"
@@ -257,13 +257,13 @@ func ParseRegClusterFromStrings(ss []string) (
 	rest = ss
 
 	var line string
-	line, err = xn.NextNBLine(&rest) // the line is trimmed
+	line, err = xc.NextNBLine(&rest) // the line is trimmed
 	if err == nil {
 		if line != "regCluster {" {
 			fmt.Println("MISSING regCluster {")
 			err = IllFormedCluster
 		} else {
-			line, err = xn.NextNBLine(&rest)
+			line, err = xc.NextNBLine(&rest)
 			if err == nil {
 				if strings.HasPrefix(line, "Attrs: ") {
 					var i int64
@@ -279,7 +279,7 @@ func ParseRegClusterFromStrings(ss []string) (
 		}
 	}
 	if err == nil {
-		line, err = xn.NextNBLine(&rest)
+		line, err = xc.NextNBLine(&rest)
 		if err == nil {
 			if strings.HasPrefix(line, "Name: ") {
 				name = line[6:]
@@ -291,7 +291,7 @@ func ParseRegClusterFromStrings(ss []string) (
 	}
 	if err == nil {
 		// collect ID
-		line, err = xn.NextNBLine(&rest)
+		line, err = xc.NextNBLine(&rest)
 		if err == nil {
 			if strings.HasPrefix(line, "ID: ") {
 				var val []byte
@@ -306,7 +306,7 @@ func ParseRegClusterFromStrings(ss []string) (
 		}
 	}
 	if err == nil {
-		line, err = xn.NextNBLine(&rest)
+		line, err = xc.NextNBLine(&rest)
 		if err == nil {
 			if strings.HasPrefix(line, "epCount: ") {
 				var count int
@@ -321,7 +321,7 @@ func ParseRegClusterFromStrings(ss []string) (
 		}
 	}
 	if err == nil {
-		line, err = xn.NextNBLine(&rest)
+		line, err = xc.NextNBLine(&rest)
 		if err == nil {
 			if strings.HasPrefix(line, "maxSize: ") {
 				var size int
@@ -339,7 +339,7 @@ func ParseRegClusterFromStrings(ss []string) (
 		rc, err = NewRegCluster(name, id, attrs, maxSize, epCount)
 	}
 	if err == nil {
-		line, err = xn.NextNBLine(&rest)
+		line, err = xc.NextNBLine(&rest)
 		if err == nil {
 			if line == "Members {" {
 				for {
@@ -365,7 +365,7 @@ func ParseRegClusterFromStrings(ss []string) (
 
 	// expect closing brace for Members list
 	if err == nil {
-		line, err = xn.NextNBLine(&rest)
+		line, err = xc.NextNBLine(&rest)
 		if err == nil {
 			if line != "}" {
 				err = MissingClosingBrace
@@ -374,7 +374,7 @@ func ParseRegClusterFromStrings(ss []string) (
 	}
 	// expect closing brace  for cluster
 	if err == nil {
-		line, err = xn.NextNBLine(&rest)
+		line, err = xc.NextNBLine(&rest)
 		if err == nil {
 			if line != "}" {
 				err = MissingClosingBrace

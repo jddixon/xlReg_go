@@ -105,13 +105,13 @@ func ParseRegNodeFromStrings(ss []string) (
 		skPriv *rsa.PrivateKey
 	)
 	rest = ss
-	line, err = xn.NextNBLine(&rest)
+	line, err = xc.NextNBLine(&rest)
 	if (err == nil) && (line != "regNode {") {
 		err = MissingRegNodeLine
 	} else {
 		node, rest, err = xn.ParseFromStrings(rest)
 		if err == nil {
-			line, err = xn.NextNBLine(&rest)
+			line, err = xc.NextNBLine(&rest)
 			if err == nil {
 				parts := strings.Split(line, ": ")
 				if parts[0] == "ckPriv" && parts[1] == "-----BEGIN -----" {
@@ -120,7 +120,7 @@ func ParseRegNodeFromStrings(ss []string) (
 					err = MissingPrivateKey
 				}
 				if err == nil {
-					line, err = xn.NextNBLine(&rest)
+					line, err = xc.NextNBLine(&rest)
 					if err == nil {
 						parts := strings.Split(line, ": ")
 						if parts[0] == "skPriv" && parts[1] == "-----BEGIN -----" {
@@ -129,7 +129,7 @@ func ParseRegNodeFromStrings(ss []string) (
 							err = MissingPrivateKey
 						}
 						if err == nil {
-							line, err = xn.NextNBLine(&rest)
+							line, err = xc.NextNBLine(&rest)
 							if (err == nil) && (line != "}") {
 								err = MissingClosingBrace
 							}
