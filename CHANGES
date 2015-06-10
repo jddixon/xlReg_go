@@ -3,9 +3,12 @@ xlReg_go/CHANGES
 The version number and date in this file must be kept in sync with version.go
 -----------------------------------------------------------------------------
 
+v1.9.9
+    2015-06-10
+        * changes reflecting API changst elsewhere                  SLOC 3971
 v1.9.8
     2015-06-06
-        * changed API for NextNBLine                                SLOC 3972
+        * changed signature for NextNBLine                          SLOC 3972
 v1.9.7
     2015-06-01
         * add scripts to daemonize xlReg on the server              SLOC 3941

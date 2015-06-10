@@ -8,7 +8,6 @@ import (
 	"fmt"
 	xc "github.com/jddixon/xlCrypto_go"
 	xi "github.com/jddixon/xlNodeID_go"
-	xn "github.com/jddixon/xlNode_go"
 	xt "github.com/jddixon/xlTransport_go"
 	xu "github.com/jddixon/xlUtil_go"
 	"strings"
@@ -63,12 +62,12 @@ func ParseRegCred(s string) (rc *RegCred, err error) {
 		version xu.DecimalVersion
 	)
 	ss := strings.Split(s, "\n")
-	line, err = xn.NextNBLine(&ss)
+	line, err = xc.NextNBLine(&ss)
 	if (err == nil) && (line != "regCred {") {
 		err = IllFormedRegCred
 	}
 	if err == nil {
-		line, err = xn.NextNBLine(&ss)
+		line, err = xc.NextNBLine(&ss)
 		if err == nil {
 			parts = strings.Split(line, ": ")
 			if len(parts) == 2 && parts[0] == "Name" {
@@ -80,7 +79,7 @@ func ParseRegCred(s string) (rc *RegCred, err error) {
 	}
 	if err == nil {
 		var id []byte
-		line, err = xn.NextNBLine(&ss)
+		line, err = xc.NextNBLine(&ss)
 		if err == nil {
 			parts = strings.Split(line, ": ")
 			if len(parts) == 2 && parts[0] == "ID" {
@@ -94,7 +93,7 @@ func ParseRegCred(s string) (rc *RegCred, err error) {
 		}
 	}
 	if err == nil {
-		line, err = xn.NextNBLine(&ss)
+		line, err = xc.NextNBLine(&ss)
 		if err == nil {
 			parts = strings.Split(line, ": ")
 			if len(parts) == 2 && parts[0] == "CommsPubKey" {
@@ -105,7 +104,7 @@ func ParseRegCred(s string) (rc *RegCred, err error) {
 		}
 	}
 	if err == nil {
-		line, err = xn.NextNBLine(&ss)
+		line, err = xc.NextNBLine(&ss)
 		if err == nil {
 			parts = strings.Split(line, ": ")
 			if len(parts) == 2 && parts[0] == "SigPubKey" {
@@ -116,7 +115,7 @@ func ParseRegCred(s string) (rc *RegCred, err error) {
 		}
 	}
 	if err == nil {
-		line, err = xn.NextNBLine(&ss)
+		line, err = xc.NextNBLine(&ss)
 		if err == nil {
 			// collect EndPoints section; this should be turned into a
 			// utility function
@@ -126,7 +125,7 @@ func ParseRegCred(s string) (rc *RegCred, err error) {
 					if line == "}" {
 						break
 					}
-					line, err = xn.NextNBLine(&ss)
+					line, err = xc.NextNBLine(&ss)
 					if err == nil {
 						line = strings.TrimSpace(line)
 						parts := strings.Split(line, ": ")
@@ -142,7 +141,7 @@ func ParseRegCred(s string) (rc *RegCred, err error) {
 					}
 				}
 				if err == nil {
-					line, err = xn.NextNBLine(&ss)
+					line, err = xc.NextNBLine(&ss)
 					if (err == nil) && (line != "}") {
 						err = MissingClosingBrace
 					}
@@ -153,7 +152,7 @@ func ParseRegCred(s string) (rc *RegCred, err error) {
 		}
 	}
 	if err == nil {
-		line, err = xn.NextNBLine(&ss)
+		line, err = xc.NextNBLine(&ss)
 		if err == nil {
 			parts = strings.Split(line, ": ")
 			if len(parts) == 2 && parts[0] == "Version" {

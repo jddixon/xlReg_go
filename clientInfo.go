@@ -161,7 +161,7 @@ func (mi *ClientInfo) String() string {
 func collectClientAttrs(mi *ClientInfo, ss []string) (rest []string, err error) {
 	rest = ss
 	var line string
-	line, err = xn.NextNBLine(&rest) // trims
+	line, err = xc.NextNBLine(&rest) // trims
 	if err == nil {
 		// attrs line looks like "attrs: 0xHHHH..." where H is a hex digit
 		if strings.HasPrefix(line, "attrs: 0x") {
@@ -190,7 +190,7 @@ func collectClientAttrs(mi *ClientInfo, ss []string) (rest []string, err error) 
 func collectMyEnds(mi *ClientInfo, ss []string) (rest []string, err error) {
 	rest = ss
 	var line string
-	line, err = xn.NextNBLine(&rest)
+	line, err = xc.NextNBLine(&rest)
 	if err == nil {
 		if line == "endPoints {" {
 			for {
@@ -198,14 +198,14 @@ func collectMyEnds(mi *ClientInfo, ss []string) (rest []string, err error) {
 				if line == "}" {
 					break
 				}
-				line, err = xn.NextNBLine(&rest)
+				line, err = xc.NextNBLine(&rest)
 				if err == nil {
 					// XXX NO CHECK THAT THIS IS A VALID ENDPOINT
 					mi.MyEnds = append(mi.MyEnds, line)
 				}
 			}
 			if err == nil {
-				line, err = xn.NextNBLine(&rest)
+				line, err = xc.NextNBLine(&rest)
 				if err == nil {
 					if line != "}" {
 						err = MissingClosingBrace
@@ -238,7 +238,7 @@ func ParseClientInfoFromStrings(ss []string) (
 		if err == nil {
 			var line string
 			// expect and consume a closing brace
-			line, err = xn.NextNBLine(&rest)
+			line, err = xc.NextNBLine(&rest)
 			if err == nil {
 				if line != "}" {
 					err = MissingClosingBrace
