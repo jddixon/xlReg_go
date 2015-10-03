@@ -1,5 +1,9 @@
 xlReg_go/TODO
 
+2015-10-02
+    * get rid of "error = <nil>" messages in test runs
+    * URGENT: need v1.9.10 on public xlReg servers
+
 2015-06-01
     * consider conforming to:
       http://refspecs.linuxbase.org/LSB_4.1.0/LSB-Core-generic/LSB-Core-generic/iniscrptact.html
