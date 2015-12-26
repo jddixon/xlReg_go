@@ -1,5 +1,8 @@
 xlReg_go/TODO
 
+2015-11-26
+    * missing links from README.md/index.md to ghpDoc/*md
+
 2015-10-02
     * get rid of "error = <nil>" messages in test runs
     * URGENT: need v1.9.10 on public xlReg servers
