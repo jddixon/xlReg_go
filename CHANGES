@@ -3,6 +3,12 @@ xlReg_go/CHANGES
 The version number and date in this file must be kept in sync with version.go
 -----------------------------------------------------------------------------
 
+v1.9.13
+    2016-01-14
+        * drop use of code.google.com                               SLOC 3995
+v1.9.12
+    2015-12-25
+        * fix dead link
 v1.9.11
     2015-11-26
         * dropped duplicate *.md ; minor edits to all *.md          SLOC 3995
@@ -144,4 +150,6 @@ v0.5.1
 v0.5.0
     2014-05-14
         * split from xlattice_go/reg                                SLOC  
+
+
 

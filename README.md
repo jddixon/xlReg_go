@@ -45,4 +45,4 @@ use since May 2014, when it was split off from the xlattice_go project.
 ## On-line Documentation
 
 More information on the **xlReg_go** project can be found
-[here](://jddixon.github.io/xlReg_go)
+[here](https://jddixon.github.io/xlReg_go)
