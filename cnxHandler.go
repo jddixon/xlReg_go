@@ -3,8 +3,8 @@ package reg
 // xlReg_go/cnxHandler.go
 
 import (
-	"code.google.com/p/goprotobuf/proto"
 	"fmt"
+	"github.com/golang/protobuf/proto"
 	xr "github.com/jddixon/rnglib_go"
 	xa "github.com/jddixon/xlProtocol_go/aes_cnx"
 	xt "github.com/jddixon/xlTransport_go"
