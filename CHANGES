@@ -3,6 +3,9 @@ xlReg_go/CHANGES
 The version number and date in this file must be kept in sync with version.go
 -----------------------------------------------------------------------------
 
+v1.9.14
+    2016-01-20
+        * protocol, protobuf pages linked to {README,index}
 v1.9.13
     2016-01-14
         * drop use of code.google.com                               SLOC 3995
@@ -150,6 +153,7 @@ v0.5.1
 v0.5.0
     2014-05-14
         * split from xlattice_go/reg                                SLOC  
+
 
 
 
