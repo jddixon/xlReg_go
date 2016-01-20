@@ -37,6 +37,16 @@ which means that each has
   listens at all times
 * and optionally a local file system
 
+## Protocols
+
+Cluster members communicate using a common
+[protocol](https://jddixon.github.io/xlReg_go/xlReg_protocol.html)
+based on Google's
+[Protocol Buffers](https://jddixon.github.io/xlReg_go/xlReg_protobuf.html),
+a widely-used standard.  The same protocol is used for communication with
+the xlReg registry and for communications with other cluster members.
+Communications sessions use AES keys that are unique to the session.
+
 ## Project Status
 
 The Go version of the xlReg server has been stable and in production

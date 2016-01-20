@@ -348,7 +348,7 @@ func (mm *MemberMaker) MemberAndOK() (err error) {
 			digSig, err = rsa.SignPKCS1v15(rand.Reader, skPriv,
 				crypto.SHA1, hash)
 			// DEBUF
-			fmt.Printf("    MM: digSig added; error = %v\n", err)
+			//fmt.Printf("    MM: digSig added; error = %v\n", err)
 			// END
 		}
 	}
@@ -372,7 +372,7 @@ func (mm *MemberMaker) MemberAndOK() (err error) {
 		// SHOULD CHECK FOR TIMEOUT
 		err = mm.writeMsg(request)
 		// DEBUF
-		fmt.Printf("    MM: Member msg written; error = %v\n", err)
+		//fmt.Printf("    MM: Member msg written; error = %v\n", err)
 		// END
 	}
 	// Process CLIENT_OK --------------------------------------------
@@ -387,7 +387,7 @@ func (mm *MemberMaker) MemberAndOK() (err error) {
 		mm.Attrs = response.GetMemberAttrs()
 	}
 	// DEBUF
-	fmt.Printf("    MM: response received; error = %v\n", err)
+	//fmt.Printf("    MM: response received; error = %v\n", err)
 	// END
 	return
 }
