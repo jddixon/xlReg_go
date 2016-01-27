@@ -1,3 +1,12 @@
-pySloc -v \
-    bash:countem bash:make.template \
-    bash:scripts/rc.local bash:scripts/start.xlreg
+cd ~/dev/go/src/github.com/jddixon/xlReg_go
+
+rm -rf tmp/*
+
+gofmt -w .
+
+pySloc -v -X "\.dat$|^testData$|^tmp$"    $@        \
+    bash:countem bash:make.template                 \
+    bash:scripts/rc.local bash:scripts/start.xlreg  \
+    Makefile                                        \
+
+
