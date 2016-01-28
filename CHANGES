@@ -3,6 +3,9 @@ xlReg_go/CHANGES
 The version number and date in this file must be kept in sync with version.go
 -----------------------------------------------------------------------------
 
+v1.9.16
+    2016-01-28
+        * minor edits                                               SLOC 4048
 v1.9.15
     2016-01-27
         * minor edits                                               SLOC 4048
@@ -156,6 +159,7 @@ v0.5.1
 v0.5.0
     2014-05-14
         * split from xlattice_go/reg                                SLOC  
+
 
 
 
