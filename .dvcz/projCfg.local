@@ -1,0 +1,24 @@
+# xlReg_go/.dvcz/projCfg.local
+
+dir:clr:tmp
+
+code:local:Makefile
+
+# should be wrapped
+bash:local:make.template
+
+# should be wrapped, need inspection
+bash:local:scripts/rc.local
+bash:local:scripts/start.xlreg
+
+txt:local:scripts/README.daemonize
+#
+code:local:p.proto
+code:local:portlandRegCred.dat
+code:local:stockton.regCred.dat
+code:local:testDataTestTemplate
+code:local:xlreg_error_const.dat
+code:local:xlreg_error_names.dat
+code:local:xlreg_error_names.dat
+code:local:xlreg_error_str.dat
+code:local:xlreg_errors.dat
