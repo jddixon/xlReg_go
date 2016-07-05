@@ -1,7 +1,9 @@
 xlReg_go/TODO
 
-2016-01-22
-    * 
+2016-06-02
+    * need a standard script to run xlReg detached, at least
+        nohup xlReg &> /dev/null &
+
 2015-11-26
     * missing links from README.md/index.md to ghpDoc/*md               * FIXED
 

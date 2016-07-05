@@ -4,6 +4,7 @@ if [ ! -z "${DEV_BASE// }" ]
 then
   cd $DEV_BASE/go/src/github.com/jddixon/xlReg_go
   
+  gofmt -w .
   
 else
   echo "DEV_BASE is not defined"
