@@ -1,0 +1,144 @@
+-----BEGIN RSA PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoM2sBgX0ChP2JriXkOxS
+e2FjHYVzBGkNvgf0vIAa7FFYZi2pWmxBAVXgl3tTiB3quqqud/MbKqdejM6gkKBK
+v8f7hlcBQLD6BLIZ/RRfhIElc+WlDVfKSnBTB4va5qTQAgvuq5i8+oMj7G8WEy5d
+7cYucWyUJMtHvT4pCDtBWeeqQ62tByWjv34Ud/+A9Mjf0leiWxM3tiToVsqIKb4s
+zPjEShF9rvcNa9XEy1dKpcDz9Szbm2SlxOgM83fDDGtOq4SSCSqndtxrOvXXPB57
+H1mJV/FmerbXRPm5ERJVNIxtLk7Gr2Ce45FVlWyJGMhpfVlKkkk+bRQ02OFfazJI
+GQIDAQAB
+-----END RSA PUBLIC KEY-----
+xlReg_go v1.9.19
+2016-07-05 20:41:58
+# START CONTENT #
+xlReg_go
+ .copyright 803f3e50518123ef8a08d34f2238e89b62d0c9a2
+ .dvcz
+  builds facdbaf245ac945fdd32c20cc78632c75fb6620d
+  lastBuildList 6b11d5a93d66d262fca30a0c6c0ba1830ad28846
+  projCfg 7721301e81d5864fdcef6afb82b14ce2e3155776
+  projCfg.local 9f3da4067829d73022d54ef5bd1d83da162ec157
+  version a51dd1c6d1ace9722f0b3fd4af7d278000d10f62
+ .gitignore ec0f9002629753cd248c6a672ef3de695c30f4b7
+ CHANGES 148e767ae278b101b17cc0aa19b37c9c981f83dd
+ LICENSE.md d1cecfadc47b23486f6bc8a863cfdde348c3eb46
+ Makefile fcc185345c550c522ab23c6b12e6d62f29cff67b
+ README.errors 3d1199baebbc1154625f7ebf52ca333a6595972c
+ README.md 6fd54e28dab543909624efe7f57ca7170c54c705
+ TODO 6758d305da694133e60083043282cdfb63d49939
+ admin_client.go 2e0de44d967c8d1de224bebca1c5bcbafa35b481
+ bkp2U 9f1265227b95fc52a8597248e7bde503351f1c80
+ bootstrap.go ef03b43e9f35c57cc33eab096a6f95416ca41267
+ clientInfo.go 8675d715739ded7bac46427ebc518c67b3a2a039
+ clientInfo_test.go d08d273dc0c18e4b13afa3480d5af71ab80c241a
+ cmd
+  xlReg
+   TODO 9c278a74c86ae0c99115c34bc062804d6cfbd92b
+   myApp
+    xlReg
+     idFilter.dat 870bc81fda383f670224d71cf13ba640ce8fe2a0
+     log 06c0de15ca978eca8ab9679cc975efa1465cc41e
+     regCred.dat b05c72bcc40b19611c17ed4abff53326c0daf2f6
+   xlReg.go 6c4ee6412f6f2e6bc56242b40dcbf36c48456ed3
+ cnxHandler.go 04d1b34a290593d48322ffcc2774cf442630fdb9
+ cnxHandler_test.go c238933470c704820db47de31ea5c03e0db3810e
+ const.go 5990a7995ec551949638e6bedb45b2f6203f4618
+ countem 190bbe39ca379c1110e6eda1332805c4fc334a62
+ eph_server.go d9734078686b542870d75968fccfd7ee39a2f950
+ eph_server_test.go dcc7c6e1f07f9d94a5296aa7ee8062d4e789104d
+ ghpDoc
+  TODO 95c580b8c1cfd7a7d875c7483e1e95e88941ea7a
+  css
+   LICENSE.html5-boilerplate.md ded771b3245b190da0e81c76de5a80d41392c0a6
+   ghp.css 1d6ebe8a6cf8f61f4645a793cb087dfae2420f33
+   main.css 018ed80b8a6e6607bc7c08595fa5a7fa56853885
+   normalize.css cba40c7ce3d558d00ff79d7505ac3d348015ec9c
+  img
+   GitHub-Mark-32px.png fabe53eb72f9b6d3d47cd95aff31ffc45c2fdbf8
+   chunk.jpg de2b27e41f1547fc14b13399f5906b4303b49657
+   chunk2.jpg d0593d312dbb8ea837c17b28cb639726e29ea93b
+   cluster-with-clients.jpg c167d04c0c6b5736ef9fe4cdc3fcce1956fdea78
+   simple-cluster.jpg 6b223ddd25937c1ef75ef328f36fc3436f10bd62
+   xl-registration.jpg 15cbf951f9db173a45428b32dcec87aca83bbdf0
+   xlattice-2014.jpg f185aaad06db71acd9454f31054c62c56d36f37f
+  index.md cb0182d21d8cfefa2e284f4022def60136260a54
+  xlReg.md 9ea2a6e1180aee790faa9f9e66a85cce6520784c
+  xlReg_protobuf.md 6220a2a2809eea3a0fd3f5deac555f54b01378ff
+  xlReg_protocol.md 09bf059cdf4a54f83a42be44b14bea65d7178caf
+ gocheck_test.go 1a3f1b6e890dc9237afe0ddf181ee1dc00f9c121
+ in_handler.go b7dd6b596d734e1ee3476e4bc050cfa26fe514ce
+ in_handler_test.go 00704b307b26ebdeded78cc0484440fc043b2779
+ installit 3a8c19479ae6271188e91fa06ab1d5689d26764c
+ lfs
+ make.template 31a4fe1bcde9b0762b0abcd9d7a95db3baa51c9c
+ memberNode.go 28458408a6c50f327b648c2ae30856fe3f27e103
+ member_info.go 816bc8bdd6bf8efde72b63619ea193a3326061cd
+ member_info_test.go c4e41d5a30185e5c27af795f8381239dccd90503
+ mmap_test.go 4d5488b84b7d474476ead15d408eb34eb6cd36c9
+ msg_handlers.go 46db43fcb43abe6623239cb00a5bd563057722a7
+ p.pb.go 407dcf49757cf7e04036e456ea5a74cca32050ba
+ p.proto 840dc096896698878d81eb07ad6a913506b30ec4
+ portlandRegCred.dat 47c2bdaac46b81aa427905e4800d85920013b0b2
+ portlandRegCred_test.go becaf4d927e4e8dcc4302b84fc1e7999a5e493a3
+ reg_cluster.go 7c9927b19fbbd0dd40c4cabaa88b4077658efc43
+ reg_cluster_test.go 14606f330d9ae49e92305a6b1df36e4bfa07f193
+ reg_cred.go 135782ba7ebba963bc14c4c8166c8689be3a09c5
+ reg_cred_test.go ca10ca095d651bd004245d9bf376cd10f9888860
+ reg_node.go 3eccd3fa611d1a5e271b05cee6514bc0eb78ca22
+ reg_node_test.go d9a6af1c2368855ff97ef4c4c4d059fe6857cdb6
+ reg_options.go cb6d465c821e36453d53e3bbc3879ea0a5ba0042
+ reg_server.go f1a06fd7aef57d653bf95022dfcf99a71605f4b3
+ registrant.go 979234bfd9a29fec03218518b8f899ded8937d5e
+ registry.go ad1fc7ecad849d0c58703485eddf1e81e90cd092
+ registry_test.go 2a73038637ab375c8090a5e020300c88cc793350
+ scripts
+  README.daemonize 59f6459448dba909eb318cfcb19a3a07a7025cca
+  rc.local c156041b32aedd11ae301270bf4c22314e07d908
+  start.xlreg e60079c5741725aee452de8c914b8207ca205508
+ solo_client.go e408e19a5f96b97987bf394f02437b9d61b31701
+ solo_client_test.go 6d441e63d7c1c4095b8bf911205ddadcd0fbdffb
+ stockton.regCred.dat 5ceba4ce39a1c647d66603f2eee245e7bbe24348
+ styleit b407773bd986a0aa6a4606ef4388e47e4cda896d
+ test.all 01be3b2e7445404135af0b23d262a41fc6b4bdd2
+ testData
+  helloAndReply
+   hello-data c484c296f5032060b57aada531f389deffe111ae
+   hello-encrypted 2f1cb5190c4ae4326fea2c081a97f3f33a0ae23a
+   iv1 09128feba9ed0131c7945ff5f6b688101979da0e
+   iv2 410790ed969b74548998d79515a9e1d8a9df48ec
+   key-rsa 55ffef17fae671e104ae4be8b41ca32a77b8b655
+   key-rsa.pem 5a159b56812fc7c20d407276a6b30d0924258e1c
+   key-rsa.pub d48cd7981fe12ce8903577685c38646e843b0984
+   key1 99e0a5f332df9621ab9ccb2acc2f975331dedde3
+   key2 5bceca3b8cbe065fe2a8a50081ec65229fda4221
+   padding d0ffbbfd3ab11eed1896774cccb5bc9b2885fcb4
+   reply-data 9aed17607a459e3ac88ce852e4cf5f31bc43a59b
+   reply-encrypted 764a28457eb3f624e34da3a88d07867c0abb19b8
+   salt1 29d2ee5ffd39b15f44e571b406964ab32a9b3cf6
+   salt2 9a42d74af39d89863284f89ce38f76748e99fd16
+   version1 12dada1fff4d4787ade3333147202c3b443e376f
+   version1.str 09c35807ba47a82592ef88e5d6304ea699b8cbe2
+   version2 85d9651d9a399a67e015d047fd9e6a941e6b20bb
+   version2.str 62fb9f454b831106ca8dd9af69cce1e2663e7647
+  regCred
+   ck-rsa.pub 219c3e7398f182eff238839ae761531ae17f3120
+   endPoints 4344330beb252450dfef50e5212ddd5c03c26ecb
+   id 56f6f243391009e2df5196ba31a4b91a885d28bc
+   name.str 7fe6e4dfb01718cb00408b87e5944671fbdaccbd
+   regCred.dat 9223f27e0af2756a4a45458faecd46b2f1944e7d
+   sk-rsa.pub 4c4cbf30429095361b33916c3f32314c9ec92527
+   version.str 34bd011bbebff5fb833fca323a37297cb6cd06c9
+ testDataTestTemplate 8407450724e103cc445e817e2eb80186f62cc565
+ testData_test.go 35dc7a5fd5b5fff27f7db32d8d14f50b14a22c49
+ user_client.go 69e1e7420bc18cd543e822430023bc50e0776927
+ version.go 67fbaeb9a56daecc565b688033152ae0566d3ea7
+ xlreg_const_test.go 397bffd616cf9bc2ecbbb0cc92280783c4e14092
+ xlreg_error_const.dat eb0e2b35f0b98bc98a43e1e17d6b210b2b6436f6
+ xlreg_error_const.go 44b674a2caafa31e29a8fe928b44ccc2a577c24d
+ xlreg_error_names.dat 70d920cd924dea5056e051a4238945ef9bacbbc2
+ xlreg_error_str.dat a5b6412a13ac9f9d44dc9b083afb19442f1da230
+ xlreg_error_str.go ecd2099abff05405b7262bf26d2594f5d533fc34
+ xlreg_errors.dat 206b42d64840123cd3a75b359f2e01fe26b18bc5
+ xlreg_errors.go 1d471cbb6051c81760d4817e80dd4fdafa897544
+# END CONTENT #
+
+aovdyJGzGQDrS/8oPXzERrFoPrZ1T5YjWmV6hdFbABxAz5BpUE+8eyrjZ5BY2SfLgjy1tJBDkT1WLXnMzCUT67Dn8NLYREUF4bgb+Wj07Zgh3DZq+qJsnMeRDqn0RKTmDpWY6/pWvPTwpxuioj7ewr0dJkuaSyZYtnOOAOF3Ag1sD1rPyRMHOrqRnTn19chcQz1h8RDFRBWahvPVeVyHJMwt5Oet27ILFjpxW973HLih9CXeDhRhm1YvhQVlbDcVa47V1oOC1X4lyVbvQhW4iFzpAVJjtsFeXAtpjTAg75dCp7eAOvZoWdEJ/OXc3ZsmQ2olw3vbNs+2T+elMRXtSg==
