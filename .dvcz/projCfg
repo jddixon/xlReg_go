@@ -2,8 +2,8 @@
 project:xlReg_go
 package:xlReg_go
 mainlang:go
-version:1.9.18
-versionDate:2016-05-20
+version:1.9.19
+versionDate:2016-07-05
 :?dirs?:
 dir:std:ghpDoc
 dir:std:.dvcz
@@ -33,9 +33,8 @@ code:local:xlreg_error_const.dat
 code:local:xlreg_error_names.dat
 code:local:xlreg_error_str.dat
 code:local:xlreg_errors.dat
-txt:std:.copyright
+txt:std:LICENSE-MIT.md
 txt:std:CHANGES
-txt:std:LICENSE.md
 txt:std:README.errors
 txt:std:README.md
 txt:std:TODO

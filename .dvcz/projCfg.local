@@ -1,6 +1,7 @@
 # xlReg_go/.dvcz/projCfg.local
 
 dir:clr:tmp
+txt:std:LICENSE-MIT.md
 
 code:local:Makefile
 

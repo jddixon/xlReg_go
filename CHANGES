@@ -3,6 +3,9 @@ xlReg_go/CHANGES
 The version number and date in this file must be kept in sync with version.go
 -----------------------------------------------------------------------------
 
+v1.9.20
+    2016-09-21
+        * standardize licensing                                     SLOC 5025
 v1.9.19
     2016-07-05
         * add ghpDoc/{css,img}                                      SLOC 4993
@@ -168,6 +171,7 @@ v0.5.1
 v0.5.0
     2014-05-14
         * split from xlattice_go/reg                                SLOC  
+
 
 
 
