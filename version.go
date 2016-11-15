@@ -1,6 +1,6 @@
 package reg
 
 const (
-	VERSION      = "1.9.20"
-	VERSION_DATE = "2016-09-21"
+	VERSION      = "1.9.21"
+	VERSION_DATE = "2016-11-15"
 )

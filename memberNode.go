@@ -255,6 +255,7 @@ func (mm *MemberMaker) SessionSetup(proposedVersion uint32) (
 	fmt.Printf("        SessionSetup: ctor is %s\n", ctor.String())
 	// END
 	var conn xt.ConnectionI
+	//conn, err = ctor.Connect(xt.ANY_TCP_END_POINT) // 2016-11-14
 	conn, err = ctor.Connect(nil)
 	if err == nil {
 		cnx = conn.(*xt.TcpConnection)
@@ -283,6 +284,12 @@ func (mm *MemberMaker) SessionSetup(proposedVersion uint32) (
 			// Process HELLO REPLY ----------------------------------
 			if err == nil {
 				ciphertext2, err = mm.ReadData()
+
+				if len(ciphertext2) == 0 {
+					if err == nil {
+						err = io.EOF
+					}
+				}
 				if err == nil {
 					cSession, decidedVersion,
 						err = xa.ClientDecryptHelloReply(cOneShot, ciphertext2)

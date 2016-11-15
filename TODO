@@ -1,15 +1,20 @@
 xlReg_go/TODO
 
+2016-11-15
+    * modify xlReg server so that if only -a 127.0.0.1 option is
+        specified it does NOT listen on its global interface 
+        - AND regCred.dat has the 127.0.0.1 address 
+
 2016-06-02
-    * need a standard script to run xlReg detached, at least
-        nohup xlReg &> /dev/null &
+    * need a standard script to run xlReg detached, at least            * DONE
+        nohup xlReg &> /dev/null &                                      * DONE
 
 2015-11-26
     * missing links from README.md/index.md to ghpDoc/*md               * FIXED
 
 2015-10-02
     * get rid of "error = <nil>" messages in test runs                  * DONE
-    * URGENT: need v1.9.10 on public xlReg servers
+    * URGENT: need v1.9.10 on public xlReg servers                      * DONE
 
 2015-06-01
     * consider conforming to:
