@@ -18,7 +18,7 @@ These are conventionally delivered as an ASCII file, <code>regCred.dat</code>,
 containing</p>
 
 <ul>
-<li>the registry&rsquo;s name</li>
+<li>the registry&#39;s name</li>
 <li>its ID as a string of hex digits</li>
 <li>its comms RSA public key (<strong>ck</strong>, for encrypting data) in ssh format</li>
 <li>its sig RSA public key (<strong>sk</strong>, for digital signatures) in ssh format</li>
@@ -43,9 +43,9 @@ containing</p>
 </code></pre>
 
 <p>This particular registry was on stockton.dixons.org, a machine in
-Amazon&rsquo;s AWS/EC2 cloud.  It listened on <code>56789</code>, the port conventionally
+Amazon&#39;s AWS/EC2 cloud.  It listened on <code>56789</code>, the port conventionally
 used by the xlReg server.
-<em>(<strong>Note</strong> that the test registry is now at xlreg.xlattice.org:56789.)</em></p>
+<em>(</em><em>Note</em>* that the test registry is now at xlreg.xlattice.org:56789.)*</p>
 
 <p>The <code>Go</code> version of the xlReg client provides functions to read and write
 serialized RegCred files (<code>xlattice_go.reg.ParseRegCred()</code> and
@@ -103,7 +103,7 @@ a pointer to an RSA public key.</p>
 should be generated using a
 secure, crypto-quality random number generator.</p>
 
-<p>The <code>Hello</code> message is encrypted using <strong>the server&rsquo;s</strong> public key, <strong>ck</strong>.
+<p>The <code>Hello</code> message is encrypted using <strong>the server&#39;s</strong> public key, <strong>ck</strong>.
 The message to be encoded must not be longer than the length of modulus
 less twice the hash length plus 2.  As we use SHA1, the hash length is
 20 bytes, so for a 1024-bit = 128 byte RSA key the maximum message length
@@ -121,12 +121,12 @@ well-known address.  Conventionally the xlReg server listens on port 56789.</p>
 <h3>Reply</h3>
 
 <p>The server decrypts the message using its RSA private key - and the
-server&rsquo;s correctly encrypted reply proves to
+server&#39;s correctly encrypted reply proves to
 the client that the server has that private key.  The server examines
 the message on receipt;
 if it is not well-formed the server silently discards it.  Otherwise the
 server encrypts its reply using the AES IV and key from the <code>Hello</code> message.
-The server&rsquo;s reply consists of</p>
+The server&#39;s reply consists of</p>
 
 <ul>
 <li>iv2, the 16-byte IV to be used in further communications</li>
@@ -202,7 +202,7 @@ only the token-based message should be used.</p>
 <ul>
 <li>the client <strong>Name</strong>, whose leading character should be a letter; other
 characters should be alphanumeric</li>
-<li>an unsigned 64-bit <strong>Attrs</strong> field; this is the client&rsquo;s proposed
+<li>an unsigned 64-bit <strong>Attrs</strong> field; this is the client&#39;s proposed
 value (and is ignored in the current implementation)</li>
 <li>a serialized RSA public key, the <strong>CommsKey</strong>, used for encrypting
 (small) messages</li>
@@ -222,7 +222,7 @@ assigned by the server in response to this message.</p>
 <p>The server examines the client message on receipt.  If the message is
 ill-formed, the server simply closes the connection and discards the message.
 Otherwise it determines the value of the <strong>Attrs</strong> field for the client
-(currently it just accepts the client&rsquo;s proposed value and returns it)
+(currently it just accepts the client&#39;s proposed value and returns it)
 and constructs a unique random ID for the client.  This is a
 256-bit / 32-byte <strong>ClientID</strong>.  The AES-encrypted reply to the client
 contains both of these fields.</p>
@@ -250,7 +250,7 @@ with an XLReg Error message rather than a <code>CreateReply</code>.</p>
 <p>The cluster <code>Create</code> message consists of</p>
 
 <ul>
-<li><strong>ClusterName</strong>, which should be an acceptable xlReg name, and so
+<li> <strong>ClusterName</strong>, which should be an acceptable xlReg name, and so
 begin with a letter (<code>[a-zA-Z_]</code>) and otherwise alphanumeric
 (<code>[a-zA-Z_0-9\</code>).</li>
 <li><strong>ClusterAttrs</strong>, an unsigned 64-bit integer, which currently is ignored</li>
@@ -327,7 +327,7 @@ to make this request.</p>
 
 <p>The bit map is a little-endian sequence of 64 bits, with the low-order
 bits in each byte mapping to 0, 1, 2, and so forth.  The server ignores
-any bits that are out of range, so <code>0xffffffff</code> simply means &ldquo;all members&rdquo;.
+any bits that are out of range, so <code>0xffffffff</code> simply means &quot;all members&quot;.
 The client maintains a local bit map identifying those members that it
 has information on.  It will loop until it has information on all members
 or until MAX_GET is exceeded.</p>
@@ -349,8 +349,8 @@ Message heading</li>
 iterates through the bit map and copies each token to the corresponding
 slot in its own members table.</p>
 
-<p>If a cluster member is making this request &ndash; that is, if the client has
-already joined the cluster &ndash; the reply will normally contain a token
+<p>If a cluster member is making this request -- that is, if the client has
+already joined the cluster -- the reply will normally contain a token
 for the requesting client.</p>
 
 <p>The xlReg server does not maintain state regarding which membership
@@ -366,7 +366,7 @@ It contains no further information.</p>
 
 <h3>Ack Message</h3>
 
-<p>The server&rsquo;s reply is a simple <strong>Ack</strong>.  It contains no further
+<p>The server&#39;s reply is a simple <strong>Ack</strong>.  It contains no further
 information.  After sending it, the server closes the connection.  On
 receiving the <code>Ack</code>, the client does the same.</p>
   <div class="f">

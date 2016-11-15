@@ -37,7 +37,7 @@ details.</p>
 
 <p><img src="img/xl-registration.jpg" alt="xl-registration" style="float:right"></p>
 
-<p>The <code>Hello</code> is encrypted using the server&rsquo;s RSA public key.  It contains a
+<p>The <code>Hello</code> is encrypted using the server&#39;s RSA public key.  It contains a
 salt (<code>salt1</code>), a requested version number, and an AES IV and key (<code>keyIV</code>)
 used only to encrypt the reply, the <code>HelloReply</code>.  This iv+key is created by
 the client and used once and once only by the server.</p>
@@ -63,7 +63,7 @@ by the server.</p>
 clientName and a token or a clientID and salt2 from the <code>HelloReply</code>.  In the
 first case the token will contain, among other things, a proposed
 Attrs bit string.  In either case the message is signed using the
-client&rsquo;s public key for signatures.  The server replies with a <code>ClientOK</code>
+client&#39;s public key for signatures.  The server replies with a <code>ClientOK</code>
 message or an error message.  The <code>ClientOK</code> contains a possibly
 uniquified clientName, the actual clientID, and a possibly modified Attrs
 bit string, the value that the server will use from this point forward.</p>
