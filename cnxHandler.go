@@ -8,6 +8,7 @@ import (
 	xr "github.com/jddixon/rnglib_go"
 	xa "github.com/jddixon/xlProtocol_go/aes_cnx"
 	xt "github.com/jddixon/xlTransport_go"
+	"io"
 )
 
 var _ = fmt.Print
@@ -48,7 +49,15 @@ func NewCnxHandler(cnx *xt.TcpConnection, key []byte, rng *xr.PRNG) (
 func (a *CnxHandler) ReadData() (data []byte, err error) {
 	data = make([]byte, MSG_BUF_LEN)
 	count, err := a.Cnx.Read(data)
-	if err == nil && count > 0 {
+	// DEBUG
+	fmt.Sprintf("CnxHandler.ReadData(): count = %d\n", count)
+	if err == nil {
+		fmt.Sprintf("    err = nil\n")
+	} else {
+		fmt.Sprintf("    err = %s\n", err.Error())
+	}
+	// END
+	if (err == nil || err == io.EOF) && count > 0 {
 		data = data[:count]
 	} else {
 		data = nil
