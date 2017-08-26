@@ -37,7 +37,7 @@ func NewRegNode(node *xn.Node, commsKey, sigKey *rsa.PrivateKey) (
 	if node == nil {
 		err = NilNode
 		// We would prefer that the node's name be xlReg and that its
-		// LFS default to /var/app/xlReg.
+		// LFS default to /var/app/xlreg.
 	} else {
 		acc = node.GetAcceptor(0)
 		if acc == nil {

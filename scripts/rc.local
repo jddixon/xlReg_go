@@ -4,12 +4,12 @@
 if [ ! -f /tmp/xlReg ]
 then
     mkdir -p /tmp/xlReg
-    chown ubuntu.ubuntu /tmp/xlReg
+    chown ubuntu.ubuntu /tmp/xlreg
 fi
 /usr/local/sbin/daemonize -a    \
-    -c /var/app/xlReg           \
-	-l /tmp/xlReg/lockFile	    \
-	-p /tmp/xlReg/pidFile	    \
+    -c /var/app/xlreg           \
+	-l /tmp/xlreg/lockFile	    \
+	-p /tmp/xlreg/pidFile	    \
     -u ubuntu                   \
     /home/ubuntu/go/bin/xlReg   \
 	$@
