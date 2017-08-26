@@ -1,24 +1,24 @@
 -----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoM2sBgX0ChP2JriXkOxS
-e2FjHYVzBGkNvgf0vIAa7FFYZi2pWmxBAVXgl3tTiB3quqqud/MbKqdejM6gkKBK
-v8f7hlcBQLD6BLIZ/RRfhIElc+WlDVfKSnBTB4va5qTQAgvuq5i8+oMj7G8WEy5d
-7cYucWyUJMtHvT4pCDtBWeeqQ62tByWjv34Ud/+A9Mjf0leiWxM3tiToVsqIKb4s
-zPjEShF9rvcNa9XEy1dKpcDz9Szbm2SlxOgM83fDDGtOq4SSCSqndtxrOvXXPB57
-H1mJV/FmerbXRPm5ERJVNIxtLk7Gr2Ce45FVlWyJGMhpfVlKkkk+bRQ02OFfazJI
-GQIDAQAB
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAl9xsFHvzEsi3G8q8dUOM
+3v4WLJefw8Kv0hHBGFPFQF1WRPldwPGNdVKql8zcO52KO4hzFNHNSBCGgH8cbtAk
+mLWB78ackABFJzhY9TEbPkLnoMXJHAXQpZK/JAudSixuAZIXYtIyBWfgLaHjurAT
+6+DBgC1oQXNrfT4Fvpe1QbHMejjGb41v/r/8ck/dWDr1YzcRFIbiJPj+sQq+X0Uy
+Giaje1YAJPNVBt3dlOA5lhBp4GpSYBskJ9UR2Zyt3lgAGK3dEwxYETLMh9VWEV8i
+k2lyCIE/V/CDb9eVDYQgYSJYrnQ/JAPST7NbcY8aI+/0l7QVBhLBpmOCvmS6ofvz
+/QIDAQAB
 -----END PUBLIC KEY-----
-xlReg_go v1.9.21
-2016-11-15 20:34:49
+xlReg_go v1.9.22
+2017-08-26 22:20:40
 # BEGIN CONTENT #
 xlReg_go
  .dvcz
-  builds 198067ecee19958952e2d11e6bf4ded70ffa9646
+  builds abd822e26e0bd392d8a0ca2f9be139d72d2abdec
   copyright 803f3e50518123ef8a08d34f2238e89b62d0c9a2
-  lastBuildList f0fb6a7b5e6343c02c89b88a79d9ca3c7e8cbb76
+  lastBuildList 0f653ee67faca023e33d30b42e78d8c6d8235ac7
   license 5977a55c75bb4612004451a56b0b4c22d9d3311d
   projCfg a304d3913882d6a0768471d3c0c7f37394063248
   projCfg.local 4e5c25015d68a21dc218e07f51a795a5156366aa
-  version f1f01eb048b87facb8bb9bcb80a45cd5226f9419
+  version 9ee54f6bbd6ecb4228474b105fd75d412d61a630
  .git
   FETCH_HEAD a361fe556c7f9d029b946bf30ae25a2b5985d52c
   HEAD acbaef275e46a7f14c1ef456fff2c8bbe8c84724
@@ -61,7 +61,7 @@ xlReg_go
      HEAD d9427cda09aba1cdde5c69c2b13c905bddb0bc51
    tags
  .gitignore ec0f9002629753cd248c6a672ef3de695c30f4b7
- CHANGES c9453844bdb8fcba2179b1d3fbf339ca9ef27bb9
+ CHANGES 365f8d0ab81aee94a5344bd6da67c3ff67b990cc
  LICENSE-MIT.md d1cecfadc47b23486f6bc8a863cfdde348c3eb46
  Makefile fcc185345c550c522ab23c6b12e6d62f29cff67b
  README.errors 3d1199baebbc1154625f7ebf52ca333a6595972c
@@ -80,7 +80,7 @@ xlReg_go
      idFilter.dat 870bc81fda383f670224d71cf13ba640ce8fe2a0
      log 06c0de15ca978eca8ab9679cc975efa1465cc41e
      regCred.dat b05c72bcc40b19611c17ed4abff53326c0daf2f6
-   xlReg.go 6c4ee6412f6f2e6bc56242b40dcbf36c48456ed3
+   xlReg.go 0cd528a9801e126bfb7140cb78ad904273b69ca8
  cnxHandler.go 9cf80bd712c48fe53a786cbd4740eecbbb8e6de9
  cnxHandler_test.go c238933470c704820db47de31ea5c03e0db3810e
  const.go 5990a7995ec551949638e6bedb45b2f6203f4618
@@ -126,7 +126,7 @@ xlReg_go
  reg_cluster_test.go 14606f330d9ae49e92305a6b1df36e4bfa07f193
  reg_cred.go 135782ba7ebba963bc14c4c8166c8689be3a09c5
  reg_cred_test.go ca10ca095d651bd004245d9bf376cd10f9888860
- reg_node.go 3eccd3fa611d1a5e271b05cee6514bc0eb78ca22
+ reg_node.go 2cc1a23777ab87317880f6a7022220d9ced0eb59
  reg_node_test.go d9a6af1c2368855ff97ef4c4c4d059fe6857cdb6
  reg_options.go cb6d465c821e36453d53e3bbc3879ea0a5ba0042
  reg_server.go f1a06fd7aef57d653bf95022dfcf99a71605f4b3
@@ -135,8 +135,8 @@ xlReg_go
  registry_test.go 2a73038637ab375c8090a5e020300c88cc793350
  scripts
   README.daemonize 59f6459448dba909eb318cfcb19a3a07a7025cca
-  rc.local c156041b32aedd11ae301270bf4c22314e07d908
-  start.xlreg e60079c5741725aee452de8c914b8207ca205508
+  rc.local 0d8861ff35b182b3395acb2bd55901c90a251100
+  start.xlreg 1472b9c8a958a49a8e93bb5553ed1c45f25ed412
  solo_client.go e408e19a5f96b97987bf394f02437b9d61b31701
  solo_client_test.go 6d441e63d7c1c4095b8bf911205ddadcd0fbdffb
  stockton.regCred.dat 5ceba4ce39a1c647d66603f2eee245e7bbe24348
@@ -173,7 +173,7 @@ xlReg_go
  testDataTestTemplate 8407450724e103cc445e817e2eb80186f62cc565
  testData_test.go 35dc7a5fd5b5fff27f7db32d8d14f50b14a22c49
  user_client.go 69e1e7420bc18cd543e822430023bc50e0776927
- version.go b45334b685937787f0b536c9366048c72076e9dd
+ version.go 9a9af2fa16e12f037de50ac022ab699e17d3b412
  xlreg_const_test.go 397bffd616cf9bc2ecbbb0cc92280783c4e14092
  xlreg_error_const.dat eb0e2b35f0b98bc98a43e1e17d6b210b2b6436f6
  xlreg_error_const.go 44b674a2caafa31e29a8fe928b44ccc2a577c24d
@@ -184,4 +184,4 @@ xlReg_go
  xlreg_errors.go 1d471cbb6051c81760d4817e80dd4fdafa897544
 # END CONTENT #
 
-Chx68C5CIzSFUgaegfirNuQWT7cZqloeW+nydKV44AMIgjwLC4DvlZsYpkA+cI/HXDJrvXN680LFzikD75i/mfGNhh1D1y6UhplxI/583UrwtG3Ia9itIE1b7s3wWjt7bc0tQTa8jvpHlyr0RV2QYRZCx1K3NWu51q58H+MGvamOqp3eGeZwx8XO2uhKFqX6RswLoo2TWfj+0O4z1W4Cb0EyqKzplafCmB7pYWfhWeW80fVz7BlDlhpoF/7a8/UPKrDNAamKwmGQDhrSay0hAXJ3oUE7pnoPqEcGsQBKsJmDuPu/AdhP76Ml48lO/d6AaHrWdRocktwJ3lkfmNRBbg==
+eBpxGLgwj58m4Sffy5luamm/lrbrH71rv68iGcNsz/LvtW8r7unvtPFQKVpRcWJy2yvnZ3lspPD29quSVLp/TSTah+WF/egQMxvKTOinmdrnGPP6Bl5Ss4ckAjilw7F7tUiQyYfw4EXudhNh26xXblev0eAq+i43nsnwi0UusObTxjagllDIZeMRaGWGrReesGKpxSliRw8WA5M8KgVVmRlufFiqCfdyyK6jwvk1C1p/tyVwItYt3V0LfiLTzLCOq/NK3Uodxn9W2oPG/FuIaz6MMdNfHGNdhbeQesOlQtvpk6PEbemW5Tlu2LVL3fUZyK2e4XcsA4zSwaAR79ba7w==

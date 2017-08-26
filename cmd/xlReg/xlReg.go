@@ -28,7 +28,7 @@ const (
 	DEFAULT_ADDR        = "0.0.0.0" // listen on all interfaces
 	DEFAULT_GLOBAL_ADDR = "54.186.197.123"
 	DEFAULT_NAME        = "xlReg"
-	DEFAULT_LFS         = "/var/app/xlReg"
+	DEFAULT_LFS         = "/var/app/xlreg"
 	TEST_DEFAULT_PORT   = 45678 // for the registry, not clients
 	DEFAULT_PORT        = 56789 // for the registry, not clients
 )
@@ -129,8 +129,8 @@ func main() {
 		}
 		err = xf.CheckLFS(*lfs, 0700) // tries to create if it doesn't exist
 		if err == nil {
-			if *logFile != "" {
-				*logFile = path.Join(*lfs, *logFile)
+			if *logFile == "" {
+				*logFile = path.Join(*lfs, "log")
 			}
 		}
 	}

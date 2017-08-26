@@ -4,10 +4,10 @@
 
 echo "This script assumes that xlReg is located at /home/$USER/dev/go/bin/xlReg"
 
-mkdir -p /tmp/xlReg
+mkdir -p /tmp/xlreg
 /usr/local/sbin/daemonize -a    \
-    -c /var/app/xlReg           \
-	-l /tmp/xlReg/lockFile	    \
-	-p /tmp/xlReg/pidFile	    \
+    -c /var/app/xlreg           \
+	-l /tmp/xlreg/lockFile	    \
+	-p /tmp/xlreg/pidFile	    \
     /home/$USER/dev/go/bin/xlReg      \
 	$@
