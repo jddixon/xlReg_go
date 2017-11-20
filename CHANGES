@@ -3,6 +3,9 @@ xlReg_go/CHANGES
 The version number and date in this file must be kept in sync with version.go
 -----------------------------------------------------------------------------
 
+v1.9.24
+    2017-11-20
+        * correct directory structure, config files                 SLOC 5046
 v1.9.23
     2017-10-21
         * add projConfig.toml                                       SLOC 5087
@@ -180,6 +183,7 @@ v0.5.1
 v0.5.0
     2014-05-14
         * split from xlattice_go/reg                                SLOC  
+
 
 
 

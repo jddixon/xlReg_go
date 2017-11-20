@@ -7,20 +7,18 @@ Giaje1YAJPNVBt3dlOA5lhBp4GpSYBskJ9UR2Zyt3lgAGK3dEwxYETLMh9VWEV8i
 k2lyCIE/V/CDb9eVDYQgYSJYrnQ/JAPST7NbcY8aI+/0l7QVBhLBpmOCvmS6ofvz
 /QIDAQAB
 -----END PUBLIC KEY-----
-xlReg_go v1.9.23
-2017-10-21 07:07:02
+xlReg_go
+2017-11-20 19:34:12
 # BEGIN CONTENT #
 xlReg_go
  .dvcz
-  builds 9860adc4cf69e85c33afb9bf2bc7ea9da6046048
-  copyright d468692d6e277c5e0d803a0b22b1f4bf8f5419bd
-  lastBuildList 0705e2bee377b8cc52fde71909489f013f53c28c
-  license 5977a55c75bb4612004451a56b0b4c22d9d3311d
+  builds 7d223e030206f8b7a5ef92bf00de9273304be15e
+  lastBuildList e8667278dce0478013e434eaffe7a9a9bc5b7ea7
   projCfg a304d3913882d6a0768471d3c0c7f37394063248
   projCfg.local 4e5c25015d68a21dc218e07f51a795a5156366aa
-  version 1b912d62a666c78cecd7c10e65c51b1c70be36ac
+  projConfig.toml e6ba34e5558cec5ff3402e169144507ef79e717d
  .gitignore 4ac626e1e9b9dc380fa7b0ab060088b0c4a88215
- CHANGES b6eba45468693afe2bba25b296d16ed18711cdff
+ CHANGES 1e225cdce810f7e1acfade5b21d2fc32b338ba85
  LICENSE-MIT.md d1cecfadc47b23486f6bc8a863cfdde348c3eb46
  Makefile fcc185345c550c522ab23c6b12e6d62f29cff67b
  README.errors 3d1199baebbc1154625f7ebf52ca333a6595972c
@@ -80,7 +78,6 @@ xlReg_go
  p.proto 840dc096896698878d81eb07ad6a913506b30ec4
  portlandRegCred.dat 47c2bdaac46b81aa427905e4800d85920013b0b2
  portlandRegCred_test.go becaf4d927e4e8dcc4302b84fc1e7999a5e493a3
- projConfig.toml 76096cb36c4f42468afadd3f21b857b61d9443ae
  regCred.dat 9c4b701e0274292f47bc48c184c80a6326043c6f
  reg_cluster.go 7c9927b19fbbd0dd40c4cabaa88b4077658efc43
  reg_cluster_test.go 14606f330d9ae49e92305a6b1df36e4bfa07f193
@@ -133,7 +130,7 @@ xlReg_go
  testDataTestTemplate 8407450724e103cc445e817e2eb80186f62cc565
  testData_test.go 35dc7a5fd5b5fff27f7db32d8d14f50b14a22c49
  user_client.go 69e1e7420bc18cd543e822430023bc50e0776927
- version.go 1ab89a0b3e2e41503e292901dcd24f0f4fa4305b
+ version.go f846f1ef43f1f5e3a417e49de19f213064c15a53
  xlreg_const_test.go 397bffd616cf9bc2ecbbb0cc92280783c4e14092
  xlreg_error_const.dat eb0e2b35f0b98bc98a43e1e17d6b210b2b6436f6
  xlreg_error_const.go 44b674a2caafa31e29a8fe928b44ccc2a577c24d
@@ -144,4 +141,4 @@ xlReg_go
  xlreg_errors.go 1d471cbb6051c81760d4817e80dd4fdafa897544
 # END CONTENT #
 
-DEVY3p0jKKoDa/9NeP3TCF+s2RDfKOBlXGx5JrQ1kV88bRXdfaG/QTBQiuEodl0TPNIxxmHd6ZdqI/+g7ux2/giXSYS1KAw9X/qFHRFY6nzK0Saos3lLp08/2+c/6FWU1y3tXa8IM8s+ZcmUKOv4pkS9/DPfKH7FdpBF8VE3Fcnk29CtF0ZcceQWnmSlEkbQGiLKLNU6s1nKALO4xVbAyNgT8rQvtTRbomLgoNAWAKzdYDsiLkWCE7VjEFqd9UvcWgndsU52t4KYHm04A1psZlHIfETnQnM0djlZmUttDdBnOYljlwuTM7dC4mwwVyr3wqlxK62l+stT+z+njv1HTg==
+AHpJELCag93cpMU9MT/w43RqxduhPxOKxPRo3SG6bYZVgOrx8+JqObm44vzw1hvTGR0fZAm5w1OjC1hvS7+aWSEAUY+N1xaT64KGkyCGHrNon5qHx2RfBCDsyaK88+pxenzE7jmy+pmf5Dlz1L/B/D02OQrgWYYiaExCTayuuEUD5GpANtH2GQ3WwXiKbASjxgE7NSgSMEYVMB/+CYoErhnJfoLQH9XA8VGJ/l9gOnZDzd7umqVRdc+/M7sJdtESK2RitIJFU5Jvxl38kpbleiZGGttR5Gn9+VvSHXTxXj0IIBpz9PFuOAVwVOL3aizh5XlR+vJfjMLK4pW9Qj/5sg==
