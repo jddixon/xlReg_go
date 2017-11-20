@@ -7,20 +7,18 @@ Giaje1YAJPNVBt3dlOA5lhBp4GpSYBskJ9UR2Zyt3lgAGK3dEwxYETLMh9VWEV8i
 k2lyCIE/V/CDb9eVDYQgYSJYrnQ/JAPST7NbcY8aI+/0l7QVBhLBpmOCvmS6ofvz
 /QIDAQAB
 -----END PUBLIC KEY-----
-xlReg_go v1.9.22
-2017-08-26 22:20:40
+xlReg_go
+2017-11-20 19:34:12
 # BEGIN CONTENT #
 xlReg_go
  .dvcz
-  builds abd822e26e0bd392d8a0ca2f9be139d72d2abdec
-  copyright 803f3e50518123ef8a08d34f2238e89b62d0c9a2
-  lastBuildList 0f653ee67faca023e33d30b42e78d8c6d8235ac7
-  license 5977a55c75bb4612004451a56b0b4c22d9d3311d
+  builds 7d223e030206f8b7a5ef92bf00de9273304be15e
+  lastBuildList e8667278dce0478013e434eaffe7a9a9bc5b7ea7
   projCfg a304d3913882d6a0768471d3c0c7f37394063248
   projCfg.local 4e5c25015d68a21dc218e07f51a795a5156366aa
-  version 9ee54f6bbd6ecb4228474b105fd75d412d61a630
- .gitignore ec0f9002629753cd248c6a672ef3de695c30f4b7
- CHANGES 365f8d0ab81aee94a5344bd6da67c3ff67b990cc
+  projConfig.toml e6ba34e5558cec5ff3402e169144507ef79e717d
+ .gitignore 4ac626e1e9b9dc380fa7b0ab060088b0c4a88215
+ CHANGES 1e225cdce810f7e1acfade5b21d2fc32b338ba85
  LICENSE-MIT.md d1cecfadc47b23486f6bc8a863cfdde348c3eb46
  Makefile fcc185345c550c522ab23c6b12e6d62f29cff67b
  README.errors 3d1199baebbc1154625f7ebf52ca333a6595972c
@@ -132,7 +130,7 @@ xlReg_go
  testDataTestTemplate 8407450724e103cc445e817e2eb80186f62cc565
  testData_test.go 35dc7a5fd5b5fff27f7db32d8d14f50b14a22c49
  user_client.go 69e1e7420bc18cd543e822430023bc50e0776927
- version.go 9a9af2fa16e12f037de50ac022ab699e17d3b412
+ version.go f846f1ef43f1f5e3a417e49de19f213064c15a53
  xlreg_const_test.go 397bffd616cf9bc2ecbbb0cc92280783c4e14092
  xlreg_error_const.dat eb0e2b35f0b98bc98a43e1e17d6b210b2b6436f6
  xlreg_error_const.go 44b674a2caafa31e29a8fe928b44ccc2a577c24d
@@ -143,4 +141,4 @@ xlReg_go
  xlreg_errors.go 1d471cbb6051c81760d4817e80dd4fdafa897544
 # END CONTENT #
 
-eBpxGLgwj58m4Sffy5luamm/lrbrH71rv68iGcNsz/LvtW8r7unvtPFQKVpRcWJy2yvnZ3lspPD29quSVLp/TSTah+WF/egQMxvKTOinmdrnGPP6Bl5Ss4ckAjilw7F7tUiQyYfw4EXudhNh26xXblev0eAq+i43nsnwi0UusObTxjagllDIZeMRaGWGrReesGKpxSliRw8WA5M8KgVVmRlufFiqCfdyyK6jwvk1C1p/tyVwItYt3V0LfiLTzLCOq/NK3Uodxn9W2oPG/FuIaz6MMdNfHGNdhbeQesOlQtvpk6PEbemW5Tlu2LVL3fUZyK2e4XcsA4zSwaAR79ba7w==
+AHpJELCag93cpMU9MT/w43RqxduhPxOKxPRo3SG6bYZVgOrx8+JqObm44vzw1hvTGR0fZAm5w1OjC1hvS7+aWSEAUY+N1xaT64KGkyCGHrNon5qHx2RfBCDsyaK88+pxenzE7jmy+pmf5Dlz1L/B/D02OQrgWYYiaExCTayuuEUD5GpANtH2GQ3WwXiKbASjxgE7NSgSMEYVMB/+CYoErhnJfoLQH9XA8VGJ/l9gOnZDzd7umqVRdc+/M7sJdtESK2RitIJFU5Jvxl38kpbleiZGGttR5Gn9+VvSHXTxXj0IIBpz9PFuOAVwVOL3aizh5XlR+vJfjMLK4pW9Qj/5sg==
